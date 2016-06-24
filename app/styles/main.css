@@ -1,0 +1,182 @@
+@import url(https://fonts.googleapis.com/css?family=David+Libre:400,700);
+
+* {
+  box-sizing: border-box;
+}
+html,body{
+	padding: 0;
+	min-width: 480px;
+	height:100%;
+}
+
+body{
+	font-family: 'David Libre', serif;
+}
+.content, .content>.ng-scope{
+	height: 100%;
+}
+.fullwidth{
+	width:100%;
+}
+.header{
+	margin-bottom: -20px;
+}
+.navbar{
+
+}
+.navbar-immo{
+
+}
+
+.navbar-immo .active{
+
+}
+
+.navbar-immo li>a:hover{
+
+}
+
+
+
+.banner p{
+	font-size: 20px;
+	text-align: center;
+
+}
+.banner{
+	position: relative;
+}
+.button-expose{
+	font-size: 24px;
+  padding: 0;
+}
+.button-expose a{
+  display: block;
+  margin:0;
+  padding: 10px 20px;
+  width:100%;
+  height:100%;
+  text-decoration: none;
+}
+.banner-header .button-action-margin{
+	top: 25%;
+	left: 25%;
+	position: absolute;
+}
+.banner-gallery img{
+	max-height:200px;
+	margin-bottom: 20px;
+}
+.banner-gallery .item{
+	text-align: center;
+
+}
+.banner-first .button-action-margin{
+	margin: 140px 50px;
+}
+
+.tool-info, .tool-banner .tab-content{
+  box-shadow: 0 0 4px #222;
+  border-radius: 5px;
+}
+
+.banner-first{
+	background-image: url('/images/signature.jpg');
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	/*height: 0;
+	width: 100%;
+	padding-top: 30%;	*/
+}
+
+.textblock .container{
+	padding: 80px 50px;
+	font-size: 20px;
+	text-align: left;
+}
+.text-wrapper p{
+	padding: 20px 0;
+}
+.textblock p,.textblock-image{
+	margin: 0 20px;
+}
+.textblock-image{
+	margin-top: 40px;
+	border-radius: 5px;
+	box-shadow: 0 0 4px black;
+
+}
+.textblock-title{
+	text-align: center;
+	margin:50px 0;
+
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+.tool-banner{
+  background-image: url('/images/living_3.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
+  height: 100%;
+  width: 100%;
+}
+.tool-banner>.container>.row>div{
+  margin-top: 10%;
+}
+.tool-info{
+  font-weight: 700;
+
+  padding: 10px;
+  line-height: 50px;
+}
+
+.tool-info h2{
+  font-size:36px;
+}
+.tool-info p{
+  font-size:30px;
+}
+.login-wrapper{
+
+}
+.getstarted-wrapper form{
+  padding: 10px;
+}
+.getstarted-wrapper form label{
+  display: block;
+  padding: 10px 20px;
+  color: #fff;
+}
+.getstarted-wrapper form input{
+  padding: 10px;
+  color: #000;
+}
+
+.getstarted-wrapper form span{
+  display: inline-block;
+}
+
+.getstarted-wrapper form .glyphicon{
+  display: inline-block;
+  margin-right: 10px;
+}
+.getstarted-wrapper .row-eq-height [class*="col-"]{
+
+}
+.btn-login{
+
+  padding: 10px 20px;
+}
+.login-wrapper .btn-login{
+  margin-top: 50%;
+}
+.getstarted-wrapper .help-block{
+  margin-bottom:0;
+}

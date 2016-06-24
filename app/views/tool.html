@@ -1,0 +1,45 @@
+<div class="sidebar col-xs-12 col-sm-3 col-lg-2">
+  <ul>
+    <li>
+      <a ui-sref=".dashboard">
+        <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span>
+        <span class="nav-text">Dashboard</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+        <span class="nav-text">Exposé erstellen</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+        <span class="nav-text">Exposé suchen</span>
+      </a>
+    </li>
+    <li>
+      <a ui-sref=".user">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+        <span class="nav-text">Profil</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <span class="glyphicon glyphicon-cloud" aria-hidden="true"></span>
+        <span class="nav-text">Team</span>
+      </a>
+    </li>
+    <li class="logout">
+      <a href="#">
+        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+        <span class="nav-text">Logout</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="area col-xs-12 col-sm-9 col-lg-10">
+  <ui-view></ui-view>
+</div>
+<link rel="stylesheet" href="styles/tool.css">
+<link rel="stylesheet" href="styles/tool_colortheme.css">

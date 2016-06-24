@@ -1,0 +1,121 @@
+/*
+grau : #eee
+
+blau dunkel: #05668d
+blau hell: #427aa1
+
+gr�n hell: #a5be00
+gr�n dunkel: #679436
+
+*/
+.textblock a{
+	color: #a5be00;
+}
+.textblock a:hover{
+	color: #679436;
+}
+.fullwidth{
+
+}
+.navbar{
+	border-bottom-color: #fff;
+}
+.navbar-immo{
+	background-color: #eee;
+	color: #05668d;
+}
+
+.navbar-immo .active{
+	background-color: #fff;
+	color: #eee;
+	font-weight: 700;
+}
+
+.navbar-immo li>a:hover, .navbar-immo li>a:focus{
+	background-color: #05668d;
+	color: #eee;
+}
+.banner-first p{
+	background: hsla(0,0%,40%,0.5);
+}
+.banner p{
+	font-weight: 700;
+	color: #fff;
+
+}
+.button-expose{
+	background-color: #a5be00;
+	border-color: #fff;
+	opacity: 0.9;
+}
+.button-expose a{
+  color: #fff;
+}
+.button-expose:hover{
+	color: white;
+	background-color: #679436;
+	opacity: 1;
+}
+.banner{
+
+}
+
+
+
+.textblock .container{
+
+}
+.textblock-first{
+	background-color: #eee;
+}
+.textblock-first p{
+	color: #05668d;
+}
+.carousel-caption{
+	background: hsla(0,0%,40%,0.5)
+}
+
+.textblock-title{
+	border-bottom: 1px solid #679436;
+
+}
+.tool-info {
+  color: #fff;
+  background: hsla(0,0%,0%,0.6);
+}
+.tool-info h2 span{
+  color: #679436;
+}
+.tool-banner .nav li a,.tool-banner .tab-content{
+  background: hsla(0,0%,0%,0.6);
+}
+.tool-banner .nav li a{
+  border: 1px solid #fff;
+
+}
+
+.tool-banner .nav li.active a,
+.tool-banner .nav li a:focus,
+.tool-banner .nav li a:hover{
+  background: #679436;
+  font-weight: 700;
+}
+
+.tool-banner .nav a,.tool-banner .nav li.active a{
+  color: white;
+}
+.btn-login{
+  background: #a5be00;
+  color: #111;
+}
+
+.btn-login:hover,.btn-login:focus{
+  background: #679436;
+  color: white;
+}
+.getstarted-wrapper {
+  color: #fff;
+}
+.getstarted-wrapper .help-block{
+  color: white;
+}
