@@ -7,9 +7,11 @@
  * # MainCtrl
  * Controller of the zimmoApp
  */
+
 angular.module('zimmoApp')
-  .controller('MainCtrl', function () {
+  .controller('MainCtrl',["$http", function ($http) {
     var vm = this;
+
 
     this.loginObj = {
       tab: 1,
@@ -28,11 +30,37 @@ angular.module('zimmoApp')
       error : false
     };
 
-    this.doLogin = function(event){
+    this.doLogin = function(){
       //$event.preventDefault();
-      console.log('jo');
-      console.log(event);
-      console.log(vm);
+        var credentials = {"action":"login","username":"horst"};
+        var loc = window.location.pathname;
+        console.log(loc);
+        $http({
+            //url: 'scripts/php/ajaxCtrl.php',
+            url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+            method: "POST",
+            data: JSON.stringify(credentials),
+            withCredentials: true
+
+        })
+        .then(function(response) {
+            console.log(response.data);
+            //$http.defaults.headers.common["X-AUTH-TOKEN"] = response.data.token;
+        });
+
+
     };
 
-  });
+      this.doRegister = function(){
+          //$event.preventDefault();
+
+          var credentials = {"action":"check"};
+          $http.post("http://127.0.0.1/Zimmo/app/scripts/php/ajaxCtrl.php", credentials).then(function(response) {
+              console.log(response.data);
+              //$http.defaults.headers.common["X-AUTH-TOKEN"] = response.data.token;
+          });
+
+
+      };
+
+  }]);

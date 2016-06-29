@@ -81,7 +81,7 @@ body{
 }
 
 .banner-first{
-	background-image: url('/images/signature.jpg');
+	background-image: url('../images/signature.jpg');
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: cover;
@@ -119,7 +119,7 @@ body{
   display:         flex;
 }
 .tool-banner{
-  background-image: url('/images/living_3.jpg');
+  background-image: url('../images/living_3.jpg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
