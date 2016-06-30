@@ -9,9 +9,9 @@
  */
 
 angular.module('zimmoApp')
-  .controller('MainCtrl',["$http", function ($http) {
+  .controller('MainCtrl',["$http","$state", function ($http,$state) {
     var vm = this;
-
+    this.dataLoading = false;
 
     this.loginObj = {
       tab: 1,
@@ -23,18 +23,20 @@ angular.module('zimmoApp')
     };
 
     this.regObj = {
-      username : '',
-      mailaddress: '',
-      password: '',
-      agb : false,
-      error : false
+        formdata : {
+            prename : '',
+            lastname : '',
+            mailaddress: '',
+            password: '',
+            agb : false,
+
+        },
+        error : false
     };
 
     this.doLogin = function(){
       //$event.preventDefault();
-        var credentials = {"action":"login","username":"horst"};
-        var loc = window.location.pathname;
-        console.log(loc);
+        var credentials = {"action":"login","formdata":vm.loginObj.formdata};
         $http({
             //url: 'scripts/php/ajaxCtrl.php',
             url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
@@ -45,6 +47,16 @@ angular.module('zimmoApp')
         })
         .then(function(response) {
             console.log(response.data);
+            try{
+                var resObj = response.data;
+                console.log($state)
+                console.log(resObj.code)
+                if(resObj.code===1){
+                    $state.go('tool');
+                }
+            }catch(e){
+                console.log(e);
+            }
             //$http.defaults.headers.common["X-AUTH-TOKEN"] = response.data.token;
         });
 
@@ -53,10 +65,19 @@ angular.module('zimmoApp')
 
       this.doRegister = function(){
           //$event.preventDefault();
+          this.dataLoading = true;
+          var credentials = {"action":"register","formdata":vm.regObj.formdata};
+          $http({
+              //url: 'scripts/php/ajaxCtrl.php',
+              url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+              method: "POST",
+              data: JSON.stringify(credentials),
+              withCredentials: true
 
-          var credentials = {"action":"check"};
-          $http.post("http://127.0.0.1/Zimmo/app/scripts/php/ajaxCtrl.php", credentials).then(function(response) {
-              console.log(response.data);
+          })
+              .then(function(response) {
+                  vm.dataLoading = false;
+                  console.log(response.data);
               //$http.defaults.headers.common["X-AUTH-TOKEN"] = response.data.token;
           });
 

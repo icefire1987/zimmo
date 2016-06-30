@@ -9,7 +9,7 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router'])
+    .module('zimmoApp', ['ui.router','ngMessages'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider) {
         $httpProvider.defaults.withCredentials = true;

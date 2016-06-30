@@ -180,3 +180,11 @@ body{
 .getstarted-wrapper .help-block{
   margin-bottom:0;
 }
+.text-formerror{
+
+    color: #EE5757;
+    padding: 0 2px;
+}
+.errorArea{
+    padding-top: 10px;
+}

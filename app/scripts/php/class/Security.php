@@ -41,7 +41,9 @@ class Security{
             return $url;
         }
     }
-
+    function  userLoggedIn(){
+        return (isset($_SESSION) && isset($_SESSION["login"]) && $_SESSION["login"]===true);
+    }
     function sec_session_start($name, $limit = 0, $path = '/', $domain = null, $secure = null){
         // Set the cookie name
         session_name($name . '_Session');
@@ -160,15 +162,23 @@ class Security{
         if(!isset($array) || !isset($array[$key])){
             return false;
         }
+        $string = trim($array[$key]);
         switch ($typ){
             case 'string':
-                if(!is_string($array[$key])){
+                if(!is_string($string)){
                     return false;
                 }
-                $string = $array[$key];
-                $newValue = filter_var($string, FILTER_SANITIZE_STRING);
+                $newValue = htmlentities($string, ENT_QUOTES, "UTF-8");
+
+                break;
+            case 'mail':
+                $newValue = filter_var($string, FILTER_SANITIZE_EMAIL);
+                if (filter_var($newValue, FILTER_VALIDATE_EMAIL) === false) {
+                    return false;
+                }
                 break;
         }
+
 
         return $newValue;
     }
