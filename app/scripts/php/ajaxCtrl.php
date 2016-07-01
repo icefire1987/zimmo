@@ -5,6 +5,7 @@ class AjaxControl{
         require_once("class/Db.php");
         require_once("class/Security.php");
         require_once("class/LoginModel.php");
+        require_once("class/ExposeModel.php");
 
         $this->Security = new Security("zuumeoImmoApp_Session");
         $this->DB = new myDB();
@@ -31,6 +32,13 @@ class AjaxControl{
                     break;
                 case "register":
                     $this->register();
+                    break;
+                // TOOL
+                case "exposeSearchAll":
+                    $this->exposeSearch();
+                    break;
+                case "logout":
+                    $this->logout();
                     break;
             }
 
@@ -85,6 +93,41 @@ class AjaxControl{
 
     function noroute(){
         echo json_encode(array("type"=>"err","text"=>"Route nicht vorhanden","code"=>10));
+    }
+
+    function exposeSearch($parse=false){
+        if($this->checkLogin()===true){
+            $exposeModel = new ExposeModel($this->DB);
+            $data = [];
+            if($parse!==false) {
+                $data["nummer"] = $this->Security->validateInput('string', $this->input["formdata"], 'nummer');
+                $data["strasse"] = $this->Security->validateInput('string', $this->input["formdata"], 'strasse');
+                $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');               
+
+                if ($data["nummer"] === false) {
+                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: nummer", "code" => 91));
+                    return false;
+                } else if ($data["strasse"] === false) {
+                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: strasse", "code" => 92));
+                    return false;
+                } else if ($data["id"] === false) {
+                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: id", "code" => 93));
+                    return false;
+                } else {
+                    $obj = $exposeModel->getExpose($data);
+                    echo json_encode($obj);
+                }
+            }else{
+                $obj = $exposeModel->getExposeAll();
+                echo json_encode($obj);
+            }
+        }
+    }
+
+    function logout(){
+        session_destroy();
+        session_unset();
+        echo json_encode(array("type" => "success", "text" => "Logout", "code" => 1));
     }
 }
 

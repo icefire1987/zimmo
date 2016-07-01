@@ -42,7 +42,7 @@ class Security{
         }
     }
     function  userLoggedIn(){
-        return (isset($_SESSION) && isset($_SESSION["login"]) && $_SESSION["login"]===true);
+        return (isset($_SESSION) && isset($_SESSION["login_string"]));
     }
     function sec_session_start($name, $limit = 0, $path = '/', $domain = null, $secure = null){
         // Set the cookie name

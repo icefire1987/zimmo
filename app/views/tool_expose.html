@@ -1,0 +1,628 @@
+<div class="container" style="margin-top: 60px;">
+    <div class="row">
+        <div class="col-xs-12">
+            <ol class="breadcrumb" id="breadcrump"></ol>
+        </div>
+    </div>
+    <div id="1" class="row">
+        <div class="col-xs-12">
+            <a id="g1" href="eingabe.html?g=miete"
+               class="btn btn-default btn-lg" role="button">Miete</a> <a id="g2"
+                                                                         href="eingabe.html?g=kauf" class="btn btn-default btn-lg"
+                                                                         role="button">Kauf</a>
+        </div>
+    </div>
+    <div id="2" class="row">
+        <div class="col-xs-12">
+            <a id="grund" href="&o=grund" class="btn btn-default btn-lg"
+               role="button">Grundstück</a> <a id="o2" href="&o=haus"
+                                               class="btn btn-default btn-lg" role="button">Haus</a> <a id="o3"
+                                                                                                        href="&o=wohnung" class="btn btn-default btn-lg" role="button">Wohnung</a>
+        </div>
+    </div>
+    <div id="feedbackError"></div>
+    <div id="3" class="row">
+        <form method="POST" class="form-group" id="myForm"
+              onsubmit="return false;" action="req/input.php">
+            <input type="hidden" name="hiddenObjectID" id="hiddenObjectID">
+            <input type="hidden" name="geschaeftsart" id="inputGeschaeftsart">
+            <input type="hidden" name="objekttyp" id="inputObjekttyp"> <input
+                type="hidden" name="mapID" id="mapID">
+
+            <div class="col-xs-12 col-md-12" id="accordion">
+                <h3>Adressangaben eingeben <span id="badge_adress" class="badge"></span></h3>
+                <div class="accordionContainer">
+                    <div class="row">
+                        <label class="control-label col-xs-6 col-md-offset-2 col-md-4">
+                            <span>ID-Nummer</span>
+                            <input type="text" id="go" name="go" placeholder="" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-4">
+                            <span>Exposé-Titel</span>
+                            <input type="text" name="exposetitel" id="exposetitel" placeholder="" class="form-control">
+                        </label>
+                    </div>
+                    <div class="row" id="address">
+                        <label class="control-label col-xs-8 col-md-6 col-md-offset-2">
+                            <span>Strasse</span>
+                            <input type="text" name="strasse" id="strasse" placeholder="" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-4 col-md-2">
+                            <span>Hausnr </span>
+                            <input type="text" name="hausnummer" id="hausnummer" placeholder="" class="form-control">
+                        </label>
+
+                        <label class="control-label col-xs-4 col-md-2 col-md-offset-2">
+                            <span>PLZ</span>
+                            <input type="text" name="plz" id="plz" placeholder="" class="form-control" pattern="[0-9]{4,5}">
+                        </label>
+                        <label class="control-label col-xs-8 col-md-6">
+                            <span>Ort</span>
+                            <input type="text" name="ort" id="ort" placeholder="" class="form-control">
+                        </label>
+
+                        <label class="control-label col-xs-6 col-md-4 col-md-offset-2">
+                            <span>Bezirk</span>
+                            <input type="text" name="bezirk" placeholder="" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-4">
+                            <span>Land</span>
+                            <select name="land" id="land" class="form-control col-xs-12">
+                                <option value=""></option>
+                                <option value="1" selected>Deutschland</option>
+                                <option value="2">Österreich</option>
+                                <option value="3">Schweiz</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="col-xs-4 col-md-2 col-md-offset-2"><span class="btn btn-danger btn"
+                                                                               style="white-space: normal;" id="getMap"> Lageplan
+										erstellen</span>
+                        </label>
+                        <label class="col-xs-4 col-md-2" style="display: none;" id="parent_saveMap">
+                            <span class="btn btn-default" style="white-space: normal;" id="saveMap"> Karte speichern</span>
+                            <span class="text-success" style="display: none" id="saveMap_return">gespeichert &#10004;</span>
+                        </label>
+
+                        <div class="checkbox_custom col-xs-6 col-md-3">
+                            <label class="">
+                                <input type="checkbox" name="showMap" checked="checked" id="showMap">
+                                <span>Im Exposé anzeigen</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
+                            <div id="map_element" style="display: block;">
+                                <img id="staticLageplan" style="width: 100%; display: none;">
+                            </div>
+                            <div id="mapErr"></div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- End Container -->
+
+                <h3>Stammdaten eingeben <span id="badge_stamm" class="badge"></span></h3>
+                <div class="accordionContainer">
+                    <div class="row" id="inputKaufpreis">
+                        <label class="control-label col-xs-6">
+                            <span>Kaufpreis</span>
+                            <input type="text" name="kaufpreis" id="kp" placeholder="in €" class="form-control money">
+                        </label>
+                        <label class="control-label col-xs-6">
+                            <span>Wohngeld</span>
+                            <input type="text" name="nebenkosten" id="wg" placeholder="in €" class="form-control money">
+                        </label>
+                    </div>
+                    <div class="row" id="inputKaltmiete">
+                        <label class="control-label col-xs-6 col-sm-4">
+                            <span>Kaltmiete</span>
+                            <input type="text" name="kaltmiete" id="km" placeholder="in €" class="form-control money" onchange="$('#pm').val('')">
+                        </label>
+                        <label class="control-label col-xs-6 col-sm-4">
+                            <span>Nebenkosten</span>
+                            <input type="text" name="nebenkosten" id="nk" placeholder="in €" class="form-control money">
+                        </label>
+                        <label class="control-label col-xs-6  col-sm-4" id="inputPauschalmiete">
+                            <span>Pauschalmiete</span>
+                            <input type="text" name="pauschalmiete" id="pm" placeholder="in €" class="form-control money" onchange="$('#km').val('');$('#nk').val('')">
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Provision netto</span>
+                            <input type="text" name="provision" placeholder="" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Einheit Prov.</span>
+                            <select name="provisionEinheit" id="provisionEinheit"class="form-control">
+                                <option value="eur">Euro</option>
+                                <option value="nkm">NKM</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row" id="inputKaution">
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Kaution netto</span>
+                            <input type="text" name="kaution" id="kaution" placeholder="" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>>Einheit Kaut.</span>
+                            <select name="kautionEinheit" id="kautionEinheit" class="form-control">
+                                <option value="eur">Euro</option>
+                                <option value="nkm">NKM</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="col-xs-12">Stellplätze</label>
+                        <label class="control-label col-xs-5 col-sm-3">
+                            <span>Anzahl</span>
+                            <select name="stellplatz" class="form-control">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">>9</option>
+                            </select>
+                        </label>
+                        <label class="control-label col-xs-7 col-sm-3">
+                            <span>Kosten/ Stellplatz</span>
+                            <input type="text" name="stellplatzkosten" placeholder="in €" class="form-control money">
+                        </label>
+
+                        <label class="control-label col-xs-6 col-sm-3">
+                            <span>Stellplatzart</span><br>
+                            <input type="radio" name="stellplatztyp[]" value="Tiefgaragenstellplatz"> TGSPL
+                        </label>
+                        <label class="control-label col-xs-6 col-sm-3"><br>
+                            <input type="radio" name="stellplatztyp[]" value="Stellplatz">
+                            <span>STPL</span>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="control-label col-xs-6" id="inputStockwerk">
+                            <span>Stockwerk der Wohnung</span>
+                            <select name="stockwerk" class="form-control">
+                                <option value="0"></option>
+                                <option value="Gartengeschoss">Gartengeschoss</option>
+                                <option value="Erdgeschoss">EG</option>
+                                <option value="Hochparterre">Hochparterre</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value=">9">>9</option>
+                            </select>
+                        </label>
+                        <label class="control-label col-xs-6" id="inputHaustyp">
+                            <span>Haustyp</span>
+                            <select name="haustyp" id="haustyp" class="form-control">
+                                <option value=""></option>
+                                <option value="EFH">EFH</option>
+                                <option value="DHH">DHH</option>
+                                <option value="Reihenhaus">Reihenhaus</option>
+                                <option value="ERH">ERH</option>
+                                <option value="Bungalow">Bungalow</option>
+                                <option value="Townhaus">Townhaus</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="row checkbox_custom">
+                        <label class="col-xs-12">Besonderheit</label>
+                        <label class=" col-xs-6 col-md-2">
+                            <input type="checkbox" name="besonderheit[]" value="DG"><span>DG</span>
+                        </label>
+                        <label class=" col-xs-6 col-md-2">
+                            <input type="checkbox" name="besonderheit[]" value="Maisonette"><span>Maisonette</span>
+                        </label> <label class=" col-xs-6 col-md-2">
+                        <input type="checkbox" name="besonderheit[]" value="Penthouse"><span>Penthouse</span>
+                    </label>
+                    </div>
+                    <div class="row">
+                        <label class="control-label col-xs-12 col-sm-6">
+                            <span>Lieferung</span>
+                            <input type="text" name="lieferung" placeholder="kein Eingabe = freie Lieferung" class="form-control">
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="control-label col-xs-6 col-sm-3">
+                            <span>Baujahr</span>
+                            <input type="text" name="baujahr" id="baujahr" placeholder="Jahreszahl" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-sm-3" id="inputRenovierung">
+                            <span>Renovierung</span>
+                            <input type="text" name="renovierung" placeholder="" class="form-control">
+                        </label>
+
+                        <div class="col-xs-12 col-sm-3 checkbox_custom">
+                            <div class="row">
+                                <label class="control-label col-xs-6" id=""> <br>
+                                    <input class="form-control" type="checkbox" name="sanierung" value="saniert"><span>Objekt Saniert</span>
+                                </label> <label class="control-label col-xs-6" id="inputMoebliert">
+                                <br> <input type="checkbox" name="moebliert" value="möbliert" class="form-control"><span>möbliert</span>
+                            </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label class="control-label col-xs-6 col-md-3" id="inputWohnflaeche">
+                            <span>Wohnfläche</span>
+                            <input type="text" name="wohnflaeche" id="wohnflaeche" placeholder="in m²" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3" id="inputGrundstueckflaeche">
+                            <span>Grundstückfläche</span>
+                            <input type="text" name="grundstueckflaeche" placeholder="in m²" class="form-control">
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Zimmer</span>
+                            <select name="zimmer" id="zimmer" class="form-control">
+                                <option value="0"></option>
+                                <option value="1.0">1</option>
+                                <option value="1.5">1,5</option>
+                                <option value="2.0">2</option>
+                                <option value="2.5">2,5</option>
+                                <option value="3.0">3</option>
+                                <option value="3.5">3,5</option>
+                                <option value="4.0">4</option>
+                                <option value="4.5">4,5</option>
+                                <option value="5.0">5</option>
+                                <option value="5.5">5,5</option>
+                                <option value="6.0">6</option>
+                                <option value="6.5">6,5</option>
+                                <option value="7.0">7</option>
+                                <option value="7.5">7,5</option>
+                                <option value="8.0">8</option>
+                                <option value="8.5">8,5</option>
+                                <option value="9.0">9</option>
+                                <option value="9.5">9,5</option>
+                                <option value="10.0">>9</option>
+                            </select>
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Balkon</span>
+                            <select name="balkon" class="form-control col-xs-12">
+                                <option value="0"></option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">>9</option>
+                            </select>
+                        </label>
+                        <label class="control-label col-xs-6 col-md-3">
+                            <span>Terrasse</span>
+                            <select name="terrasse" class="form-control">
+                                <option value="0"></option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">>9</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <!-- End Container -->
+                <h3>Angebotdetails eingeben</h3>
+                <div class="accordionContainer">
+                    <div class="row">
+                        <label class="control-label col-xs-12 col-sm-4">Energieverbrauchskenn.
+                            <input type="text" name="energiewert" placeholder="in kWh/m²*a"
+                                   class="form-control">
+                        </label> <label class="control-label col-xs-5 col-sm-4">Ausweisart <select
+                            class="form-control" name="energieausweisTyp">
+                        <option value="Bedarfsausweis">Bedarfsausweis</option>
+                        <option value="Verbrauchsausweis">Verbrauchsausweis</option>
+                    </select>
+                    </label>
+                        <div class="checkbox_custom col-xs-7 col-sm-4">
+                            <br> <label class="control-label" id="inputDenkmalschutz">
+                            <input type="checkbox" name="denkmalschutz" value=""
+                                   class="form-control"><span>Denkmalschutz</span>
+                        </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="control-label col-xs-6">Heizung <select
+                                name="heizung" class="form-control">
+                            <option value=""></option>
+                            <option value="Fernwärme">Fernwärme</option>
+                            <option value="Gaszentral">Gaszentral</option>
+                            <option value="Gasetage">Gasetage</option>
+                            <option value="Ölzentral">Ölzentral</option>
+                            <option value="Palletheizung">Palletheizung</option>
+                            <option value="Erdwärme">Erdwärme</option>
+                            <option value="Blockheizkraftwerk">Blockheizkraftwerk</option>
+                        </select>
+
+                        </label> <label class="col-xs-6"><input type="text"
+                                                                id="heizungFreitext" name="heizungFreitext"
+                                                                placeholder="Heizung Freitext" class="form-control hidden"></label>
+                    </div>
+                    <div class="row">
+
+
+
+                        <label class="control-label col-xs-6">Schlafzimmer Anzahl
+                            <select name="schlafzimmer" class="form-control">
+                                <option value="1.0">1</option>
+                                <option value="1.5">1,5</option>
+                                <option value="2.0">2</option>
+                                <option value="2.5">2,5</option>
+                                <option value="3.0">3</option>
+                                <option value="3.5">3,5</option>
+                                <option value="4.0">4</option>
+                                <option value="4.5">4,5</option>
+                                <option value="5.0">5</option>
+                                <option value="5.5">5,5</option>
+                                <option value="6.0">6</option>
+                                <option value="6.5">6,5</option>
+                                <option value="7.0">7</option>
+                                <option value="7.5">7,5</option>
+                                <option value="8.0">8</option>
+                                <option value="8.5">8,5</option>
+                                <option value="9.0">9</option>
+                                <option value="9.5">9,5</option>
+                                <option value="10.0">>9</option>
+                            </select>
+                        </label>
+
+                        <label class="control-label col-xs-6">Deckenhöhe<input
+                                type="text" name="decke" placeholder="in m" class="form-control"></label>
+
+                    </div>
+                    <div class="row checkbox_custom">
+                        <label class="control-label col-xs-12">Innenausstattung</label> <label
+                            class="col-xs-6 col-md-3"><input type="checkbox"
+                                                             name="innenausstattung[]" value="Hauswirtschaftsraum"><span>HWR</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Klimaanlage"><span>Klimaanlage</span></label>
+
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Aufzug"><span>Aufzug</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Wände gespachtelt"><span>Wände
+									gespachtelt</span></label> <label class="col-xs-6 col-md-3"><input
+                            type="checkbox" name="innenausstattung[]" value="Keller"><span>Keller</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Doppelkastenfenster"><span>Doppelkasten-Fenster</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Stuck"><span>Stuck</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Barrierefrei"><span>Barrierefrei</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Kamin"><span>Kamin</span></label>
+                        <label class="col-xs-6 col-md-3"><input type="checkbox"
+                                                                name="innenausstattung[]" value="Flügeltüren"><span>Flügeltüren</span></label>
+                        <div class="control-label col-xs-6 col-md-3">
+                            <input type="text" id="innenausstattungFreitext"
+                                   name="innenausstattung[]" placeholder="Freitext"
+                                   class="form-control">
+                        </div>
+                    </div>
+                    <div class="row checkbox_custom">
+                        <label class="col-xs-12 control-label">Bodenbelag</label>
+                        <label class=" col-xs-6 col-md-3">
+                            <input type="checkbox" name="boden[]" value="Echtholzparkett"><span>Echtholz-Parkett</span>
+                        </label>
+
+                        <label class=" col-xs-6 col-md-3">
+                            <input type="checkbox" name="boden[]" value="hochwertiges Parkett"><span>hochwertiges Parkett</span>
+                        </label>
+                        <label class=" col-xs-6 col-md-3">
+                            <input type="checkbox" name="boden[]" value="Fussbodenheizung"><span>Fussboden-heizung</span>
+                        </label>
+                        <label class=" col-xs-6 col-md-3">
+                            <input type="checkbox" name="boden[]" value="Dielen"><span>Dielen</span>
+                        </label>
+                    </div>
+                    <div class="row">
+                        <label class="col-xs-12 control-label">Küche</label>
+                        <label class="control-label col-xs-12">
+                            <select name="kueche" id="kueche" class="form-control">
+                                <option value="0">ohne EBK</option>
+                                <option value="1">mit EBK</option>
+                            </select>
+                        </label>
+                        <div id="kuecheDetails" class="col-xs-12" style="display: none;">
+
+                            <div class="row checkbox_custom">
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="offene Küche"><span>offene Küche</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="Wohnküche"><span>Wohnküche</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="hochwertig"><span>hochwertig</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="modern"><span>modern</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="klassisch"><span>klassisch</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="Marken-EBK"><span>Marken-EBK</span></label>
+                                <label class="col-xs-6 col-sm-4"><input type="checkbox" name="kuecheausstattung[]" value="allen technischen Geräten ausgestattet"><span>allen technischen Geräten ausgestattet</span></label>
+                                <div class="col-xs-6 col-sm-4">
+                                    <input type="text" id="kuecheausstattungFreitext" name="kuecheausstattung[]" placeholder="Freitext" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-xs-12 control-label">Badezimmer</label>
+                        <div class=" col-xs-12">
+                            <table class="table" id="tableBadAusstattung">
+                                <tr>
+                                    <th>Eigenschaft</th>
+                                    <th><select name="badtyp[]" id="badtyp0"
+                                                onchange="tablerowAddCheckboxes('tableBadAusstattung',this,2)">
+                                        <option value=""></option>
+                                        <option value="Vollbad">Vollbad</option>
+                                        <option value="Duschbad">Duschbad</option>
+                                        <option value="Wannenbad">Wannenbad</option>
+                                        <option value="Gäste-WC">Gäste-WC</option>
+                                    </select></th>
+                                </tr>
+                                <tr>
+                                    <td>en Suite</td>
+                                </tr>
+                                <tr>
+                                    <td>modernes</td>
+                                </tr>
+                                <tr>
+                                    <td>hochwertiges</td>
+                                </tr>
+                                <tr>
+                                    <td>Regendusche</td>
+                                </tr>
+                                <tr>
+                                    <td>freistehender Badewanne</td>
+                                </tr>
+                                <tr>
+                                    <td>tagesbelichtetes</td>
+                                </tr>
+                                <tr>
+                                    <td>Fussbodenheizung</td>
+                                </tr>
+                                <tr>
+                                    <td>bodentiefe Dusche</td>
+                                </tr>
+                                <tr>
+                                    <td>Doppelwaschtisch</td>
+                                </tr>
+                                <tr>
+                                    <td>Bidet</td>
+                                </tr>
+                                <tr>
+                                    <td>Feinstein</td>
+                                </tr>
+                                <tr>
+                                    <td>Naturstein</td>
+                                </tr>
+                                <tr>
+                                    <td>Fliesen</td>
+                                </tr>
+                                <tr>
+                                    <td>Freitext</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Container -->
+                <h3>Bilder</h3>
+                <div class="accordionContainer">
+                    <div class="row" id="objectFrontImageWrapper">
+                        <h4>Titelbild</h4>
+                        <div class="col-xs-6">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <input id="bildFrontFile" name="bildFrontFile[]" type="file"
+                                           accept="image/*" style="display: none; cursor: pointer;"
+                                           onchange="addFrontImageToList('bildFrontFile')">
+                                    <div id="addFrontImageArea"
+                                         class="btn btn-danger"
+                                         style="cursor: pointer">neues Titelbild</div>
+
+                                </div>
+                                <div class="col-xs-6">
+                                    <input id="bildFrontFileSub" name="bildFrontFileSub"
+                                           type="hidden">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="frontImageWrapper" class="col-xs-12">
+                                    <img id="imagePreview1" class="img-thumbnail">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="row"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4>Objektbilder</h4>
+                        <div class="col-xs-12 col-md-8" id="objectImagesWrapper">
+
+                            <div id="fileContainer">
+                                <!--  <div id="addImageArea" class="btn btn-danger" onclick="clickInput(this)" ontouchstart="clickInput(this)" style="cursor:pointer">
+                                    neues Bild hinzufügen
+
+                                </div>
+                                <input id="bildFile_dummy" name="bildFile_dummy" type="file" accept="image/*" style="display:none;cursor:pointer;" onchange="addImageToList(this.id)" multiple>
+                                -->
+                                <div id="addImageArea" class="btn btn-danger"
+                                     style="cursor: pointer">
+                                    neues Bild hinzufügen</div>
+                            </div>
+                            <ol class="sortable nested_with_switch vertical" id="imageList">
+                            </ol>
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-md-6">
+                            <div class="row">
+                                <h4>Grundriss</h4>
+
+                                <div class="col-xs-12" id="formGrundriss">
+                                    <button type="button" onclick="createGrundrissUI('grWrapper')"
+                                            class="btn btn-danger">Grundriss hinzufügen</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <div class="row">
+                                <h4>Energieausweis</h4>
+
+
+
+                                <div class="col-xs-12">
+                                    <div class="row">
+                                        <input id="energieFile" name="energie[]" type="file"
+                                               accept="image/*" multiple
+                                               style="display: none; cursor: pointer;"
+                                               onchange="previewImage(this,'energieWrapper','y')">
+
+                                        <div id="addEnergie" class="btn btn-danger"
+                                             style="cursor: pointer">Energieausweis hinzufügen</div>
+                                    </div>
+                                    <div class="row">
+                                        <div id="energieWrapper" class=""></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Container -->
+            </div>
+            <!--  End Accordion -->
+
+
+
+            <div class="col-xs-12" style="margin-top: 10px;">
+                <input type="submit" class="btn btn-success" id="submitButton">
+            </div>
+        </form>
+    </div>
+</div>

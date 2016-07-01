@@ -22,6 +22,9 @@
 .sidebar ul li .glyphicon{
   padding-right:15px;
 }
-
+.area{
+  height:100%;
+  overflow: scroll;
+}
 
 
