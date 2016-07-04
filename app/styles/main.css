@@ -18,7 +18,7 @@ body{
 .fullwidth{
 	width:100%;
 }
-.header{
+body>.header{
 	margin-bottom: -20px;
 }
 .navbar{

@@ -8,29 +8,46 @@
     <div class="row">
         <div class="col-xs-12">
             <form class="form-inline" role="form" method="POST" id="myForm">
-                <div class="form-group"><label class="control-label col-xs-2"><input type="text" name="go"
-                                                                                     placeholder="GO! Nummer"
-                                                                                     class="form-control"></label></div>
-                <div class="form-group"><label class="control-label col-xs-3"><input type="text" name="strasse"
-                                                                                     placeholder="Strasse"
-                                                                                     class="form-control"></label></div>
-                <div class="form-group"><label class="control-label col-xs-2"><input type="text" name="id"
-                                                                                     placeholder="interne ID"
-                                                                                     class="form-control"></label></div>
+                <div class="form-group">
+                    <label class="control-label col-xs-2">
+                     <input id="es_go" type="text" name="es_go" placeholder="Expose-Nummer" class="form-control"
+                            ng-model="c_tool.searchObj.formdata.nummer" ng-model-options="{ debounce: 50 }">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-2">
+                        <input id="es_strasse" type="text" name="es_strasse" placeholder="Strasse" class="form-control"
+                               ng-model="c_tool.searchObj.formdata.strasse" ng-model-options="{ debounce: 50 }">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-xs-2">
+                        <input id="es_id" type="text" name="es_id" placeholder="Datenbank-ID" class="form-control"
+                               ng-model="c_tool.searchObj.formdata.id" ng-model-options="{ debounce: 50 }">
+                    </label>
+                </div>
 
-                <button class=" btn btn-primary " name="showFilterObjects" type="submit" ng-click="c_tool.exposeSearcOne()">suchen</button>
-                <button class=" btn btn-danger" name="showAllObjects" type="submit" ng-click="c_tool.exposeSearchAll()">alle anzeigen</button>
+
+                <button class=" btn btn-primary " name="showFilterObjects" type="submit" ng-click="c_tool.exposeSearch(true)">suchen</button>
+                <button class=" btn btn-danger" name="showAllObjects" type="submit" ng-click="c_tool.exposeSearch()">alle anzeigen</button>
             </form>
 
 
-            <table id="searchResult" class="tablesorter">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <div id="noSearchResult"></div>
 
+
+        </div>
+    </div>
+    <div class="row" ng-show="c_tool.resultAll_tableParams">
+        <div class="col-xs-12">
+            <h3>Ergebnis</h3>
+        </div>
+
+        <div class="col-xs-12">
+            <table ng-table-dynamic="c_tool.resultAll_tableParams with c_tool.cols" class="table table-condensed table-bordered table-striped">
+                <tr ng-repeat="row in $data">
+                    <td ng-repeat="col in $columns">{{row[col.field]}}</td>
+                </tr>
+            </table>
         </div>
     </div>
 

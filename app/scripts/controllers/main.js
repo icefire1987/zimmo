@@ -50,7 +50,7 @@ angular.module('zimmoApp')
             try{
                 var resObj = response.data;
                 if(resObj.code===1) {
-                    AuthService.userObj = {isAuthenticated:true}
+                    AuthService.userObj = {isAuthenticated:true};
                     // LOGIN erfolgreich
                     if ($rootScope.returnToState){
                         $state.go($rootScope.returnToState);

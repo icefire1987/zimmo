@@ -8,41 +8,62 @@
  * Controller of the zimmoApp
  */
 angular.module('zimmoApp')
-    .controller('ToolCtrl',['$http','$state','AuthService', function ($http,$state,AuthService) {
+    .controller('ToolCtrl',['$http','$state','AuthService','NgTableParams',  function ($http,$state,AuthService,NgTableParams) {
+        // on local:
+        var scriptbase = 'http://localhost/Zimmo/app/';
+        // on webserver:
+        //var scriptbase = '';
         var vm = this;
-        this.dataSearch = {
-            nummer: false,
-            strasse: false,
-            id: false
-        }
-        this.exposeSearchAll = function () {
+
+        this.searchObj = {
+            formdata: {
+                nummer: '',
+                strasse: '',
+                id: ''
+            }
+        };
+        this.exposeSearch = function (searchdata) {
             var credentials = {
                 action: 'exposeSearchAll',
                 formdata: false
+            };
+            if(searchdata===true){
+                credentials = {
+                    action: 'exposeSearchOne',
+                    formdata: vm.searchObj.formdata
+                };
+                console.log(credentials)
             }
+           
             $http({
-                //url: 'scripts/php/ajaxCtrl.php',
-                url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+                url: scriptbase+'scripts/php/ajaxCtrl.php',
                 method: 'POST',
                 data: JSON.stringify(credentials),
                 withCredentials: true
 
             })
             .then(function(response) {
-
+                var resultset = JSON.parse(response.data.txt);
+                vm.cols = [
+                    {field: "id", title: "ID", sortable: "id", show: true},
+                    {field: "go", title: "Nummer", sortable: "go", show: true},
+                    {field: "strasse", title: "Strasse", sortable: "strasse", show: true},
+                    {field: "plz", title: "PLZ", sortable: "plz", show: true},
+                    {field: "ort", title: "Ort", sortable: "ort", show: true},
+                    {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
+                    {field: "oa", title: "Objektart", sortable: "oa", show: true}
+                ];
+                vm.resultAll_tableParams = new NgTableParams({}, { dataset: resultset});
             })
-        }
-        this.exposeSearchOne = function () {
-
-        }
+            ;
+        };
 
         this.logout = function(){
             var credentials = {
                 action: 'logout'
-            }
+            };
             $http({
-                //url: 'scripts/php/ajaxCtrl.php',
-                url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+                url: scriptbase+'scripts/php/ajaxCtrl.php',
                 method: 'POST',
                 data: JSON.stringify(credentials),
                 withCredentials: true
@@ -53,8 +74,8 @@ angular.module('zimmoApp')
                 AuthService.userObj = undefined;
                 $state.go("exit");
             })
-
-        }
+            ;
+        };
     }])
     .run(
         function () {

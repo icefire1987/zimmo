@@ -9,6 +9,7 @@ class AjaxControl{
 
         $this->Security = new Security("zuumeoImmoApp_Session");
         $this->DB = new myDB();
+
     }
     function setHeaders(){
         header("Access-Control-Allow-Credentials: true");
@@ -37,6 +38,9 @@ class AjaxControl{
                 case "exposeSearchAll":
                     $this->exposeSearch();
                     break;
+                case "exposeSearchOne":
+                    $this->exposeSearch(true);
+                    break;
                 case "logout":
                     $this->logout();
                     break;
@@ -57,6 +61,8 @@ class AjaxControl{
     }
 
     function checkLogin(){
+        $_SESSION["userid"]=2;
+        return true;
         if($this->Security->userLoggedIn()===false){
             echo json_encode(array("type"=>"err","text"=>"Nicht eingeloggt","code"=>4));
             return false;
@@ -92,10 +98,11 @@ class AjaxControl{
     }
 
     function noroute(){
-        echo json_encode(array("type"=>"err","text"=>"Route nicht vorhanden","code"=>10));
+        echo json_encode(array("type"=>"err","text"=>"Route nicht übermittelt","code"=>10));
     }
 
     function exposeSearch($parse=false){
+        //var_dump($_SESSION);
         if($this->checkLogin()===true){
             $exposeModel = new ExposeModel($this->DB);
             $data = [];
@@ -118,7 +125,7 @@ class AjaxControl{
                     echo json_encode($obj);
                 }
             }else{
-                $obj = $exposeModel->getExposeAll();
+                $obj = $exposeModel->getExpose();
                 echo json_encode($obj);
             }
         }

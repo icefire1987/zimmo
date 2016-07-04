@@ -53,12 +53,11 @@ class LoginModel{
                         $user_browser = $_SERVER['HTTP_USER_AGENT'];
                         // XSS protection as we might print this value
                         $user_id = preg_replace("/[^0-9]+/", "", $user_id);
-                        $_SESSION['user_id'] = $user_id;
+                        $_SESSION['userid'] = $user_id;
                         // XSS protection as we might print this value
                         $username = preg_replace("/[^a-zA-Z0-9_\-]+/",
                             "",
                             $user_email);
-                        $_SESSION['username'] = $username;
                         $_SESSION['login_string'] = hash('sha512',
                             $db_password . $user_browser);
                         // Login successful.

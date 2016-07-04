@@ -9,7 +9,7 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router','ngMessages'])
+    .module('zimmoApp', ['ui.router','ngMessages','ngTable'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,AuthService) {
         $httpProvider.defaults.withCredentials = true;
@@ -105,9 +105,9 @@ angular
         this.userObj = undefined;
 
         this.checkAuthenticated = function(){
-            //return true;
+            return true;
             return self.userObj !== undefined && self.userObj.isAuthenticated;
-        }
+        };
 
     })
 

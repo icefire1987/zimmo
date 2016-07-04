@@ -13,18 +13,107 @@ class ExposeModel{
     function __construct($dbCLassObj){
         $this->db = $dbCLassObj;
     }
-    function getExposeAll(){
-        $prep_stmt = "SELECT id FROM objects ";
-        $stmt =  $this->db->mysqli->prepare($prep_stmt);
+    function getExpose($search=false){
+        $user = $_SESSION["userid"];
+        if($search!==false){
+            // Such-Parameter übergeben
+
+            $addWhere="";
+            // 1. fester Parameter: userid
+            $bindParamTyp[] = 'i';
+            $bindParam[]=$user;
+
+            foreach($search as $key=>$value){
+                if($value==""){
+                    break;
+                }
+                switch($key) {
+                    case "nummer":
+                        $addWhere.= " AND objects.go LIKE ? ";
+                        $bindParamTyp[]="s";
+                        $bindParam[]="%".$value."%";
+                        break;
+                    case "strasse":
+                        $addWhere.= " AND objects.strasse LIKE ? ";
+                        $bindParamTyp[]="s";
+                        $bindParam[]="%".$value."%";
+                        break;
+                    case "id":
+                        $addWhere.= " AND objects.id = ? ";
+                        $bindParamTyp[]="i";
+                        $bindParam[]=$value;
+                        break;
+                }
+            }
+
+            $a_params = array();
+            $param_type = '';
+            $n = count($bindParamTyp);
+            for($i = 0; $i < $n; $i++) {
+                $param_type .= $bindParamTyp[$i];
+            }
+
+            /* with call_user_func_array, array params must be passed by reference */
+            $a_params[] = & $param_type;
+            for($i = 0; $i < $n; $i++) {
+                /* with call_user_func_array, array params must be passed by reference */
+                $a_params[] = & $bindParam[$i];
+            }
+
+            $prep_stmt = "
+                SELECT 
+                  objects.id,go,strasse,hausnummer,plz,ort,
+                  CASE geschaeftsart WHEN 1 THEN 'Miete' WHEN 2 THEN 'Kauf' END as 'geschaeftsart',
+                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
+                FROM objects
+                LEFT JOIN members ON objects.userID = members.id
+                LEFT JOIN members as me ON me.id = ?
+                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+                
+               ".$addWhere;
+
+            $stmt =  $this->db->mysqli->prepare($prep_stmt);
+            if ($stmt) {
+                /* use call_user_func_array, as $stmt->bind_param('s', $param); does not accept params array */
+                call_user_func_array(array($stmt, 'bind_param'), $a_params);
+            }
+        }else{
+            // ALL
+            $prep_stmt = "
+                SELECT 
+                  objects.id,go,strasse,hausnummer,plz,ort,
+                  CASE geschaeftsart WHEN 1 THEN 'Miete' WHEN 2 THEN 'Kauf' END as 'geschaeftsart',
+                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
+                FROM objects
+                LEFT JOIN members ON objects.userID = members.id
+                LEFT JOIN members as me ON me.id = ?
+                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+               ";
+            $stmt =  $this->db->mysqli->prepare($prep_stmt);
+            if ($stmt) {
+                $stmt->bind_param('i', $user);
+            }
+        }
+
+
+
         if ($stmt) {
             $stmt->execute();
             $stmt->store_result();
 
             if ($stmt->num_rows > 1) {
                 // get variables from result.
-                $stmt->bind_result($id);
+                $stmt->bind_result($id,$go,$strasse,$hausnr,$plz,$ort,$ga,$oa);
                 WHILE($stmt->fetch()){
-                    $dbData[] = array("id"=>$id);
+                    $dbData[] = array(
+                        "id"=>$id,
+                        "go"=>$go,
+                        "strasse"=>$strasse." ".$hausnr,
+                        "plz"=>$plz,
+                        "ort"=>$ort,
+                        "ga"=>$ga,
+                        "oa"=>$oa
+                    );
                 }
                 $stmt->close();
 
@@ -35,40 +124,10 @@ class ExposeModel{
             }
 
         } else {
-            $stmt->close();
+            print_r($this->db->mysqli->error);
             return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
         }
     }
-    function getExpose($data){
-        $strasse=$data["strasse"];
-        $nummer=$data["nummer"];
-        $id=$data["id"];
 
-        $prep_stmt = "SELECT * FROM object WHERE email = ? ";
-        $stmt =  $this->db->mysqli->prepare($prep_stmt);
-
-        // check existing email
-        if ($stmt) {
-            $stmt->bind_param('s', $email);
-            $stmt->execute();
-            $stmt->store_result();
-
-            if ($stmt->num_rows == 1) {
-                // A user with this email address already exists
-                $stmt->close();
-                return array("code"=>21,"txt"=>"eMail bereits vergeben");
-            }else{
-                $stmt->close();
-            }
-
-        } else {
-            $stmt->close();
-            return array("code"=>29,"txt"=>"DB-Error Login::mailexist");
-        }
-
-
-
-
-    }
 
 }
