@@ -39,6 +39,15 @@
   </ul>
 </div>
 <div class="area col-xs-12 col-sm-9 col-lg-10">
+  <div ng-if="c_tool.feedbackVisible" class="feedback" ng-class="{'bg-danger':c_tool.feedback.type=='err','bg-success':c_tool.feedback.type=='success'}">
+    <div class="stateTitle">
+
+    </div>
+    <div class="stateText">
+      {{c_tool.feedback.text}}
+      <a ng-if="c_tool.feedback.addData.filename" href="download/pdf/{{c_tool.feedback.addData.filename}}" target="_blank">PDF öffnen </a>
+    </div>
+  </div>
   <ui-view></ui-view>
 </div>
 <link rel="stylesheet" href="styles/tool.css">

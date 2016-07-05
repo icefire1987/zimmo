@@ -117,7 +117,7 @@ class ExposeModel{
                 }
                 $stmt->close();
 
-                return array("code"=>1,"txt"=>json_encode($dbData));
+                return $dbData;
             }else{
                 $stmt->close();
                 return array("code"=>28,"txt"=>"NoRes Expose::getAll");
@@ -128,6 +128,63 @@ class ExposeModel{
             return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
         }
     }
+    function deleteExpose($data){
+        $user = $_SESSION["userid"];
+        $exposeID = $data["id"];
+        $prep_stmt = "
+                DELETE objects
+                FROM objects
+                LEFT JOIN members ON objects.userID = members.id
+                LEFT JOIN members as me ON me.id = ?
+                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+                AND objects.id = ?
+               ";
+        $stmt =  $this->db->mysqli->prepare($prep_stmt);
+        if ($stmt) {
+            $stmt->bind_param('ii', $user,$exposeID);
+            if ($stmt) {
+                $stmt->execute();
+                if($this->db->mysqli->affected_rows>0){
+                    return array("txt"=>"Delete successfull");
+                }else{
+                    return array("code"=>29,"txt"=>"NoRes Expose::deleteExecute.User:".$user."#Expo:".$exposeID);
+                }
 
+            }else {
+                return array("code"=>29,"txt"=>"DB-Error Expose::deleteExecute");
+            }
+        }else{
+            return array("code"=>29,"txt"=>"DB-Error Expose::delete".$this->db->mysqli->error);
+        }
+    }
 
+    function getExposedata($data){
+        $user = $_SESSION["userid"];
+        $exposeID = $data["id"];
+
+        $prep_stmt = "
+            SELECT 
+              objects.*             
+            FROM objects
+            LEFT JOIN members ON objects.userID = members.id
+            LEFT JOIN members as me ON me.id = ?
+            WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+            AND objects.id = ?
+           ";
+
+        $stmt =  $this->db->mysqli->prepare($prep_stmt);
+        if ($stmt) {
+            $stmt->bind_param('ii', $user,$exposeID);
+
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $dbData = $result->fetch_array(MYSQLI_ASSOC);
+            $stmt->close();
+
+            return $dbData;
+        } else {
+            print_r($this->db->mysqli->error);
+            return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
+        }
+    }
 }

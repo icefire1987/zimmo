@@ -169,8 +169,11 @@ class Security{
                     return false;
                 }
                 $newValue = htmlentities($string, ENT_QUOTES, "UTF-8");
-
                 break;
+            case 'int':
+                $newValue = intval($string);
+                break;
+            
             case 'mail':
                 $newValue = filter_var($string, FILTER_SANITIZE_EMAIL);
                 if (filter_var($newValue, FILTER_VALIDATE_EMAIL) === false) {

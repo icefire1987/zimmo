@@ -6,6 +6,7 @@ class AjaxControl{
         require_once("class/Security.php");
         require_once("class/LoginModel.php");
         require_once("class/ExposeModel.php");
+        require_once("class/PDFModel.php");
 
         $this->Security = new Security("zuumeoImmoApp_Session");
         $this->DB = new myDB();
@@ -40,6 +41,15 @@ class AjaxControl{
                     break;
                 case "exposeSearchOne":
                     $this->exposeSearch(true);
+                    break;
+                case "exposeDelete":
+                    $this->exposeDelete();
+                    break;
+                case "createPDF":
+                    $this->createPDF();
+                    break;
+                case "echoRecord":
+                    $this->echoRecord();
                     break;
                 case "logout":
                     $this->logout();
@@ -122,11 +132,20 @@ class AjaxControl{
                     return false;
                 } else {
                     $obj = $exposeModel->getExpose($data);
-                    echo json_encode($obj);
+                    if(isset($obj["code"])){
+                        echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage", "code" => $obj["code"]));
+                    }else{
+                        echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>json_encode($obj)));
+                    }
+
                 }
             }else{
                 $obj = $exposeModel->getExpose();
-                echo json_encode($obj);
+                if(isset($obj["code"])){
+                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage", "code" => $obj["code"]));
+                }else{
+                    echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>json_encode($obj)));
+                }
             }
         }
     }
@@ -135,6 +154,47 @@ class AjaxControl{
         session_destroy();
         session_unset();
         echo json_encode(array("type" => "success", "text" => "Logout", "code" => 1));
+    }
+    function exposeDelete(){
+        if($this->checkLogin()===true){
+            $exposeModel = new ExposeModel($this->DB);
+            $data = [];
+            $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
+
+            $obj = $exposeModel->deleteExpose($data);
+
+            if(isset($obj["code"])){
+                echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
+            }else{
+                echo json_encode(array("type" => "success", "feedbacktext" => "Löschen erfolgreich", "code" => 1, "text"=>json_encode($obj)));
+            }
+
+        }
+    }
+    function createPDF(){
+        if($this->checkLogin()===true) {
+
+            $data = [];
+            $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
+            $raw = $this->getExposeRecord($data["id"]);
+
+            $pdfmodel = new PDFModel($this->DB);
+
+            $obj = $pdfmodel->createPDF($raw);
+            echo json_encode($obj);
+        }
+    }
+    function echoRecord(){
+        if($this->checkLogin()===true) {
+            $data = [];
+            $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
+            $raw = $this->getExposeRecord($data["id"]);
+            echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>json_encode($raw)));
+        }
+    }
+    function getExposeRecord($id){
+        $exposeModel = new ExposeModel($this->DB);
+        return $exposeModel->getExposedata(array("id"=>$id));
     }
 }
 
