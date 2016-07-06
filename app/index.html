@@ -43,7 +43,7 @@
             <ul class="nav navbar-nav  navbar-right">
               <li ng-class="{active: $state.current.name.includes('home')}"><a href="#">Home</a></li>
               <li ng-class="{active: $state.current.name.includes('getstarted')}"><a ui-sref="tool">Exposé erstellen</a></li>
-              <li><a ng-href="http://zuumeo.com" target="_blank"> Fotos machen</a></li>
+              <li ng-class="{active: $state.current.name.includes('fotos')}"><a ui-sref="fotos">Fotos machen</a></li>
             </ul>
           </div>
         </div>
@@ -52,7 +52,6 @@
     <div class="content" >
     	<div ui-view></div>
     </div>
-
 
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
@@ -73,7 +72,13 @@
     <!-- endbower -->
     <!-- endbuild -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ng-table/1.0.0/ng-table.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.3/ui-bootstrap-tpls.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-table/1.0.0/ng-table.min.js"></script>
+
+
+    <script src="bower_components/angular-leaflet/angular-leaflet-directive.min.js"></script>
+    <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.1/dist/leaflet.css" />
+    <script src="https://npmcdn.com/leaflet@1.0.0-rc.1/dist/leaflet.js"></script>
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>

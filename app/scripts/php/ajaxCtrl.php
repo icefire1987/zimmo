@@ -189,7 +189,7 @@ class AjaxControl{
             $data = [];
             $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
             $raw = $this->getExposeRecord($data["id"]);
-            echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>json_encode($raw)));
+            echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>$raw));
         }
     }
     function getExposeRecord($id){

@@ -37,4 +37,14 @@ body>.header {
   color: black;
 
 }
+.form-error{
+  margin-bottom: -6px;
+}
+.leaflet{
+
+}
+.angular-leaflet-map{
+  height: 400px;
+  width: 80%;
+}
 

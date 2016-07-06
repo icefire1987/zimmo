@@ -1,8 +1,10 @@
-{{c_tool.currentExpose}}
+<code>{{c_tool.currentExpose}}</code>
 <div class="container" id="create">
     <!-- Titel -->
     <div class="row">
         <div class="col-xs-12">
+
+
             <h2 ng-show="c_tool.currentExpose.id">Datensatz bearbeiten</h2>
             <h2 ng-hide="c_tool.currentExpose.id">Datensatz erstellen</h2>
         </div>
@@ -10,62 +12,104 @@
     <!-- Breadcrump -->
     <div class="row">
         <div class="col-xs-12">
-            <span ng-show="c_tool.currentExpose.geschaeftsart" ng-click="c_tool.deleteProp('geschaeftsart')">{{c_tool.currentExpose.geschaeftsart}}</span>
-            <span ng-show="c_tool.currentExpose.objektart" ng-click="c_tool.deleteProp('objektart')">{{c_tool.currentExpose.objektart}}</span>
+            <a ng-show="c_tool.currentExpose.geschaeftsart" ng-click="c_tool.deleteProp('geschaeftsart')">{{c_tool.currentExpose.geschaeftsart==1?'Kauf':'Miete'}}</a>
+            <a ng-show="c_tool.currentExpose.objekttyp" ng-click="c_tool.deleteProp('objekttyp')">{{c_tool.currentExpose.objekttyp==1?'Haus':c_tool.currentExpose.objekttyp==2?'Wohnung':'Grundstück'}}</a>
         </div>
     </div>
     <!-- Geschäftsart -->
-    <div class="row" ng-hide="c_tool.currentExpose.geschaeftsart">
+    <div class="row" ng-show="!c_tool.currentExpose.geschaeftsart">
         <div class="col-xs-12">
-            <button ng-click="c_tool.currentExpose.geschaeftsart=1">Kauf</button>
+            <button ng-click="c_tool.setProp('geschaeftsart',1)">Kauf</button>
             <button ng-click="c_tool.currentExpose.geschaeftsart=2">Miete</button>
         </div>
     </div>
     <!-- Objektart -->
-    <div class="row" ng-hide="c_tool.currentExpose.objektart">
+    <div class="row" ng-show="c_tool.currentExpose.geschaeftsart && !c_tool.currentExpose.objekttyp">
         <div class="col-xs-12">
-            <button ng-click="c_tool.currentExpose.objektart=1">Haus</button>
-            <button ng-click="c_tool.currentExpose.objektart=2">Wohnung</button>
-            <button ng-click="c_tool.currentExpose.objektart=3">Grundstück</button>
+            <button ng-click="c_tool.currentExpose.objekttyp=1">Haus</button>
+            <button ng-click="c_tool.currentExpose.objekttyp=2">Wohnung</button>
+            <button ng-click="c_tool.currentExpose.objekttyp=3">Grundstück</button>
         </div>
     </div>
-    <div class="row" ng-show="c_tool.currentExpose.objektart && c_tool.currentExpose.geschaeftsart">
+    <!-- Objektdaten -->
+    <div class="row" ng-show="c_tool.currentExpose.objekttyp && c_tool.currentExpose.geschaeftsart">
         <div class="col-xs-12">
-            <h2>Awesome Form-Part</h2>
-            <form>
-                <div class="col-xs-12 col-md-12" id="accordion">
-                    <h3>Adressangaben eingeben <span id="badge_adress" class="badge"></span></h3>
-                    <div class="accordionContainer">
+            <form method="POST" name="form_object" role="form" ng-submit="c_tool.checkExposeForm($event);">
+                <uib-accordion close-others="true" class="col-xs-12">
+                    <uib-accordion-group is-open="c_tool.accExpo.statusAddress.open" ng-click="c_tool.doopen()">
+                        <uib-accordion-heading>
+                            Adresse
+                            <i class="pull-right glyphicon"
+                               ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusAddress.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusAddress.open}"></i>
+                        </uib-accordion-heading>
                         <div class="row">
                             <label class="control-label col-xs-6 col-md-offset-2 col-md-4">
-                                <span>ID-Nummer</span>
-                                <input type="text" id="go" name="go" placeholder="" class="form-control">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Expose-ID</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.go.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" id="ex_go" name="go" placeholder="" class="form-control" ng-model="c_tool.currentExpose.go" ng-model-options="{ debounce: 500 }" required>
                             </label>
                             <label class="control-label col-xs-6 col-md-4">
-                                <span>Exposé-Titel</span>
-                                <input type="text" name="exposetitel" id="exposetitel" placeholder=""
-                                       class="form-control">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Exposé-Titel</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.exposetitel.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="exposetitel" placeholder="" class="form-control" ng-model="c_tool.currentExpose.exposetitel" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
                         <div class="row" id="address">
                             <label class="control-label col-xs-8 col-md-6 col-md-offset-2">
-                                <span>Strasse</span>
-                                <input type="text" name="strasse" id="strasse" placeholder="" class="form-control">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Strasse</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.strasse.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="strasse" placeholder="" class="form-control" ng-model="c_tool.currentExpose.strasse" ng-model-options="{ debounce: 500 }">
                             </label>
                             <label class="control-label col-xs-4 col-md-2">
-                                <span>Hausnr </span>
-                                <input type="text" name="hausnummer" id="hausnummer" placeholder=""
-                                       class="form-control">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Hausnummer</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.hausnummer.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="hausnummer" placeholder="" class="form-control" ng-model="c_tool.currentExpose.hausnummer" ng-model-options="{ debounce: 500 }">
                             </label>
-
                             <label class="control-label col-xs-4 col-md-2 col-md-offset-2">
-                                <span>PLZ</span>
-                                <input type="text" name="plz" id="plz" placeholder="" class="form-control"
-                                       pattern="[0-9]{4,5}">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>PLZ</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.plz.$error">
+                                        <div ng-messages-include="views/exposeForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="plz" placeholder="" class="form-control" ng-model="c_tool.currentExpose.plz" ng-model-options="{ debounce: 500 }" ng-pattern="/^[0-9]{4,6}$/">
                             </label>
                             <label class="control-label col-xs-8 col-md-6">
-                                <span>Ort</span>
-                                <input type="text" name="ort" id="ort" placeholder="" class="form-control">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Ort</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.ort.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="ort" placeholder="" class="form-control" ng-model="c_tool.currentExpose.ort" ng-model-options="{ debounce: 500 }">
                             </label>
 
                             <label class="control-label col-xs-6 col-md-4 col-md-offset-2">
@@ -73,8 +117,15 @@
                                 <input type="text" name="bezirk" placeholder="" class="form-control">
                             </label>
                             <label class="control-label col-xs-6 col-md-4">
-                                <span>Land</span>
-                                <select name="land" id="land" class="form-control col-xs-12">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Ort</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.land.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <select name="land" class="form-control" ng-model="c_tool.currentExpose.land" ng-model-options="{ debounce: 500 }">
                                     <option value=""></option>
                                     <option value="1" selected>Deutschland</option>
                                     <option value="2">Österreich</option>
@@ -85,7 +136,7 @@
                         <div class="row">
                             <label class="col-xs-4 col-md-2 col-md-offset-2"><span class="btn btn-danger btn"
                                                                                    style="white-space: normal;"
-                                                                                   id="getMap"> Lageplan
+                                                                                   ng-click="c_tool.getMap()"> Lageplan
 										erstellen</span>
                             </label>
                             <label class="col-xs-4 col-md-2" style="display: none;" id="parent_saveMap">
@@ -103,19 +154,25 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
-                                <div id="map_element" style="display: block;">
-                                    <img id="staticLageplan" style="width: 100%; display: none;">
-                                </div>
-                                <div id="mapErr"></div>
+                                <leaflet center="c_tool.mapdata.center" markers="c_tool.mapdata.markers" layers="c_tool.mapdata.layers" ></leaflet>
+                                {{c_tool.mapdata.center}}
                             </div>
-
                         </div>
-                    </div>
-                    <!-- End Container -->
-                </div>
+                    </uib-accordion-group>
+                    <uib-accordion-group is-open="c_tool.accExpo.statusStamm.open">
+                        <uib-accordion-heading>
+                            Stammdaten
+                            <i class="pull-right glyphicon"
+                               ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusStamm.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusStamm.open}"></i>
+                        </uib-accordion-heading>
+                        This content is straight in the template.
+                    </uib-accordion-group>
+                </uib-accordion>
             </form>
         </div>
     </div>
-</div>
-<!-- End Container -->
-{{}}
+
+<!--
+
+        {"id":"2","geschaeftsart":"2","strasse":"Schnellerstr","hausnummer":"90D","plz":"12439","ort":"Berlin","bezirk":"","land":"1","go":"123","lieferung":"0000-00-00","moebiliert":"","objekttyp":"3","lageHaus":"","lageStockwerk":"","stockwerke":"","stockwerk":"0","haustyp":"","baujahr":"","sanierung":"","renovierung":"","besonderheit":"","exposetitel":"neueingabe mit foto","provision":"","provisionEinheit":"eur","kaution":"","kautionEinheit":"eur","kaltmiete":"800","pauschalmiete":"","nebenkosten":"","kaufpreis":"","stellplatz":"","stellplatztyp":"","stellplatzkosten":"","wohnflaeche":"75","grundstueckflaeche":"","zimmer":"","schlafzimmer":"1","balkon":"","terrasse":"","aussenflaeche_balkon":"","aussenflaeche_terrasse":"","decke":"","wcgast":"","badezimmer":"","badtyp":"null","badbesonderheit":"[]","heizung":"","boden":"","kueche":"","kuecheausstattung":"","innenausstattung":"","energiewert":"","energieausweisTyp":"Bedarfsausweis","denkmalschutz":"","zustand":"","lage":"","manualTextLage":"","manualTextAusstattung":"","manualTextObjekt":"","updatedatum":"2016-07-06 17:08:29","userID":"2","map":"{\"lat\":\"52.4526587\",\"lon\":\"13.5269479\",\"zoom\":\"14\"}"}
+            -->

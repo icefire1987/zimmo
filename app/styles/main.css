@@ -37,7 +37,9 @@ body>.header{
 }
 
 
-
+.text-inline{
+    display: inline-block;
+}
 .banner p{
 	font-size: 20px;
 	text-align: center;
