@@ -9,13 +9,13 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive'])
+    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies'])
 
-    .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider,$locationProvider) {
         $httpProvider.defaults.withCredentials = true;
         $httpProvider.defaults.useXDomain = true;
         $logProvider.debugEnabled(false);
-
+        //$locationProvider.html5Mode(true);
         $urlRouterProvider.otherwise('/');
         $stateProvider
             .state('home', {
@@ -64,6 +64,7 @@ angular
                 roles: [],
                 controller: function($scope,$stateParams){
                     $scope.c_tool.currentExpose = {"id":"2","geschaeftsart":"2","strasse":"Schnellerstr","hausnummer":"90D","plz":"12439","ort":"Berlin","bezirk":"","land":"1","go":"123","lieferung":"0000-00-00","moebiliert":"","objekttyp":"3","lageHaus":"","lageStockwerk":"","stockwerke":"","stockwerk":"0","haustyp":"","baujahr":"","sanierung":"","renovierung":"","besonderheit":"","exposetitel":"neueingabe mit foto","provision":"","provisionEinheit":"eur","kaution":"","kautionEinheit":"eur","kaltmiete":"800","pauschalmiete":"","nebenkosten":"","kaufpreis":"","stellplatz":"","stellplatztyp":"","stellplatzkosten":"","wohnflaeche":"75","grundstueckflaeche":"","zimmer":"","schlafzimmer":"1","balkon":"","terrasse":"","aussenflaeche_balkon":"","aussenflaeche_terrasse":"","decke":"","wcgast":"","badezimmer":"","badtyp":"null","badbesonderheit":"[]","heizung":"","boden":"","kueche":"","kuecheausstattung":"","innenausstattung":"","energiewert":"","energieausweisTyp":"Bedarfsausweis","denkmalschutz":"","zustand":"","lage":"","manualTextLage":"","manualTextAusstattung":"","manualTextObjekt":"","updatedatum":"2016-07-06 17:08:29","userID":"2","map":{"lat":"52.4526587","lon":"13.5269479","zoom":"14"}};
+                    $scope.c_tool.feedbackVisible = false;
                 }
             })
             .state('tool.exposeOne', {
@@ -115,16 +116,20 @@ angular
             }
         });
     }])
-    .service('AuthService', function(){
+    .service('AuthService',['$cookies', function($cookies){
         var self = this;
         this.userObj = undefined;
 
         this.checkAuthenticated = function(){
-            return true;
-            return self.userObj !== undefined && self.userObj.isAuthenticated;
+            var phpcookie = $cookies.get("zuumeoImmoApp_Session_Session");
+            console.log(phpcookie);
+            if(phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
+                return true;
+            }
+
         };
 
-    })
+    }])
 
 ;
 

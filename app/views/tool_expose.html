@@ -1,4 +1,4 @@
-<code>{{c_tool.currentExpose}}</code>
+<!--<code>{{c_tool.currentExpose}}</code>-->
 <div class="container" id="create">
     <!-- Titel -->
     <div class="row">
@@ -52,7 +52,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" id="ex_go" name="go" placeholder="" class="form-control" ng-model="c_tool.currentExpose.go" ng-model-options="{ debounce: 500 }" required>
+                                <input type="text" id="ex_go" name="go" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.go" ng-model-options="{ debounce: 500 }" required>
                             </label>
                             <label class="control-label col-xs-6 col-md-4">
                                 <div>
@@ -63,7 +64,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" name="exposetitel" placeholder="" class="form-control" ng-model="c_tool.currentExpose.exposetitel" ng-model-options="{ debounce: 500 }">
+                                <input type="text" name="exposetitel" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.exposetitel" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
                         <div class="row" id="address">
@@ -76,7 +78,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" name="strasse" placeholder="" class="form-control" ng-model="c_tool.currentExpose.strasse" ng-model-options="{ debounce: 500 }">
+                                <input type="text" name="strasse" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.strasse" ng-model-options="{ debounce: 500 }">
                             </label>
                             <label class="control-label col-xs-4 col-md-2">
                                 <div>
@@ -87,7 +90,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" name="hausnummer" placeholder="" class="form-control" ng-model="c_tool.currentExpose.hausnummer" ng-model-options="{ debounce: 500 }">
+                                <input type="text" name="hausnummer" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.hausnummer" ng-model-options="{ debounce: 500 }">
                             </label>
                             <label class="control-label col-xs-4 col-md-2 col-md-offset-2">
                                 <div>
@@ -98,7 +102,9 @@
                                         <div ng-messages-include="views/exposeForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" name="plz" placeholder="" class="form-control" ng-model="c_tool.currentExpose.plz" ng-model-options="{ debounce: 500 }" ng-pattern="/^[0-9]{4,6}$/">
+                                <input type="text" name="plz" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.plz" ng-model-options="{ debounce: 500 }"
+                                       ng-pattern="/^[0-9]{4,6}$/">
                             </label>
                             <label class="control-label col-xs-8 col-md-6">
                                 <div>
@@ -109,7 +115,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="text" name="ort" placeholder="" class="form-control" ng-model="c_tool.currentExpose.ort" ng-model-options="{ debounce: 500 }">
+                                <input type="text" name="ort" placeholder="" class="form-control"
+                                       ng-model="c_tool.currentExpose.ort" ng-model-options="{ debounce: 500 }">
                             </label>
 
                             <label class="control-label col-xs-6 col-md-4 col-md-offset-2">
@@ -125,7 +132,8 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <select name="land" class="form-control" ng-model="c_tool.currentExpose.land" ng-model-options="{ debounce: 500 }">
+                                <select name="land" class="form-control" ng-model="c_tool.currentExpose.land"
+                                        ng-model-options="{ debounce: 500 }">
                                     <option value=""></option>
                                     <option value="1" selected>Deutschland</option>
                                     <option value="2">Österreich</option>
@@ -154,10 +162,149 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
-                                <leaflet center="c_tool.mapdata.center" markers="c_tool.mapdata.markers" layers="c_tool.mapdata.layers" ></leaflet>
+                                <leaflet center="c_tool.mapdata.center" markers="c_tool.mapdata.markers"
+                                         layers="c_tool.mapdata.layers"></leaflet>
                                 {{c_tool.mapdata.center}}
                             </div>
                         </div>
+                    </uib-accordion-group>
+                    <uib-accordion-group is-open="c_tool.accExpo.statusKosten.open">
+                        <uib-accordion-heading>
+                            Kosten
+                            <i class="pull-right glyphicon"
+                               ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusKosten.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusKosten.open}"></i>
+                        </uib-accordion-heading>
+                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                            <label class="control-label col-xs-6">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Kaufpreis</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.kaufpreis.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="kaufpreis" placeholder="in €" class="form-control" step="0.01"
+                                       ng-model="c_tool.currentExpose.kaufpreis" ng-model-options="{ debounce: 500 }" required>
+                            </label>
+                            <label class="control-label col-xs-6">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Wohngeld</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.wohngeld.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="wohngeld" placeholder="in €" class="form-control" step="0.01"
+                                       ng-model="c_tool.currentExpose.wohngeld" ng-model-options="{ debounce: 500 }">
+                            </label>
+                        </div>
+                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                            <label class="control-label col-xs-6 col-sm-4">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Kaltmiete</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.kaltmiete.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="kaltmiete" placeholder="in €" class="form-control" step="0.01"
+                                       ng-required="!c_tool.currentExpose.pauschalmiete"
+                                       ng-model="c_tool.currentExpose.kaltmiete" ng-model-options="{ debounce: 500 }"
+                                       ng-change="c_tool.clearOtherVal('kaltmiete','pauschalmiete')">
+                            </label>
+                            <label class="control-label col-xs-6 col-sm-4">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Nebenkosten</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.nebenkosten.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="nebenkosten" placeholder="in €" class="form-control" step="0.01"
+                                       ng-model="c_tool.currentExpose.nebenkosten" ng-model-options="{ debounce: 500 }"
+                                       ng-change="c_tool.clearOtherVal('nebenkosten','pauschalmiete')">
+                            </label>
+                            <label class="control-label col-xs-6  col-sm-4" id="inputPauschalmiete">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Pauschalmiete</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.pauschalmiete.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="pauschalmiete" placeholder="in €" class="form-control" step="0.01"
+                                       ng-required="!c_tool.currentExpose.kaltmiete"
+                                       ng-model="c_tool.currentExpose.pauschalmiete" ng-model-options="{ debounce: 500 }"
+                                       ng-change="c_tool.clearOtherVal('pauschalmiete',['kaltmiete','nebenkosten'])">
+                            </label>
+                        </div>
+                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                            <label class="control-label col-xs-6 col-md-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Provision netto</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.provision.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="provision" placeholder="in €" class="form-control" step="0.01"
+                                       ng-required=""
+                                       ng-model="c_tool.currentExpose.provision" ng-model-options="{ debounce: 500 }">
+                            </label>
+
+                            <label class="control-label col-xs-6 col-md-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Einheit Prov.</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.provisionEinheit.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <select name="provisionEinheit" class="form-control" ng-model="c_tool.currentExpose.provisionEinheit"
+                                        ng-model-options="{ debounce: 500 }">
+                                    <option value="eur">Euro</option>
+                                    <option value="nkm">NKM</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                            <label class="control-label col-xs-6 col-md-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Kaution netto</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.kaution.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="kaution" placeholder="in €" class="form-control" step="0.01"
+                                       ng-required=""
+                                       ng-model="c_tool.currentExpose.kaution" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-6 col-md-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Einheit Kaut.</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.kautionEinheit.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <select name="kautionEinheit" class="form-control" ng-model="c_tool.currentExpose.kautionEinheit"
+                                        ng-model-options="{ debounce: 500 }">
+                                    <option value="eur">Euro</option>
+                                    <option value="nkm">NKM</option>
+                                </select>
+                            </label>
+                        </div>
+
                     </uib-accordion-group>
                     <uib-accordion-group is-open="c_tool.accExpo.statusStamm.open">
                         <uib-accordion-heading>
@@ -165,12 +312,14 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusStamm.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusStamm.open}"></i>
                         </uib-accordion-heading>
-                        This content is straight in the template.
+                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        </div>
                     </uib-accordion-group>
                 </uib-accordion>
             </form>
         </div>
     </div>
+</div>
 
 <!--
 

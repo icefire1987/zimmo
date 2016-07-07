@@ -36,7 +36,10 @@ body>.header{
 
 }
 
-
+.marginLeft10{
+    display: inline-block;
+    margin-left: 10px;
+}
 .text-inline{
     display: inline-block;
 }
@@ -120,12 +123,16 @@ body>.header{
   display: -ms-flexbox;
   display:         flex;
 }
+.fotos-banner{
+    background-image: url('../images/house.jpg');
+}
 .tool-banner{
-  background-image: url('../images/living_3.jpg');
+    background-image: url('../images/living_3.jpg');
+}
+.tool-banner,.fotos-banner{
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
-
   height: 100%;
   width: 100%;
 }
@@ -140,7 +147,7 @@ body>.header{
 
     padding-top:20%;
 }
-.tool-banner>.container>.row>div{
+.tool-banner>.container>.row>div,.fotos-banner>.container>.row>div{
   margin-top: 10%;
 }
 .tool-info{

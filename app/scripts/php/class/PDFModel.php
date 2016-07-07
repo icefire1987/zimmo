@@ -180,7 +180,6 @@ class PDFModel{
         return $content;
     }
     function createPDF($objRaw){
-        var_dump($objRaw);
         $id = $objRaw["id"];
         $content= $this->preparePDF($objRaw);
         ob_start();

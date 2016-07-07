@@ -153,6 +153,15 @@ class AjaxControl{
     function logout(){
         session_destroy();
         session_unset();
+        if (isset($_SERVER['HTTP_COOKIE'])) {
+            $cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+            foreach($cookies as $cookie) {
+                $parts = explode('=', $cookie);
+                $name = trim($parts[0]);
+                setcookie($name, '', time()-1000);
+                setcookie($name, '', time()-1000, '/');
+            }
+        }
         echo json_encode(array("type" => "success", "text" => "Logout", "code" => 1));
     }
     function exposeDelete(){
@@ -181,7 +190,13 @@ class AjaxControl{
             $pdfmodel = new PDFModel($this->DB);
 
             $obj = $pdfmodel->createPDF($raw);
-            echo json_encode($obj);
+            if(isset($obj["addData"])){
+                echo json_encode(array("type" => "info", "feedbacktext" => "PDF erfolgreich erstellt", "code" => 1, "text"=>$obj, "addData"=>$obj["addData"]));
+            }else{
+                echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
+            }
+
+
         }
     }
     function echoRecord(){

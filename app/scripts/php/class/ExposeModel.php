@@ -63,7 +63,7 @@ class ExposeModel{
             $prep_stmt = "
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
-                  CASE geschaeftsart WHEN 1 THEN 'Miete' WHEN 2 THEN 'Kauf' END as 'geschaeftsart',
+                  CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
                   CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
@@ -82,7 +82,7 @@ class ExposeModel{
             $prep_stmt = "
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
-                  CASE geschaeftsart WHEN 1 THEN 'Miete' WHEN 2 THEN 'Kauf' END as 'geschaeftsart',
+                  CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
                   CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id

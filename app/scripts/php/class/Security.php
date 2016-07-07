@@ -44,7 +44,8 @@ class Security{
     function  userLoggedIn(){
         return (isset($_SESSION) && isset($_SESSION["login_string"]));
     }
-    function sec_session_start($name, $limit = 0, $path = '/', $domain = null, $secure = null){
+    function sec_session_start($name, $limit = 6000, $path = '/', $domain = null, $secure = null){
+        $lifetime=3600;
         // Set the cookie name
         session_name($name . '_Session');
 
@@ -52,8 +53,29 @@ class Security{
         $https = isset($secure) ? $secure : isset($_SERVER['HTTPS']);
 
         // Set session cookie options
-        session_set_cookie_params($limit, $path, $domain, $https, true);
+        //session_set_cookie_params($limit, $path, $domain, $https, true);
+        $currentCookieParams = session_get_cookie_params();
+        $rootDomain = null;
+
+        // SESSION Cookie
+        session_set_cookie_params(
+            $lifetime,
+            $currentCookieParams["path"],
+            $rootDomain,
+            $https,
+           true
+        );
         session_start();
+
+        // JS-Cookie
+        session_set_cookie_params(
+            $lifetime,
+            $currentCookieParams["path"],
+            $rootDomain,
+            $https,
+            false
+        );
+        setcookie("AT", session_id(), time()+$lifetime);  /* verfällt in 1 Stunde */
 
         // Make sure the session hasn't expired, and destroy it if it has
         if(self::validateSession())
