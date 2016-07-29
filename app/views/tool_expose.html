@@ -1,4 +1,4 @@
-<!--<code>{{c_tool.currentExpose}}</code>-->
+
 <div class="container" id="create">
     <!-- Titel -->
     <div class="row">
@@ -68,7 +68,7 @@
                                        ng-model="c_tool.currentExpose.exposetitel" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row" id="address">
+                        <div class="row row-marginbottom" id="address">
                             <label class="control-label col-xs-8 col-md-6 col-md-offset-2">
                                 <div>
                                     <div class="text-inline">
@@ -126,7 +126,7 @@
                             <label class="control-label col-xs-6 col-md-4">
                                 <div>
                                     <div class="text-inline">
-                                        <span>Ort</span>
+                                        <span>Land</span>
                                     </div>
                                     <div class="text-inline form-error" ng-messages="form_object.land.$error">
                                         <div ng-messages-include="views/regForm_messages.html"></div>
@@ -141,7 +141,7 @@
                                 </select>
                             </label>
                         </div>
-                        <div class="row">
+                        <div class="row row-marginbottom">
                             <label class="col-xs-4 col-md-2 col-md-offset-2"><span class="btn btn-danger btn"
                                                                                    style="white-space: normal;"
                                                                                    ng-click="c_tool.getMap()"> Lageplan
@@ -174,7 +174,7 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusKosten.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusKosten.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
                             <label class="control-label col-xs-6">
                                 <div>
                                     <div class="text-inline">
@@ -200,7 +200,7 @@
                                        ng-model="c_tool.currentExpose.wohngeld" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
                             <label class="control-label col-xs-6 col-sm-4">
                                 <div>
                                     <div class="text-inline">
@@ -243,7 +243,7 @@
                                        ng-change="c_tool.clearOtherVal('pauschalmiete',['kaltmiete','nebenkosten'])">
                             </label>
                         </div>
-                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
                             <label class="control-label col-xs-6 col-md-3">
                                 <div>
                                     <div class="text-inline">
@@ -274,7 +274,7 @@
                                 </select>
                             </label>
                         </div>
-                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
                             <label class="control-label col-xs-6 col-md-3">
                                 <div>
                                     <div class="text-inline">
@@ -304,7 +304,50 @@
                                 </select>
                             </label>
                         </div>
+                        <div class="row">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Anzahl Stellplätze</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.stellplatz_count.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="stellplatz_count" placeholder="" class="form-control" step="1"
+                                       ng-model="c_tool.currentExpose.stellplatz" ng-model-options="{ debounce: 500 }"
+                                       ng-change="c_tool.clearOtherVal('kaltmiete','pauschalmiete')">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Gesamtkosten für Stellplätze</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.stellplatz_cost.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="stellplatz_cost" placeholder="in €" class="form-control" step="0.01"
 
+                                       ng-model="c_tool.currentExpose.stellplatzkosten" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Stellplatzart</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.stellplatztyp.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="stellplatztyp" placeholder="Doppelklick für Vorlagen" class="form-control"
+                                       list="datalist_stellplatztyp"
+                                       ng-model="c_tool.currentExpose.stellplatztyp" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_stellplatztyp">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.stellplatztyp | orderBy:'toString()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+                        </div>
                     </uib-accordion-group>
                     <uib-accordion-group is-open="c_tool.accExpo.statusStamm.open">
                         <uib-accordion-heading>
@@ -312,11 +355,371 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusStamm.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusStamm.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp==1">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Haustyp</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.haustyp.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="haustyp" placeholder="Doppelklick für Vorlagen" class="form-control"
+                                       list="datalist_haustyp"
+                                       ng-model="c_tool.currentExpose.haustyp" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_haustyp">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.haustyp | orderBy:'toString()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+
+                            <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp==2">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Wohnungstyp</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.wohnungstyp.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="wohnungstyp" placeholder="Doppelklick für Vorlagen" class="form-control"
+                                       list="datalist_wohnungstyp"
+                                       ng-model="c_tool.currentExpose.besonderheit" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_wohnungstyp">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.wohnungstyp | orderBy:'toString()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Baujahr</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.baujahr.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="baujahr" placeholder="Jahreszahl" class="form-control"
+                                       list="datalist_jahreszahl"
+                                       ng-model="c_tool.currentExpose.baujahr" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_jahreszahl">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.jahreszahl | orderBy:'toValue()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+                            <div class="control-label col-xs-8 col-sm-6">
+                                <h5>Zustand</h5>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="renoviert">
+                                    <span class="tag">renoviert</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="saniert">
+                                    <span class="tag">saniert</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="moebliert">
+                                    <span class="tag">möbliert</span>
+                                </label>
+                            </div>
                         </div>
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-6 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Energieausweis</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.energieausweis.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="energieausweis" placeholder="Doppelklick für Vorlagen" class="form-control"
+                                       list="datalist_energieausweis" ng-disabled="c_tool.currentExpose.denkmalschutz"
+                                       ng-model="c_tool.currentExpose.energieausweisTyp" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_energieausweis">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.energieausweis | orderBy:'toString()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+                            <label class="control-label col-xs-6 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Energieverbrauchskennwert</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.energiewert.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="energiewert" placeholder="in kWh/m² * a" class="form-control"
+                                       ng-disabled="c_tool.currentExpose.denkmalschutz"
+                                       ng-model="c_tool.currentExpose.energiewert" ng-model-options="{ debounce: 500 }">
+
+                            </label>
+                            <div class="control-label col-xs-6 col-sm-4">
+                                <h5>&nbsp;</h5>
+                                <label class="control-label col-xs-12">
+                                    <input type="checkbox" name="denkmalschutz" ng-model="c_tool.currentExpose.denkmalschutz">
+                                    <span class="tag">Denkmalschutz vorhanden</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Wohnfläche</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.wohnflaeche.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="wohnflaeche" placeholder="Fläche in m²" class="form-control" required
+                                       ng-model="c_tool.currentExpose.wohnflaeche" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp!=2">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Grundstücksfläche</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.grundstueckflaeche.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="grundstueckflaeche" placeholder="Fläche in m²" class="form-control"
+                                       ng-model="c_tool.currentExpose.grundstueckflaeche" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Deckenhöhe</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.deckenhoehe.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="number" name="deckenhoehe" placeholder="Höhe in m" class="form-control" step="0.1"
+                                       ng-model="c_tool.currentExpose.decke" ng-model-options="{ debounce: 500 }">
+                            </label>
+                        </div>
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Zimmer</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.wohnflaeche.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="zimmer" placeholder="" class="form-control" list="datalist_zimmer" required
+                                       ng-model="c_tool.currentExpose.zimmer" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_zimmer">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.zimmer | orderBy:'toValue()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>davon Schlafzimmer</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.schlafzimmer.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="schlafzimmer" placeholder="" class="form-control" list="datalist_zimmer"
+                                       ng-model="c_tool.currentExpose.schlafzimmer" ng-model-options="{ debounce: 500 }">
+                            </label>
+                        </div>
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Balkon</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.balkon.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="balkon" placeholder="Anzahl oder m²" class="form-control"
+                                       ng-model="c_tool.currentExpose.balkon" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Terrasse</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.terrasse.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="terrasse" placeholder="Anzahl oder m²" class="form-control"
+                                       ng-model="c_tool.currentExpose.terrasse" ng-model-options="{ debounce: 500 }">
+                            </label>
+                        </div>
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Heizung</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.heizung.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="heizung" placeholder="" class="form-control" list="datalist_heizung"
+                                       ng-model="c_tool.currentExpose.heizung" ng-model-options="{ debounce: 500 }">
+                                <datalist id="datalist_heizung">
+                                    <option  data-ng-repeat="dl_opt in c_tool.datalists.heizung | orderBy:'toValue()'" value="{{dl_opt}}">
+                                </datalist>
+                            </label>
+                        </div>
+                    </uib-accordion-group>
+                    <uib-accordion-group is-open="c_tool.accExpo.statusAusstattung.open">
+                        <uib-accordion-heading>
+                            Ausstattungsdetails
+                            <i class="pull-right glyphicon"
+                               ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusAusstattung.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusAusstattung.open}"></i>
+                        </uib-accordion-heading>
+                        <div class="row row-marginbottom">
+                            <div class="control-label col-xs-12">
+                                <h5>Innenausstattung</h5>
+                                <label class="control-label col-xs-4 col-sm-3 checkbox-area">
+                                    <input type="checkbox" name="Hauswirtschaftsraum">
+                                    <span class="tag">Hauswirtschaftsraum</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Klimaanlage">
+                                    <span class="tag">Klimaanlage</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Aufzug">
+                                    <span class="tag">Aufzug</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Wände gespachtelt">
+                                    <span class="tag">Wände gespachtelt</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Keller">
+                                    <span class="tag">Keller</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Doppelkasten-Fenster">
+                                    <span class="tag">Doppelkasten-Fenster</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Stuck">
+                                    <span class="tag">Stuck</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Barrierefrei">
+                                    <span class="tag">Barrierefrei</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Kamin">
+                                    <span class="tag">Kamin</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Flügeltüren">
+                                    <span class="tag">Flügeltüren</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row row-marginbottom">
+                            <div class="control-label col-xs-12">
+                                <h5>Bodenbelag</h5>
+                                <label class="control-label col-xs-4 col-sm-3 checkbox-area">
+                                    <input type="checkbox" name="Echtholz-Parkett">
+                                    <span class="tag">Echtholz-Parkett</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="hochwertiges Parkett">
+                                    <span class="tag">hochwertiges Parkett</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Fussbodenheizung">
+                                    <span class="tag">Fussbodenheizung</span>
+                                </label>
+                                <label class="control-label col-xs-4 col-sm-3">
+                                    <input type="checkbox" name="Dielen">
+                                    <span class="tag">Dielen</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row row-marginbottom">
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <label class="control-label col-xs-12">
+                                    <input type="checkbox" name="Einbauküche" ng-model="c_tool.currentExpose.kueche">
+                                    <span class="tag">Einbauküche vorhanden</span>
+                                </label>
+                            </label>
+                            <div class="col-xs-8 col-sm-9" ng-if="c_tool.currentExpose.kueche">
+                                <div class="row">
+                                    <h5>Küchenausstattung</h5>
+                                    <label class="control-label col-xs-4 col-sm-3 checkbox-area">
+                                        <input type="checkbox" name="offene Küche">
+                                        <span class="tag">offene Küche</span>
+                                    </label>
+                                    <label class="control-label col-xs-4 col-sm-3">
+                                        <input type="checkbox" name="Wohnküche">
+                                        <span class="tag">Wohnküche</span>
+                                    </label>
+                                    <label class="control-label col-xs-4 col-sm-3">
+                                        <input type="checkbox" name="hochwertig">
+                                        <span class="tag">hochwertig</span>
+                                    </label>
+                                    <label class="control-label col-xs-4 col-sm-3">
+                                        <input type="checkbox" name="modern">
+                                        <span class="tag">modern</span>
+                                    </label>
+                                    <label class="control-label col-xs-4 col-sm-3">
+                                        <input type="checkbox" name="klassisch">
+                                        <span class="tag">klassisch</span>
+                                    </label>
+                                </div>
+                                <div class="row">
+                                    <label class="control-label col-xs-4 col-sm-3">
+                                        <div>
+                                            <div class="text-inline">
+                                                <span>Marke</span>
+                                            </div>
+                                        </div>
+                                        <input type="text" name="kueche_marke" placeholder="" class="form-control" list="datalist_kuechenmarke"
+                                               ng-model="c_tool.currentExpose.kueche_marke" ng-model-options="{ debounce: 500 }">
+                                        <datalist id="datalist_kuechenmarke">
+                                            <option  data-ng-repeat="dl_opt in c_tool.datalists.kuechenmarke | orderBy:'toValue()'" value="{{dl_opt}}">
+                                        </datalist>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </uib-accordion-group>
+                    <uib-accordion-group is-open="c_tool.accExpo.statusBilder.open">
+                        <uib-accordion-heading>
+                            Bilder
+                            <i class="pull-right glyphicon"
+                               ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusBilder.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusBilder.open}"></i>
+                        </uib-accordion-heading>
+                        <div class="row">
+
+                            <div id="fileContainer">
+                                <button type="button" ng-click="c_tool.uploadImage(this)">Bild hochladen</button>
+                                <input type="file" file-model="myFile"/>
+                            </div>
+
+                            <ol class="sortable nested_with_switch vertical" id="imageList">
+                            </ol>
+
+                            <!-- Example: nv-file-select="" uploader="{Object}" options="{Object}" filters="{String}"
+
+                            -->
+
+                        </div>
+
+        </div>
                     </uib-accordion-group>
                 </uib-accordion>
             </form>
+            <code>{{c_tool.currentExpose}}</code>
         </div>
     </div>
 </div>

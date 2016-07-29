@@ -2,6 +2,10 @@
   <dictionary name="cjurthe">
     <words>
       <w>checkbrute</w>
+      <w>datalist</w>
+      <w>grundstueckflaeche</w>
+      <w>wohnflaeche</w>
+      <w>zimmer</w>
     </words>
   </dictionary>
 </component>

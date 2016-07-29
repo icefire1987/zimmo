@@ -44,3 +44,26 @@ grün dunkel: #679436
 .sidebar ul .logout a{
   color: darkred !important;
 }
+
+input[type='checkbox']:not(:checked) + .tag::before,
+input[type='radio']:not(:checked) + .tag::before,
+input[type='checkbox']:checked + .tag::before,
+input[type='radio']:checked + .tag::before{
+  border: 1px solid #05668d;
+  background: white;
+}
+
+input[type='checkbox']:hover  + .tag::before,
+input[type='radio']:hover  + .tag::before {
+  opacity: .6;
+}
+
+input[type='checkbox']:checked + .tag::before,
+input[type='radio']:checked + .tag::before{
+  background: #05668d;
+}
+
+input[type='checkbox']:checked + .tag::after,
+input[type='radio']:checked + .tag::after{
+  color: white;
+}

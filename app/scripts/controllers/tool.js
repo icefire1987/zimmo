@@ -8,12 +8,14 @@
  * Controller of the zimmoApp
  */
 angular.module('zimmoApp')
-    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope) {
+    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','fileUpload', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, fileUpload) {
         // on local:
         var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
         //var scriptbase = '';
         var vm = this;
+
+
         vm.currentExpose = {};
         vm.feedback = {};
         vm.feedbackVisible = false;
@@ -284,7 +286,9 @@ angular.module('zimmoApp')
             } catch (e) {
 
             }
-            /*
+
+            /* CrossOrigin-Problem auf localhost
+
              $http({
              url: "http://nominatim.openstreetmap.org/search?street="
              + vm.currentExpose.hausnummer
@@ -362,7 +366,56 @@ angular.module('zimmoApp')
                 }
             }
 
+        };
+        this.setMap = function(mapdata){
+            vm.mapdata.center = {
+                lat: (mapdata.lat) * 1,
+                lng: (mapdata.lon) * 1,
+                zoom: parseInt(mapdata.zoom),
+            };
+            vm.mapdata.markers = {
+                objekt: {
+                    lat: (mapdata.lat) * 1,
+                    lng: (mapdata.lon) * 1,
+                    focus: true,
+                    draggable: true
+                }
+            };
+
+            leafletData.getMap().then(function (map) {
+                $timeout(function () {
+                    map.invalidateSize();
+                }, 300);
+            });
+        };
+        var list_jahre = [];
+        for (var i = 1900; i <= new Date().getFullYear(); i++) {
+            list_jahre.push(i);
         }
+        var list_zimmer = [];
+        var half=1;
+        for (var i = 1; i <= 20; i++) {
+            list_zimmer.push(half);
+            half+=0.5;
+        }
+
+        this.datalists = {
+            stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
+            wohnungstyp: ["Dachgeschoss","Maisonette","Penthaus"],
+            haustyp: ["Einfamilienhaus","Bungalow","Doppelhaus","Reihenendhaus","Reihenmittelhaus","Villa","Stadthaus"],
+            energieausweis: ["Bedarfsausweis","Verbrauchsausweis"],
+            heizung: ["Fernwärme","Gaszentral","Gasetage","Ölzentral","Palletheizung","Erdwärme","Blockheizkraftwerk"],
+            kuechenmarke: ["Bulthaup","Nolte","Alno","Nobilia","SieMatic"],
+            jahreszahl: list_jahre,
+            zimmer: list_zimmer
+        };
+this.uploadImage = function(data){
+    var file = $scope.myFile;
+
+    console.log('file is ' );
+    console.dir(file);
+}
+
     }])
     .run(
         function () {
