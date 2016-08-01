@@ -8,7 +8,7 @@
  * Controller of the zimmoApp
  */
 angular.module('zimmoApp')
-    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','fileUpload', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, fileUpload) {
+    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, FileUploader) {
         // on local:
         var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
@@ -23,6 +23,8 @@ angular.module('zimmoApp')
         vm.accExpo = {
             statusAddress: {}
         };
+        vm.images = [];
+        vm.cImage = {};
         this.doopen = function () {
             if (vm.accExpo.statusAddress.open) {
                 leafletData.getMap().then(function (map) {
@@ -409,12 +411,68 @@ angular.module('zimmoApp')
             jahreszahl: list_jahre,
             zimmer: list_zimmer
         };
-this.uploadImage = function(data){
-    var file = $scope.myFile;
 
-    console.log('file is ' );
-    console.dir(file);
-}
+        this.clickElement = function(id){
+            angular.element(id).click();
+        };
+        this.addImage = function(kat){
+            var obj = vm.cImage;
+            obj.kat = kat;
+            vm.images.push(angular.copy(obj));
+
+            // empty CroppArea
+            vm.cImage = {};
+        };
+
+        this.drawCanvas = function(elem_canvas,data){
+            console.log(elem_canvas);
+            var canvas = angular.element(elem_canvas);
+            console.log(canvas)
+            var ctx = canvas[0].getContext("2d");
+
+            var image = new Image();
+            image.onload = function() {
+                ctx.drawImage(image, 0, 0);
+            };
+            image.src =data;
+        }
+        var uploader = $scope.uploader = new FileUploader({
+            url: 'upload.php'
+        });
+        uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+            console.info('onWhenAddingFileFailed', item, filter, options);
+        };
+        uploader.onAfterAddingFile = function(fileItem) {
+            console.info('onAfterAddingFile', fileItem);
+        };
+        uploader.onAfterAddingAll = function(addedFileItems) {
+            console.info('onAfterAddingAll', addedFileItems);
+        };
+        uploader.onBeforeUploadItem = function(item) {
+            console.info('onBeforeUploadItem', item);
+        };
+        uploader.onProgressItem = function(fileItem, progress) {
+            console.info('onProgressItem', fileItem, progress);
+        };
+        uploader.onProgressAll = function(progress) {
+            console.info('onProgressAll', progress);
+        };
+        uploader.onSuccessItem = function(fileItem, response, status, headers) {
+            console.info('onSuccessItem', fileItem, response, status, headers);
+        };
+        uploader.onErrorItem = function(fileItem, response, status, headers) {
+            console.info('onErrorItem', fileItem, response, status, headers);
+        };
+        uploader.onCancelItem = function(fileItem, response, status, headers) {
+            console.info('onCancelItem', fileItem, response, status, headers);
+        };
+        uploader.onCompleteItem = function(fileItem, response, status, headers) {
+            console.info('onCompleteItem', fileItem, response, status, headers);
+        };
+        uploader.onCompleteAll = function() {
+            console.info('onCompleteAll');
+        };
+
 
     }])
     .run(

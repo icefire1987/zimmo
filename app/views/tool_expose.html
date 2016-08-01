@@ -699,23 +699,54 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusBilder.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusBilder.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row">
+                        <div class="row row-marginbottom">
+                            <div class="col-xs-12">
+                                <button type="button" class="btn btn-default" ng-click="c_tool.clickElement('#addFile')">Neues Bild hinzufügen</button>
 
-                            <div id="fileContainer">
-                                <button type="button" ng-click="c_tool.uploadImage(this)">Bild hochladen</button>
-                                <input type="file" file-model="myFile"/>
+                                <input type="file" nv-file-select="" uploader="uploader" class="hidden" id="addFile" img-cropper-fileread image="cropper.sourceImage"/>
                             </div>
 
-                            <ol class="sortable nested_with_switch vertical" id="imageList">
-                            </ol>
+                            <div class="col-xs-6" ng-show="c_tool.cImage.canvas!=null">
+                                    <canvas width="500" height="300" id="canvas" image-cropper image="cropper.sourceImage" cropped-image="c_tool.cImage.canvas" crop-width="400" crop-height="200" min-width="100" min-height="50" keep-aspect="true" crop-area-bounds="bounds"></canvas>
+                            </div>
+                            <div class="col-xs-6" ng-show="c_tool.cImage.canvas!=null">
+                                <div class="row row-marginbottom">
+                                    <div class="col-xs-12" ><img ng-src="{{c_tool.cImage.canvas}}" /></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <input type="text" ng-model="c_tool.cImage.title" placeholder="Titel:max 40 Zeichen" ng-maxlength="40" size="30">
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Bild speichern als<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a ng-click="c_tool.addImage('front')">Titelbild</a></li>
+                                                <li role="separator" class="divider"></li>
+                                                <li><a ng-click="c_tool.addImage('object')">Objektbild</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Example: nv-file-select="" uploader="{Object}" options="{Object}" filters="{String}"
 
                             -->
-
                         </div>
-
-        </div>
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <ol class="sortable nested_with_switch vertical" id="imageList" ng-repeat="(key, value) in c_tool.images">
+                                  <li class="row">
+                                      <div class="col-xs-4 well"><canvas id="canvas_{{key}}"></canvas></div>
+                                      <div class="col-xs-4"><input type="text" value="{{value.title}}" ng-model="c_tool.images[key].title"></div>
+                                      <div class="col-xs-4"><select ng-model="c_tool.images[key].kat"><option value="{{value.kat}}">{{value.kat}}</option></select></div>
+                                  </li>
+                                </ol>
+                            </div>
+                        </div>
                     </uib-accordion-group>
                 </uib-accordion>
             </form>

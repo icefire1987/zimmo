@@ -9,7 +9,7 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies'])
+    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angular-img-cropper','angularFileUpload'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider,$locationProvider) {
         $httpProvider.defaults.withCredentials = true;
