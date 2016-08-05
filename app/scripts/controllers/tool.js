@@ -25,6 +25,7 @@ angular.module('zimmoApp')
         };
         vm.images = [];
         vm.cImage = {};
+
         this.doopen = function () {
             if (vm.accExpo.statusAddress.open) {
                 leafletData.getMap().then(function (map) {
@@ -416,68 +417,41 @@ angular.module('zimmoApp')
             angular.element(id).click();
         };
         this.addImage = function(kat){
-            var obj = vm.cImage;
-            obj.kat = kat;
-            vm.images.push(angular.copy(obj));
+
+            var canvas =  vm.cImage.cropper.getCroppedCanvas();
+
+
+            var copycat = {};
+
+            copycat.kat = kat;
+            copycat.title = angular.copy(vm.cImage.title);
+            copycat.imgString = canvas.toDataURL();
+            copycat.source = vm.cImage.source;
+
+            vm.images.push(copycat);
 
             // empty CroppArea
-            vm.cImage = {};
+            vm.cImage.cropper.destroy();
+            vm.cImage.source = null;
+            vm.cImage.title = "";
+
+            var c=document.getElementById("canvas_crop");
+            var ctx=c.getContext("2d");
+            ctx.clearRect(0,0,c.width,c.height);
+
         };
 
-        this.drawCanvas = function(elem_canvas,data){
-            console.log(elem_canvas);
-            var canvas = angular.element(elem_canvas);
-            console.log(canvas)
-            var ctx = canvas[0].getContext("2d");
-
-            var image = new Image();
-            image.onload = function() {
-                ctx.drawImage(image, 0, 0);
-            };
-            image.src =data;
-        }
-        var uploader = $scope.uploader = new FileUploader({
+        this.uploader =  new FileUploader({
             url: 'upload.php'
         });
-        uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
-            console.info('onWhenAddingFileFailed', item, filter, options);
-        };
-        uploader.onAfterAddingFile = function(fileItem) {
+
+        this.uploader.onAfterAddingFile = function(fileItem) {
             console.info('onAfterAddingFile', fileItem);
         };
-        uploader.onAfterAddingAll = function(addedFileItems) {
-            console.info('onAfterAddingAll', addedFileItems);
-        };
-        uploader.onBeforeUploadItem = function(item) {
-            console.info('onBeforeUploadItem', item);
-        };
-        uploader.onProgressItem = function(fileItem, progress) {
-            console.info('onProgressItem', fileItem, progress);
-        };
-        uploader.onProgressAll = function(progress) {
-            console.info('onProgressAll', progress);
-        };
-        uploader.onSuccessItem = function(fileItem, response, status, headers) {
-            console.info('onSuccessItem', fileItem, response, status, headers);
-        };
-        uploader.onErrorItem = function(fileItem, response, status, headers) {
-            console.info('onErrorItem', fileItem, response, status, headers);
-        };
-        uploader.onCancelItem = function(fileItem, response, status, headers) {
-            console.info('onCancelItem', fileItem, response, status, headers);
-        };
-        uploader.onCompleteItem = function(fileItem, response, status, headers) {
-            console.info('onCompleteItem', fileItem, response, status, headers);
-        };
-        uploader.onCompleteAll = function() {
-            console.info('onCompleteAll');
-        };
-
 
     }])
     .run(
         function () {
-            console.log('run tool.js');
             $(".money").on(
                 "keyup",
                 function (e) {
@@ -503,43 +477,124 @@ angular.module('zimmoApp')
         }
     )
     .directive('ismoney', function() {
-    return {
-        require: '?ngModel',
-        link: function(scope, element, attrs, ngModelCtrl) {
-            if(!ngModelCtrl) {
-                return;
+        return {
+            require: '?ngModel',
+            link: function(scope, element, attrs, ngModelCtrl) {
+                if(!ngModelCtrl) {
+                    return;
+                }
+
+                ngModelCtrl.$parsers.push(function(val) {
+                    if (angular.isUndefined(val)) {
+                        var val = '';
+                    }
+                    val = val.replace(/,/g, "");
+                    val = val.replace(/\./g, "");
+
+                    if (val.length > 3) {
+                        val = "" + parseInt(val);
+                    }
+                    while (val.length < 3) {
+                        val = "0" + val;
+                    }
+
+                    var form_string = val.replace(
+                        /(\d+)(\d{2})/, '$1' + ','
+                        + '$2');
+
+                        ngModelCtrl.$setViewValue(form_string);
+                        ngModelCtrl.$render();
+
+                    return form_string;
+                });
+
+                element.bind('keypress', function(event) {
+                    if(event.keyCode === 32) {
+                        event.preventDefault();
+                    }
+                });
             }
+        };
+    })
 
-            ngModelCtrl.$parsers.push(function(val) {
-                if (angular.isUndefined(val)) {
-                    var val = '';
-                }
-                val = val.replace(/,/g, "");
-                val = val.replace(/\./g, "");
 
-                if (val.length > 3) {
-                    val = "" + parseInt(val);
-                }
-                while (val.length < 3) {
-                    val = "0" + val;
-                }
 
-                var form_string = val.replace(
-                    /(\d+)(\d{2})/, '$1' + ','
-                    + '$2');
+    .directive('repeatCanvas', function() {
+        return function(scope, element, attrs) {
 
-                    ngModelCtrl.$setViewValue(form_string);
-                    ngModelCtrl.$render();
+            var myCanvas = angular.element(element);
+                myCanvas.css({'width':'100%','border':'1px solid grey'});
+            var ctx = myCanvas[0].getContext("2d");
 
-                return form_string;
+            var image = new Image();
+            image.onload = function() {
+                ctx.drawImage(image, 0, 0);
+            };
+            image.src =attrs.data;
+        };
+    })
+    .directive("fileread", [function () {
+        return ({
+            link: link,
+            controller: 'ToolCtrl',
+            controllerAs: 'c_tool',
+            bindToController: true
+
+        });
+        function link( scope, element, attributes ) {
+            element.on("change", function (changeEvent) {
+                scope.$apply(function () {
+                    var file = changeEvent.target.files[0];
+                    var fr = new FileReader();
+                    var dataURL ="";
+                    fr.onload = function(){
+                        var img = new Image();
+                        img.onload = function(){
+                            if(scope.c_tool.cImage.cropper){
+                                scope.c_tool.cImage.cropper.destroy();
+                            }
+
+                            var canvas = document.getElementById(attributes.croparea);
+                            var ctx = canvas.getContext("2d");
+
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+
+                            ctx.drawImage(img,0,0);
+                            canvas.toDataURL("image/png");
+
+                            cropperinit(scope,canvas);
+                        };
+                        img.src = fr.result;
+                    };
+                    fr.readAsDataURL(file);
+
+                    scope.c_tool.cImage.source = changeEvent.target.files[0];
+                });
             });
+        }
 
-            element.bind('keypress', function(event) {
-                if(event.keyCode === 32) {
-                    event.preventDefault();
+        function cropperinit(globscope, image){
+
+            globscope.c_tool.cImage.cropper = new Cropper(image, {
+                modal: true,
+                guides: true,
+                dragCrop: true,
+                movable: true,
+                resizable: true,
+                zoomable: false,
+                touchDragZoom: false,
+                mouseWheelZoom: false,
+                preview: '#cropper_outputwrapper',
+                crop: function(e) {
+                    console.log(e.detail.x);
+                    console.log(e.detail.y);
+                    console.log(e.detail.width);
+                    console.log(e.detail.height);
+
                 }
             });
         }
-    };
-});
+    }]);
+
 ;

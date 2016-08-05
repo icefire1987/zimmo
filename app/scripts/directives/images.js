@@ -29,6 +29,7 @@ angular.module('zimmoApp')
             restrict: 'A',
             template: '<canvas/>',
             link: function(scope, element, attributes) {
+
                 if (!helper.support) return;
 
                 var params = scope.$eval(attributes.ngThumb);
@@ -36,7 +37,7 @@ angular.module('zimmoApp')
                 if (!helper.isFile(params.file)) return;
                 if (!helper.isImage(params.file)) return;
 
-                var canvas = element.find('canvas');
+                var canvas = angular.element(params.canvastocrop);
                 var reader = new FileReader();
 
                 reader.onload = onLoadFile;
@@ -53,6 +54,14 @@ angular.module('zimmoApp')
                     var height = params.height || this.height / this.width * params.width;
                     canvas.attr({ width: width, height: height });
                     canvas[0].getContext('2d').drawImage(this, 0, 0, width, height);
+
+
+                    var cropper = new Cropper(canvas[0], {
+                        aspectRatio: 16 / 9,
+                        crop: function(e) {
+
+                        }
+                    });
                 }
             }
         };
