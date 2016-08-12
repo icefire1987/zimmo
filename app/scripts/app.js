@@ -124,8 +124,12 @@ angular
 
         this.checkAuthenticated = function(){
             var phpcookie = $cookies.get("zuumeoImmoApp_Session_Session");
-            console.log(phpcookie);
+            console.info("auth")
             if(phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
+                //Update Cookie
+                var now = new Date(),
+                exp = new Date(now.getFullYear(), now.getMonth(), now.getDate()+2);
+                $cookies.put("zuumeoImmoApp_Session_Session",phpcookie,{expires: exp});
                 return true;
             }
 

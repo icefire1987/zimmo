@@ -67,3 +67,22 @@ input[type='checkbox']:checked + .tag::after,
 input[type='radio']:checked + .tag::after{
   color: white;
 }
+
+.croparea{
+  background-color: #fff;
+}
+.panel-body{
+  background-color: #7eaccb;
+}
+.box-light{
+  background-color: #427aa1;
+}
+.box-dark{
+  background-color: #7ecbc4 ;
+}
+
+.panel-body h4{
+  color: white;
+}
+
+

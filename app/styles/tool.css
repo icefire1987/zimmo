@@ -126,10 +126,44 @@ input[type='checkbox']:checked + .tag,
 input[type='radio']:checked + .tag{
   font-style: oblique;
 }
-.row-marginbottom{
-  margin-bottom: 20px;
+
+
+
+.row-paddingbottom{
+  padding-bottom: 20px;
+}
+
+#grundrissList canvas, #imageList canvas,#energieausweisList canvas{
+  max-height: 200px;
+  max-width: 100%;
+  box-shadow: 0 0 2px black;
+}
+
+#imageList, #grundrissList,#energieausweisList {
+ list-style-type: none;
+  padding: 0 40px;
+}
+
+#imageList li,#grundrissList li,#energieausweisList li{
+  padding: 4px 8px;
+  border: 1px solid white;
+  margin-bottom: 4px;
 }
 
 
+.padding-none{
+  padding: 0;
+}
 
+.iconrow{
 
+}
+.panel-body{
+  padding:0 15px;
+}
+.panel-body > .row{
+  padding: 20px 0;
+}
+.croparea{
+  padding:20px;
+}

@@ -23,8 +23,13 @@ angular.module('zimmoApp')
         vm.accExpo = {
             statusAddress: {}
         };
-        vm.images = [];
-        vm.cImage = {};
+        vm.tempdata = {
+            cImage:{},
+            cGrundriss:{},
+            cEnergieausweis:{}
+        }
+        vm.images = {object:[],grundriss:[],energieausweis:[]};
+
 
         this.doopen = function () {
             if (vm.accExpo.statusAddress.open) {
@@ -409,37 +414,55 @@ angular.module('zimmoApp')
             energieausweis: ["Bedarfsausweis","Verbrauchsausweis"],
             heizung: ["Fernwärme","Gaszentral","Gasetage","Ölzentral","Palletheizung","Erdwärme","Blockheizkraftwerk"],
             kuechenmarke: ["Bulthaup","Nolte","Alno","Nobilia","SieMatic"],
+            innenausstattung: [
+                "Hauswirtschaftsraum","Klimaanlage","Aufzug","Wämde gespachtelt","Keller","Doppelkastenfenster","Stuck","Barrierefrei","Kamin","Flügeltüren"
+            ],
             jahreszahl: list_jahre,
             zimmer: list_zimmer
         };
 
         this.clickElement = function(id){
             angular.element(id).click();
+
         };
         this.addImage = function(kat){
 
-            var canvas =  vm.cImage.cropper.getCroppedCanvas();
+            var canvas =  vm.tempdata.cImage.cropper.getCroppedCanvas();
 
-
-            var copycat = {};
-
-            copycat.kat = kat;
-            copycat.title = angular.copy(vm.cImage.title);
-            copycat.imgString = canvas.toDataURL();
-            copycat.source = vm.cImage.source;
-
-            vm.images.push(copycat);
+            vm.addToImages({
+                arrayname:'object',
+                data: {
+                    title:angular.copy(vm.tempdata.cImage.title),
+                    imgString:canvas.toDataURL(),
+                    source:vm.tempdata.cImage.source,
+                    kat:{
+                        "type": "select",
+                        "name": "Service",
+                        "value": kat,
+                        "values": [ "Titelbild", "Objektbild"]
+                    }
+                }
+            });
 
             // empty CroppArea
-            vm.cImage.cropper.destroy();
-            vm.cImage.source = null;
-            vm.cImage.title = "";
+            vm.tempdata.cImage.cropper.destroy();
+            vm.tempdata.cImage.source = null;
+            vm.tempdata.cImage.title = "";
 
             var c=document.getElementById("canvas_crop");
             var ctx=c.getContext("2d");
             ctx.clearRect(0,0,c.width,c.height);
 
         };
+
+        this.addToImages = function(obj){
+            /*
+            data = {
+            title,imgString,source,kat(additional dropdown data)
+            }
+*/
+            vm.images[obj.arrayname].push(obj.data);
+        }
 
         this.uploader =  new FileUploader({
             url: 'upload.php'
@@ -523,11 +546,12 @@ angular.module('zimmoApp')
         return function(scope, element, attrs) {
 
             var myCanvas = angular.element(element);
-                myCanvas.css({'width':'100%','border':'1px solid grey'});
             var ctx = myCanvas[0].getContext("2d");
 
             var image = new Image();
             image.onload = function() {
+                myCanvas[0].width = this.width;
+                myCanvas[0].height = this.height;
                 ctx.drawImage(image, 0, 0);
             };
             image.src =attrs.data;
@@ -546,37 +570,82 @@ angular.module('zimmoApp')
                 scope.$apply(function () {
                     var file = changeEvent.target.files[0];
                     var fr = new FileReader();
-                    var dataURL ="";
+
                     fr.onload = function(){
-                        var img = new Image();
-                        img.onload = function(){
-                            if(scope.c_tool.cImage.cropper){
-                                scope.c_tool.cImage.cropper.destroy();
+                        scope.$apply(function() {
+
+
+                            if(attributes.modeltarget == 'cImage') {
+                                scope.c_tool.tempdata.cImage.source = true;
+                                var img = new Image();
+                                img.onload = function () {
+
+                                    if (attributes.croparea) {
+                                        if (scope.c_tool.tempdata.cImage.cropper) {
+                                            scope.c_tool.tempdata.cImage.cropper.destroy();
+                                        }
+
+                                        var canvas = document.getElementById(attributes.croparea);
+                                        var ctx = canvas.getContext("2d");
+
+                                        canvas.width = img.width;
+                                        canvas.height = img.height;
+
+                                        ctx.drawImage(img, 0, 0);
+                                        canvas.toDataURL("image/png");
+
+                                        cropperinit(scope, canvas);
+                                    }
+
+
+                                };
+                                img.src = fr.result;
+
                             }
-
-                            var canvas = document.getElementById(attributes.croparea);
-                            var ctx = canvas.getContext("2d");
-
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-
-                            ctx.drawImage(img,0,0);
-                            canvas.toDataURL("image/png");
-
-                            cropperinit(scope,canvas);
-                        };
-                        img.src = fr.result;
+                            if(attributes.modeltarget == 'cGrundriss'){
+                                scope.c_tool.addToImages({
+                                    arrayname:'grundriss',
+                                    data: {
+                                        title: '',
+                                        imgString: fr.result,
+                                        source: file,
+                                        kat:{
+                                            "type": "select",
+                                            "name": "Service",
+                                            "value": 'EG',
+                                            "values": ['EG','1.OG']
+                                        }
+                                    }
+                                });
+                            }
+                            if(attributes.modeltarget == 'cEnergieausweis'){
+                                console.log(scope.c_tool)
+                                scope.c_tool.addToImages({
+                                    arrayname:'energieausweis',
+                                    data: {
+                                        title: scope.c_tool.currentExpose.energieausweisTyp,
+                                        imgString: fr.result,
+                                        source: file,
+                                        kat:{
+                                            "type": "select",
+                                            "name": "Service",
+                                            "value": 'EG',
+                                            "values": ['EG','1.OG']
+                                        }
+                                    }
+                                });
+                            }
+                        });
                     };
                     fr.readAsDataURL(file);
 
-                    scope.c_tool.cImage.source = changeEvent.target.files[0];
                 });
             });
         }
 
         function cropperinit(globscope, image){
 
-            globscope.c_tool.cImage.cropper = new Cropper(image, {
+            globscope.c_tool.tempdata.cImage.cropper = new Cropper(image, {
                 modal: true,
                 guides: true,
                 dragCrop: true,

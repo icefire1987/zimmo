@@ -68,7 +68,7 @@
                                        ng-model="c_tool.currentExpose.exposetitel" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row row-marginbottom" id="address">
+                        <div class="row row-paddingbottom" id="address">
                             <label class="control-label col-xs-8 col-md-6 col-md-offset-2">
                                 <div>
                                     <div class="text-inline">
@@ -141,7 +141,7 @@
                                 </select>
                             </label>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="col-xs-4 col-md-2 col-md-offset-2"><span class="btn btn-danger btn"
                                                                                    style="white-space: normal;"
                                                                                    ng-click="c_tool.getMap()"> Lageplan
@@ -174,7 +174,7 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusKosten.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusKosten.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        <div class="row row-paddingbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
                             <label class="control-label col-xs-6">
                                 <div>
                                     <div class="text-inline">
@@ -200,7 +200,7 @@
                                        ng-model="c_tool.currentExpose.wohngeld" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                        <div class="row row-paddingbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
                             <label class="control-label col-xs-6 col-sm-4">
                                 <div>
                                     <div class="text-inline">
@@ -243,7 +243,7 @@
                                        ng-change="c_tool.clearOtherVal('pauschalmiete',['kaltmiete','nebenkosten'])">
                             </label>
                         </div>
-                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
+                        <div class="row row-paddingbottom" ng-if="c_tool.currentExpose.geschaeftsart==1">
                             <label class="control-label col-xs-6 col-md-3">
                                 <div>
                                     <div class="text-inline">
@@ -274,7 +274,7 @@
                                 </select>
                             </label>
                         </div>
-                        <div class="row row-marginbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
+                        <div class="row row-paddingbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
                             <label class="control-label col-xs-6 col-md-3">
                                 <div>
                                     <div class="text-inline">
@@ -355,7 +355,7 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusStamm.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusStamm.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp==1">
                                 <div>
                                     <div class="text-inline">
@@ -407,7 +407,7 @@
                                 </datalist>
                             </label>
                             <div class="control-label col-xs-8 col-sm-6">
-                                <h5>Zustand</h5>
+                                <h4>Zustand</h4>
                                 <label class="control-label col-xs-4 col-sm-3">
                                     <input type="checkbox" name="renoviert">
                                     <span class="tag">renoviert</span>
@@ -422,7 +422,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-6 col-sm-3">
                                 <div>
                                     <div class="text-inline">
@@ -454,7 +454,7 @@
 
                             </label>
                             <div class="control-label col-xs-6 col-sm-4">
-                                <h5>&nbsp;</h5>
+                                <h4>&nbsp;</h4>
                                 <label class="control-label col-xs-12">
                                     <input type="checkbox" name="denkmalschutz" ng-model="c_tool.currentExpose.denkmalschutz">
                                     <span class="tag">Denkmalschutz vorhanden</span>
@@ -499,7 +499,7 @@
                                        ng-model="c_tool.currentExpose.decke" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
                                     <div class="text-inline">
@@ -528,7 +528,7 @@
                                        ng-model="c_tool.currentExpose.schlafzimmer" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
                                     <div class="text-inline">
@@ -554,7 +554,7 @@
                                        ng-model="c_tool.currentExpose.terrasse" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
                                     <div class="text-inline">
@@ -578,54 +578,21 @@
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusAusstattung.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusAusstattung.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
+                            {{c_tool.currentExpose.innenausstattung}}
                             <div class="control-label col-xs-12">
-                                <h5>Innenausstattung</h5>
-                                <label class="control-label col-xs-4 col-sm-3 checkbox-area">
-                                    <input type="checkbox" name="Hauswirtschaftsraum">
-                                    <span class="tag">Hauswirtschaftsraum</span>
+                                <h4>Innenausstattung</h4>
+                                <label class="control-label col-xs-4 col-sm-3" ng-repeat="(item,value) in c_tool.datalists.innenausstattung">
+                                    <input type="checkbox" ng-model="c_tool.currentExpose.innenausstattung[item]" ng-true-value="'{{value}}'">
+                                    <span class="tag">{{value}}</span>
                                 </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Klimaanlage">
-                                    <span class="tag">Klimaanlage</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Aufzug">
-                                    <span class="tag">Aufzug</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Wände gespachtelt">
-                                    <span class="tag">Wände gespachtelt</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Keller">
-                                    <span class="tag">Keller</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Doppelkasten-Fenster">
-                                    <span class="tag">Doppelkasten-Fenster</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Stuck">
-                                    <span class="tag">Stuck</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Barrierefrei">
-                                    <span class="tag">Barrierefrei</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Kamin">
-                                    <span class="tag">Kamin</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Flügeltüren">
-                                    <span class="tag">Flügeltüren</span>
-                                </label>
+
+
                             </div>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <div class="control-label col-xs-12">
-                                <h5>Bodenbelag</h5>
+                                <h4>Bodenbelag</h4>
                                 <label class="control-label col-xs-4 col-sm-3 checkbox-area">
                                     <input type="checkbox" name="Echtholz-Parkett">
                                     <span class="tag">Echtholz-Parkett</span>
@@ -644,7 +611,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="row row-marginbottom">
+                        <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <label class="control-label col-xs-12">
                                     <input type="checkbox" name="Einbauküche" ng-model="c_tool.currentExpose.kueche">
@@ -653,7 +620,7 @@
                             </label>
                             <div class="col-xs-8 col-sm-9" ng-if="c_tool.currentExpose.kueche">
                                 <div class="row">
-                                    <h5>Küchenausstattung</h5>
+                                    <h4>Küchenausstattung</h4>
                                     <label class="control-label col-xs-4 col-sm-3 checkbox-area">
                                         <input type="checkbox" name="offene Küche">
                                         <span class="tag">offene Küche</span>
@@ -693,56 +660,160 @@
                         </div>
 
                     </uib-accordion-group>
-                    <uib-accordion-group is-open="c_tool.accExpo.statusBilder.open">
+                    <uib-accordion-group is-open="c_tool.accExpo.statusBilder.open" class="acc_bilder">
                         <uib-accordion-heading>
                             Bilder
                             <i class="pull-right glyphicon"
                                ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusBilder.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusBilder.open}"></i>
                         </uib-accordion-heading>
-                        <div class="row row-marginbottom">
-
+                        <div class="row row-paddingbottom">
                             <div class="col-xs-12">
-                                <button type="button" class="btn btn-default" ng-click="c_tool.clickElement('#addFile')">Neues Bild hinzufügen</button>
-                                <input type="file" id="addFile" class="hidden" fileread="c_tool.cImage" croparea="canvas_crop"/>
-                            </div>
-
-                            <div class="col-xs-6">
-                               <canvas id="canvas_crop" style="width:100%;max-width:100%"></canvas>
-                            </div>
-                            <div class="col-xs-5 col-xs-offset-1" ng-show="c_tool.cImage.source!=null">
-                                <div class="row row-marginbottom">
+                                <div class="row row-paddingbottom">
                                     <div class="col-xs-12">
-                                        <div  id="cropper_outputwrapper" style="overflow: hidden; width: 100%;height:200px;"></div>
+                                        <h4>Objektbilder</h4>
+                                        <button type="button" class="btn btn-default" ng-click="c_tool.clickElement('#addFile')">Neues Bild hinzufügen</button>
+                                        <input type="file" id="addFile" class="hidden" fileread="" croparea="canvas_crop" modeltarget="cImage"/>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row croparea" ng-show="c_tool.tempdata.cImage.source!=null">
                                     <div class="col-xs-6">
-                                        <input type="text" ng-model="c_tool.cImage.title" placeholder="Titel:max 40 Zeichen" ng-maxlength="40" size="30">
+                                        <canvas id="canvas_crop" style="width:100%;max-width:100%"></canvas>
                                     </div>
-                                    <div class="col-xs-6">
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Bild speichern als<span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a ng-click="c_tool.addImage('front')">Titelbild</a></li>
-                                                <li role="separator" class="divider"></li>
-                                                <li><a ng-click="c_tool.addImage('object')">Objektbild</a></li>
-                                            </ul>
+
+                                    <div class="col-xs-5 col-xs-offset-1">
+                                        <div class="row row-paddingbottom">
+                                            <div class="col-xs-12">
+                                                <div id="cropper_outputwrapper" style="overflow: hidden; width: 100%;height:200px;"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-xs-6">
+                                                <input type="text" ng-model="c_tool.tempdata.cImage.title" placeholder="Titel:max 40 Zeichen" ng-maxlength="40" size="30">
+                                            </div>
+                                            <div class="col-xs-6">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-large btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        Bild speichern als<span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a ng-click="c_tool.addImage('Titelbild')">Titelbild</a></li>
+                                                        <li role="separator" class="divider"></li>
+                                                        <li><a ng-click="c_tool.addImage('Objektbild')">Objektbild</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xs-8">
-                                <ol class="sortable nested_with_switch vertical" id="imageList" ng-repeat="(key, value) in c_tool.images">
-                                  <li class="row">
-                                      <div class="col-xs-12"><canvas id="canvas_{{key}}" repeat-canvas data="{{value.imgString}}" style="width:100%;"></canvas></div>
-                                      <div class="col-xs-4"><input type="text" value="{{value.title}}" ng-model="c_tool.images[key].title"></div>
-                                      <div class="col-xs-4"><select ng-model="c_tool.images[key].kat"><option value="{{value.kat}}">{{value.kat}}</option></select></div>
+                        <div class="row" ng-show="c_tool.images.object.length>0">
+                            <div class="col-xs-12">
+                                <ol class="sortable nested_with_switch vertical" id="imageList">
+                                  <li class="row box-dark" ng-repeat="(key, value) in c_tool.images.object">
+                                      <div class="col-xs-12 col-sm-6">
+                                          <div class="row">
+                                              <div class="col-xs-2 padding-none iconrow">
+                                                  <span class="btn btn-danger glyphicon glyphicon-remove" ng-click="c_tool.images.object.splice(key,1)"></span>
+                                              </div>
+                                              <div class="col-xs-10">
+                                                  <canvas id="canvas_{{key}}" repeat-canvas data="{{value.imgString}}"></canvas>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="col-xs-12 col-sm-6">
+                                          <div class="row">
+                                              <div class="col-xs-12">
+                                                  <input type="text" value="{{value.title}}" ng-model="c_tool.images.object[key].title">
+                                              </div>
+                                              <div class="col-xs-12">
+                                                  <select ng-model="c_tool.images.object[key].kat.value" ng-options="v for v in c_tool.images.object[key].kat.values"></select>
+                                              </div>
+                                          </div>
+                                      </div>
                                   </li>
                                 </ol>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12 col-md-6">
+                                <div class="row row-paddingbottom">
+                                    <div class="col-xs-12">
+                                        <h4>Grundriss</h4>
+                                        <button type="button" class="btn btn-default" ng-click="c_tool.clickElement('#addGrundris')">Grundriss hinzufügen</button>
+                                        <input type="file" id="addGrundris" class="hidden" fileread="" modeltarget="cGrundriss" />
+                                    </div>
+                                </div>
+                                <div class="row" ng-show="c_tool.images.grundriss.length>0">
+                                    <div class="col-xs-12">
+                                        <ol class="sortable nested_with_switch vertical" id="grundrissList">
+                                            <li class="row box-dark" ng-repeat="(key, value) in c_tool.images.grundriss">
+                                                <div class="col-xs-12 col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-xs-2 padding-none iconrow">
+                                                            <span class="btn btn-danger glyphicon glyphicon-remove" ng-click="c_tool.images.grundriss.splice(key,1)"></span>
+                                                        </div>
+                                                        <div class="col-xs-10">
+                                                            <canvas id="canvas_grundriss_{{key}}" repeat-canvas data="{{value.imgString}}"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <input type="text" value="{{value.title}}" ng-model="c_tool.images.grundriss[key].title" placeholder="Bildtitel">
+                                                        </div>
+                                                        <div class="col-xs-12">
+                                                            <select ng-model="c_tool.images.grundriss[key].kat.value"
+                                                                    ng-options="v for v in c_tool.images.grundriss[key].kat.values"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-xs-12 col-md-6">
+                                <div class="row row-paddingbottom">
+                                    <div class="col-xs-12">
+                                        <h4>Energieausweis</h4>
+                                        <button type="button" class="btn btn-default" ng-click="c_tool.clickElement('#addEnergieausweis')">Energieausweis hinzufügen</button>
+                                        <input type="file" id="addEnergieausweis" class="hidden" fileread="" modeltarget="cEnergieausweis" />
+                                    </div>
+                                </div>
+                                <div class="row" ng-show="c_tool.images.energieausweis.length>0">
+                                    <div class="col-xs-12">
+                                        <ol class="sortable nested_with_switch vertical" id="energieausweisList">
+                                            <li class="row box-dark" ng-repeat="(key, value) in c_tool.images.energieausweis">
+                                                <div class="col-xs-12 col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-xs-2 padding-none iconrow">
+                                                            <span class="btn btn-danger glyphicon glyphicon-remove" ng-click="c_tool.images.energieausweis.splice(key,1)"></span>
+                                                        </div>
+                                                        <div class="col-xs-10">
+                                                            <canvas id="canvas_energieausweis_{{key}}" repeat-canvas data="{{value.imgString}}"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <input type="text" value="{{value.title}}" ng-model="c_tool.images.energieausweis[key].title" placeholder="Bildtitel">
+                                                        </div>
+                                                        <div class="col-xs-12">
+                                                            <select ng-model="c_tool.images.energieausweis[key].kat.value"
+                                                                    ng-options="v for v in c_tool.images.energieausweis[key].kat.values"></select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </uib-accordion-group>
