@@ -34,7 +34,7 @@
     <!-- Objektdaten -->
     <div class="row" ng-show="c_tool.currentExpose.objekttyp && c_tool.currentExpose.geschaeftsart">
         <div class="col-xs-12">
-            <form method="POST" name="form_object" role="form" ng-submit="c_tool.checkExposeForm($event);">
+            <form method="POST" name="form_object" id="formExpose" role="form" class="row" action="">
                 <uib-accordion close-others="true" class="col-xs-12">
                     <uib-accordion-group is-open="c_tool.accExpo.statusAddress.open" ng-click="c_tool.doopen()">
                         <uib-accordion-heading>
@@ -133,11 +133,8 @@
                                     </div>
                                 </div>
                                 <select name="land" class="form-control" ng-model="c_tool.currentExpose.land"
-                                        ng-model-options="{ debounce: 500 }">
+                                        ng-model-options="{ debounce: 500 }" ng-options="v as v for v in c_tool.datalists.land">
                                     <option value=""></option>
-                                    <option value="1" selected>Deutschland</option>
-                                    <option value="2">Österreich</option>
-                                    <option value="3">Schweiz</option>
                                 </select>
                             </label>
                         </div>
@@ -409,15 +406,15 @@
                             <div class="control-label col-xs-8 col-sm-6">
                                 <h4>Zustand</h4>
                                 <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="renoviert">
+                                    <input type="checkbox" name="renoviert" ng-model="c_tool.currentExpose.renoviert">
                                     <span class="tag">renoviert</span>
                                 </label>
                                 <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="saniert">
+                                    <input type="checkbox" name="saniert" ng-model="c_tool.currentExpose.saniert">
                                     <span class="tag">saniert</span>
                                 </label>
                                 <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="moebliert">
+                                    <input type="checkbox" name="moebliert" ng-model="c_tool.currentExpose.moebliert">
                                     <span class="tag">möbliert</span>
                                 </label>
                             </div>
@@ -583,7 +580,7 @@
                             <div class="control-label col-xs-12">
                                 <h4>Innenausstattung</h4>
                                 <label class="control-label col-xs-4 col-sm-3" ng-repeat="(item,value) in c_tool.datalists.innenausstattung">
-                                    <input type="checkbox" ng-model="c_tool.currentExpose.innenausstattung[item]" ng-true-value="'{{value}}'">
+                                    <input type="checkbox" ng-model="c_tool.currentExpose.innenausstattung[value]">
                                     <span class="tag">{{value}}</span>
                                 </label>
 
@@ -591,26 +588,18 @@
                             </div>
                         </div>
                         <div class="row row-paddingbottom">
+                            {{c_tool.currentExpose.boden}}
                             <div class="control-label col-xs-12">
                                 <h4>Bodenbelag</h4>
-                                <label class="control-label col-xs-4 col-sm-3 checkbox-area">
-                                    <input type="checkbox" name="Echtholz-Parkett">
-                                    <span class="tag">Echtholz-Parkett</span>
+                                <label class="control-label col-xs-4 col-sm-3" ng-repeat="(item,value) in c_tool.datalists.bodenbelag">
+                                    <input type="checkbox" ng-model="c_tool.currentExpose.boden[value]">
+                                    <span class="tag">{{value}}</span>
                                 </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="hochwertiges Parkett">
-                                    <span class="tag">hochwertiges Parkett</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Fussbodenheizung">
-                                    <span class="tag">Fussbodenheizung</span>
-                                </label>
-                                <label class="control-label col-xs-4 col-sm-3">
-                                    <input type="checkbox" name="Dielen">
-                                    <span class="tag">Dielen</span>
-                                </label>
+
+
                             </div>
                         </div>
+
                         <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <label class="control-label col-xs-12">
@@ -619,28 +608,15 @@
                                 </label>
                             </label>
                             <div class="col-xs-8 col-sm-9" ng-if="c_tool.currentExpose.kueche">
-                                <div class="row">
-                                    <h4>Küchenausstattung</h4>
-                                    <label class="control-label col-xs-4 col-sm-3 checkbox-area">
-                                        <input type="checkbox" name="offene Küche">
-                                        <span class="tag">offene Küche</span>
-                                    </label>
-                                    <label class="control-label col-xs-4 col-sm-3">
-                                        <input type="checkbox" name="Wohnküche">
-                                        <span class="tag">Wohnküche</span>
-                                    </label>
-                                    <label class="control-label col-xs-4 col-sm-3">
-                                        <input type="checkbox" name="hochwertig">
-                                        <span class="tag">hochwertig</span>
-                                    </label>
-                                    <label class="control-label col-xs-4 col-sm-3">
-                                        <input type="checkbox" name="modern">
-                                        <span class="tag">modern</span>
-                                    </label>
-                                    <label class="control-label col-xs-4 col-sm-3">
-                                        <input type="checkbox" name="klassisch">
-                                        <span class="tag">klassisch</span>
-                                    </label>
+                                <div class="row row-paddingbottom">
+                                    {{c_tool.currentExpose.kuechenausstattung}}
+                                    <div class="control-label col-xs-12">
+                                        <h4>Küchenausstattung</h4>
+                                        <label class="control-label col-xs-4 col-sm-3" ng-repeat="(item,value) in c_tool.datalists.kuechenausstattung">
+                                            <input type="checkbox" ng-model="c_tool.currentExpose.kuechenausstattung[value]">
+                                            <span class="tag">{{value}}</span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <label class="control-label col-xs-4 col-sm-3">
@@ -652,7 +628,7 @@
                                         <input type="text" name="kueche_marke" placeholder="" class="form-control" list="datalist_kuechenmarke"
                                                ng-model="c_tool.currentExpose.kueche_marke" ng-model-options="{ debounce: 500 }">
                                         <datalist id="datalist_kuechenmarke">
-                                            <option  data-ng-repeat="dl_opt in c_tool.datalists.kuechenmarke | orderBy:'toValue()'" value="{{dl_opt}}">
+                                            <option  data-ng-repeat="dl_opt in c_tool.datalists.kuechenmarke | orderBy: dl_opt" value="{{dl_opt}}">
                                         </datalist>
                                     </label>
                                 </div>
@@ -818,8 +794,16 @@
                         </div>
                     </uib-accordion-group>
                 </uib-accordion>
+
+                    <div class="col-xs-12">
+                        <button type="button" class="btn btn-large btn-success" ng-click="c_tool.submit_form_expose()">Speichern</button>
+                    </div>
+
+
             </form>
-            <code>{{c_tool.currentExpose}}</code>
+            <div class="well">
+                <div ng-bind-html="c_tool.repLB() | sanitize"></div>
+            </div>
         </div>
     </div>
 </div>

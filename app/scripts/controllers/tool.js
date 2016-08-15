@@ -15,8 +15,13 @@ angular.module('zimmoApp')
         //var scriptbase = '';
         var vm = this;
 
+        this.repLB = function(){
+            return JSON.stringify(vm.currentExpose,null," ").replace(/,/g,', <br>');
+        }
+
 
         vm.currentExpose = {};
+
         vm.feedback = {};
         vm.feedbackVisible = false;
 
@@ -408,14 +413,19 @@ angular.module('zimmoApp')
         }
 
         this.datalists = {
+            land:["Deutschland","Schweiz","Österreich"],
             stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
             wohnungstyp: ["Dachgeschoss","Maisonette","Penthaus"],
             haustyp: ["Einfamilienhaus","Bungalow","Doppelhaus","Reihenendhaus","Reihenmittelhaus","Villa","Stadthaus"],
             energieausweis: ["Bedarfsausweis","Verbrauchsausweis"],
             heizung: ["Fernwärme","Gaszentral","Gasetage","Ölzentral","Palletheizung","Erdwärme","Blockheizkraftwerk"],
-            kuechenmarke: ["Bulthaup","Nolte","Alno","Nobilia","SieMatic"],
+            kuechenmarke: ["Bulthaup","Nolte","Alno","Nobilia","SieMatic","IKEA"],
+            kuechenausstattung:["offene Küche","Wohnküche","hochwertig","modern","klassisch"],
             innenausstattung: [
                 "Hauswirtschaftsraum","Klimaanlage","Aufzug","Wämde gespachtelt","Keller","Doppelkastenfenster","Stuck","Barrierefrei","Kamin","Flügeltüren"
+            ],
+            bodenbelag: [
+                "Echtholz-Parkett","hochwertiges Parkett","Fussbodenheizung","Dielen"
             ],
             jahreszahl: list_jahre,
             zimmer: list_zimmer
@@ -425,6 +435,8 @@ angular.module('zimmoApp')
             angular.element(id).click();
 
         };
+
+
         this.addImage = function(kat){
 
             var canvas =  vm.tempdata.cImage.cropper.getCroppedCanvas();
@@ -471,6 +483,12 @@ angular.module('zimmoApp')
         this.uploader.onAfterAddingFile = function(fileItem) {
             console.info('onAfterAddingFile', fileItem);
         };
+
+        this.submit_form_expose = function(){
+            // vm.currentExpose
+
+            vm.checkExposeForm();
+        }
 
     }])
     .run(
@@ -557,6 +575,12 @@ angular.module('zimmoApp')
             image.src =attrs.data;
         };
     })
+    .filter("sanitize", ['$sce', function($sce) {
+        return function(htmlCode){
+            return $sce.trustAsHtml(htmlCode);
+        }
+    }])
+
     .directive("fileread", [function () {
         return ({
             link: link,
@@ -665,5 +689,6 @@ angular.module('zimmoApp')
             });
         }
     }]);
+
 
 ;
