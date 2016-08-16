@@ -45,8 +45,8 @@ z-index: 99;
 .form-error{
   margin-bottom: -6px;
 }
-.leaflet{
-
+.angular-leaflet-map{
+  border: 2px inset white;
 }
 .angular-leaflet-map{
   height: 400px;

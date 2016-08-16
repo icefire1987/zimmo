@@ -51,6 +51,8 @@ class AjaxControl{
                 case "echoRecord":
                     $this->echoRecord();
                     break;
+                case "exposeInsert":
+                    $this->exposeInsert();
                 case "logout":
                     $this->logout();
                     break;
@@ -180,6 +182,25 @@ class AjaxControl{
 
         }
     }
+    function exposeInsert(){
+        if($this->checkLogin()===true){
+            $exposeModel = new ExposeModel($this->DB);
+
+            $data = [];
+            $data = $this->input["formdata"];
+
+            var_dump($data);
+            $obj = $exposeModel->setExposedata($data);
+
+            if(isset($obj["code"])){
+                echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
+            }else{
+                echo json_encode(array("type" => "success", "feedbacktext" => "Löschen erfolgreich", "code" => 1, "text"=>json_encode($obj)));
+            }
+
+        }
+    }
+
     function createPDF(){
         if($this->checkLogin()===true) {
 

@@ -187,4 +187,8 @@ class ExposeModel{
             return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
         }
     }
+
+    function setExposedata($data){
+        return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
+    }
 }

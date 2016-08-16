@@ -152,7 +152,7 @@
 
                             <div class="checkbox_custom col-xs-6 col-md-3">
                                 <label class="">
-                                    <input type="checkbox" name="showMap" checked="checked" id="showMap">
+                                    <input type="checkbox" ng-checked="c_tool.currentExpose.showMap">
                                     <span>Im Exposé anzeigen</span>
                                 </label>
                             </div>
@@ -626,7 +626,7 @@
                                             </div>
                                         </div>
                                         <input type="text" name="kueche_marke" placeholder="" class="form-control" list="datalist_kuechenmarke"
-                                               ng-model="c_tool.currentExpose.kueche_marke" ng-model-options="{ debounce: 500 }">
+                                               ng-model="c_tool.currentExpose.kuechenmarke" ng-model-options="{ debounce: 500 }">
                                         <datalist id="datalist_kuechenmarke">
                                             <option  data-ng-repeat="dl_opt in c_tool.datalists.kuechenmarke | orderBy: dl_opt" value="{{dl_opt}}">
                                         </datalist>

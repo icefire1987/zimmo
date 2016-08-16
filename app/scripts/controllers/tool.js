@@ -251,7 +251,7 @@ angular.module('zimmoApp')
 
                             try {
                                 var dummy = JSON.parse(response.data.text.map);
-
+                                console.log("then try")
                                 vm.mapdata.center = {
                                     lat: (dummy.lat) * 1,
                                     lng: (dummy.lon) * 1,
@@ -289,7 +289,7 @@ angular.module('zimmoApp')
         };
 
         this.checkExposeForm = function (event) {
-            console.log('check');
+            return vm.currentExpose;
         };
         this.getMap = function () {
             try {
@@ -338,7 +338,7 @@ angular.module('zimmoApp')
                 if (typeof resdata[0].lon != 'undefined') {
                     var lon_parse = resdata[0].lon;
                     var lat_parse = resdata[0].lat;
-
+                    console.log("try if")
                     vm.mapdata.center = {
                         lat: (lat_parse) * 1,
                         lng: (lon_parse) * 1,
@@ -394,7 +394,7 @@ angular.module('zimmoApp')
                     draggable: true
                 }
             };
-
+            vm.currentExpose.map = vm.mapdata.center;
             leafletData.getMap().then(function (map) {
                 $timeout(function () {
                     map.invalidateSize();
@@ -486,8 +486,42 @@ angular.module('zimmoApp')
 
         this.submit_form_expose = function(){
             // vm.currentExpose
+            var obj;
+            if(obj = vm.checkExposeForm()){
+                var credentials = {
+                    action: 'exposeInsert',
+                    formdata: obj
+                };
 
-            vm.checkExposeForm();
+                $http({
+                    url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                    method: 'POST',
+                    data: JSON.stringify(credentials),
+                    withCredentials: true
+
+                })
+                .then(
+                    function (response) {
+                        console.log(response.data);
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+                            for (var x = 0; x < vm.resultAll_tableParams.data.length; x++) {
+                                if (vm.resultAll_tableParams.data[x].id == obj.id) {
+                                    vm.resultAll_tableParams.data.splice(x, 1);
+                                }
+
+                            }
+
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data);
+                    }
+                );
+            }else{
+                console.log("Check failed")
+            }
+
         }
 
     }])
