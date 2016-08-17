@@ -53,6 +53,7 @@ class AjaxControl{
                     break;
                 case "exposeInsert":
                     $this->exposeInsert();
+                    break;
                 case "logout":
                     $this->logout();
                     break;
@@ -186,10 +187,8 @@ class AjaxControl{
         if($this->checkLogin()===true){
             $exposeModel = new ExposeModel($this->DB);
 
-            $data = [];
             $data = $this->input["formdata"];
 
-            var_dump($data);
             $obj = $exposeModel->setExposedata($data);
 
             if(isset($obj["code"])){

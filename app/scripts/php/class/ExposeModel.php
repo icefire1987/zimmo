@@ -101,23 +101,26 @@ class ExposeModel{
             $stmt->execute();
             $stmt->store_result();
 
-            if ($stmt->num_rows > 1) {
+            if ($stmt->num_rows > 0) {
                 // get variables from result.
-                $stmt->bind_result($id,$go,$strasse,$hausnr,$plz,$ort,$ga,$oa);
-                WHILE($stmt->fetch()){
+                $stmt->bind_result($id, $go, $strasse, $hausnr, $plz, $ort, $ga, $oa);
+                WHILE ($stmt->fetch()) {
                     $dbData[] = array(
-                        "id"=>$id,
-                        "go"=>$go,
-                        "strasse"=>$strasse." ".$hausnr,
-                        "plz"=>$plz,
-                        "ort"=>$ort,
-                        "ga"=>$ga,
-                        "oa"=>$oa
+                        "id" => $id,
+                        "go" => $go,
+                        "strasse" => $strasse . " " . $hausnr,
+                        "plz" => $plz,
+                        "ort" => $ort,
+                        "ga" => $ga,
+                        "oa" => $oa
                     );
                 }
                 $stmt->close();
 
                 return $dbData;
+            }else if ($stmt->num_rows == 0) {
+                $stmt->close();
+                return null;
             }else{
                 $stmt->close();
                 return array("code"=>28,"txt"=>"NoRes Expose::getAll");
@@ -189,6 +192,74 @@ class ExposeModel{
     }
 
     function setExposedata($data){
-        return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
+       // What is needed:
+
+       $neededKeys = ["geschaeftsart","objekttyp","strasse","ort"];
+       $possibleKeys = ["geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go","lieferung","moebiliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk","stockwerke","stockwerk","haustyp","baujahr","sanierung","renovierung","besonderheit","exposetitel","provision","provisionEinheit","kaution","kautionEinheit","kaltmiete","pauschalmiete","nebenkosten","kaufpreis","stellplatz","stellplatztyp","stellplatzkosten","wohnflaeche","grundstueckflaeche","zimmer","schlafzimmer","balkon","terrasse","aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp","badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung","energiewert","energieausweisTyp","denkmalschutz","zustand","lage","manualTextLage","manualTextAusstattung","manualTextObjekt","updatedatum","userID","map"];
+       foreach($neededKeys as $k=>$v){
+           if(!array_key_exists($v,$data)){
+               return array("code"=>29,"txt"=>$v.": Missing Key Expose::set");
+           }
+       }
+
+        // INSERT INTO objects ( $colanmes ) VALUES ( $values )
+        $colnames = "";
+
+        $value_array = array();
+        $param_array = array();
+        $param_type = '';
+        $questionmarks = "";
+        //  get VarTyp and colnames AND set empty fields to null
+        foreach($possibleKeys as $pk){
+            if(!isset($data[$pk])){
+                $data[$pk] = null;
+            }
+            $vartyp = gettype($data[$pk]);
+            $colnames .= $pk.',';
+            $questionmarks .= '?,';
+
+            switch($vartyp){
+                case 'integer':
+                    $param_type .= 'i';
+                    $value_array[] = htmlspecialchars($data[$pk], ENT_NOQUOTES);
+                    break;
+                case 'double':
+                    $param_type .= 'd';
+                    $value_array[] = htmlspecialchars($data[$pk], ENT_NOQUOTES);
+                    break;
+                case 'array':
+                case 'object':
+                    $param_type .= 's';
+                    $value_array[] = htmlspecialchars(json_encode($data[$pk],JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK), ENT_NOQUOTES);
+                    break;
+                default:
+                    $param_type .= 's';
+                    $value_array[] = htmlspecialchars($data[$pk], ENT_NOQUOTES);
+                    break;
+            }
+        }
+
+        $param_array[] = &$param_type;
+        // set value for each field
+        foreach($value_array as $k=>$v){
+            $param_array[] = &$value_array[$k];
+        }
+
+        $colnames = rtrim($colnames, ",");
+        $questionmarks = rtrim($questionmarks, ",");
+        var_dump($param_array);
+
+        if (!($stmt = $this->db->mysqli->prepare("INSERT INTO objects($colnames) VALUES ($questionmarks)"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        if (!call_user_func_array(array($stmt, 'bind_param'), $param_array)) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
     }
 }

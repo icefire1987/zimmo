@@ -123,18 +123,20 @@ angular.module('zimmoApp')
                     if (response.data.type === "success" || response.data.type === "err") {
                         vm.showFeedback(response.data);
                     }
-                    var resultset = JSON.parse(response.data.text);
-                    vm.cols = [
-                        {field: "id", title: "ID", sortable: "id", show: true},
-                        {field: "go", title: "Nummer", sortable: "go", show: true},
-                        {field: "strasse", title: "Strasse", sortable: "strasse", show: true},
-                        {field: "plz", title: "PLZ", sortable: "plz", show: true},
-                        {field: "ort", title: "Ort", sortable: "ort", show: true},
-                        {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
-                        {field: "oa", title: "Objektart", sortable: "oa", show: true},
-                        {field: "action", title: "", dataType: "command", show: true}
-                    ];
-                    vm.resultAll_tableParams = new NgTableParams({}, {dataset: resultset});
+                    if (response.data.type === "success") {
+                        var resultset = JSON.parse(response.data.text);
+                        vm.cols = [
+                            {field: "id", title: "ID", sortable: "id", show: true},
+                            {field: "go", title: "Nummer", sortable: "go", show: true},
+                            {field: "strasse", title: "Strasse", sortable: "strasse", show: true},
+                            {field: "plz", title: "PLZ", sortable: "plz", show: true},
+                            {field: "ort", title: "Ort", sortable: "ort", show: true},
+                            {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
+                            {field: "oa", title: "Objektart", sortable: "oa", show: true},
+                            {field: "action", title: "", dataType: "command", show: true}
+                        ];
+                        vm.resultAll_tableParams = new NgTableParams({}, {dataset: resultset});
+                    }
                 })
             ;
         };
@@ -251,16 +253,17 @@ angular.module('zimmoApp')
 
                             try {
                                 var dummy = JSON.parse(response.data.text.map);
-                                console.log("then try")
+                                console.log("then try center")
                                 vm.mapdata.center = {
                                     lat: (dummy.lat) * 1,
-                                    lng: (dummy.lon) * 1,
+                                    lng: (dummy.lng) * 1,
                                     zoom: parseInt(dummy.zoom),
                                 };
+                                console.log("then try markers")
                                 vm.mapdata.markers = {
                                     objekt: {
                                         lat: (dummy.lat) * 1,
-                                        lng: (dummy.lon) * 1,
+                                        lng: (dummy.lng) * 1,
                                         focus: true,
                                         draggable: true
                                     }
