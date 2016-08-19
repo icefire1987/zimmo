@@ -122,17 +122,23 @@ class AjaxControl{
             if($parse!==false) {
                 $data["nummer"] = $this->Security->validateInput('string', $this->input["formdata"], 'nummer');
                 $data["strasse"] = $this->Security->validateInput('string', $this->input["formdata"], 'strasse');
-                $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');               
+                $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
 
-                if ($data["nummer"] === false) {
-                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: nummer", "code" => 91));
+                if ($data["nummer"] === false && $data["strasse"] === false && $data["id"] === false) {
+                    echo json_encode(array("type" => "err", "text" => "Bitte einen Suchwert eingeben", "code" => 91));
                     return false;
-                } else if ($data["strasse"] === false) {
-                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: strasse", "code" => 92));
-                    return false;
-                } else if ($data["id"] === false) {
-                    echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: id", "code" => 93));
-                    return false;
+                    /*
+                    if ($data["nummer"] === false) {
+                        echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: nummer", "code" => 91));
+                        return false;
+                    } else if ($data["strasse"] === false) {
+                        echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: strasse", "code" => 92));
+                        return false;
+                    } else if ($data["id"] === false) {
+                        echo json_encode(array("type" => "err", "text" => "fehlerhafte Eingabe: id", "code" => 93));
+                        return false;
+                    }
+                    */
                 } else {
                     $obj = $exposeModel->getExpose($data);
                     if(isset($obj["code"])){
@@ -194,7 +200,7 @@ class AjaxControl{
             if(isset($obj["code"])){
                 echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
             }else{
-                echo json_encode(array("type" => "success", "feedbacktext" => "Löschen erfolgreich", "code" => 1, "text"=>json_encode($obj)));
+                echo json_encode(array("type" => "success", "feedbacktext" => "Datensatz erfolgreich gespeichert", "code" => 1, "text"=>json_encode($obj),"returnID"=>$obj["returnID"]));
             }
 
         }

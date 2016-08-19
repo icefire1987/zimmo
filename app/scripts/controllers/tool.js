@@ -99,15 +99,18 @@ angular.module('zimmoApp')
             }
 
         }
-        this.exposeSearch = function (searchdata) {
+        this.exposeSearch = function (searchOne,searchdata) {
             var credentials = {
                 action: 'exposeSearchAll',
                 formdata: false
             };
-            if (searchdata === true) {
+            if (searchOne === true) {
+                if(!searchdata){
+                    searchdata= vm.searchObj.formdata
+                }
                 credentials = {
                     action: 'exposeSearchOne',
-                    formdata: vm.searchObj.formdata
+                    formdata: searchdata
                 };
             }
             vm.showFeedback({type: "info", feedbacktext: "Anfrage in Bearbeitung..."});
@@ -236,20 +239,31 @@ angular.module('zimmoApp')
             })
                 .then(
                     function (response) {
-                        console.log(response.data);
+
                         if (response.data.type === "success" || response.data.type === "err") {
                             vm.showFeedback(response.data);
                             for (var key in response.data.text) {
                                 //prevent null and int
                                 response.data.text[key] = (response.data.text[key] || "").toString()
                             }
+
                             vm.currentExpose = response.data.text;
                             // input: number
                             vm.currentExpose.kaufpreis = parseInt(vm.currentExpose.kaufpreis);
-                            vm.currentExpose.wohngeld = parseInt(vm.currentExpose.wohngeld);
-                            vm.currentExpose.kaltmiete = parseInt(vm.currentExpose.kaltmiete);
-                            vm.currentExpose.nebenkosten = parseInt(vm.currentExpose.nebenkosten);
-                            vm.currentExpose.pauschalmiete = parseInt(vm.currentExpose.pauschalmiete);
+                            vm.currentExpose.pauschalmiete = parseFloat(vm.currentExpose.pauschalmiete);
+                            vm.currentExpose.decke = parseFloat(vm.currentExpose.decke);
+                            vm.currentExpose.wohngeld = parseFloat(vm.currentExpose.wohngeld);
+                            vm.currentExpose.kaltmiete = parseFloat(vm.currentExpose.kaltmiete);
+                            vm.currentExpose.nebenkosten = parseFloat(vm.currentExpose.nebenkosten);
+                            vm.currentExpose.kaution = parseFloat(vm.currentExpose.kaution);
+                            vm.currentExpose.stellplatz = parseFloat(vm.currentExpose.stellplatz);
+                            vm.currentExpose.stellplatzkosten = parseFloat(vm.currentExpose.stellplatzkosten);
+
+                            vm.currentExpose.innenausstattung = JSON.parse(vm.currentExpose.innenausstattung);
+                            vm.currentExpose.boden = JSON.parse(vm.currentExpose.boden);
+                            vm.currentExpose.kuechenausstattung = JSON.parse(vm.currentExpose.kuechenausstattung);
+
+
 
                             try {
                                 var dummy = JSON.parse(response.data.text.map);
@@ -495,7 +509,6 @@ angular.module('zimmoApp')
                     action: 'exposeInsert',
                     formdata: obj
                 };
-
                 $http({
                     url: scriptbase + 'scripts/php/ajaxCtrl.php',
                     method: 'POST',
@@ -505,16 +518,10 @@ angular.module('zimmoApp')
                 })
                 .then(
                     function (response) {
-                        console.log(response.data);
+                        console.log(response);
                         if (response.data.type === "success" || response.data.type === "err") {
+                            $state.go("tool.sucheOne", {exposeid: response.data.returnID});
                             vm.showFeedback(response.data);
-                            for (var x = 0; x < vm.resultAll_tableParams.data.length; x++) {
-                                if (vm.resultAll_tableParams.data[x].id == obj.id) {
-                                    vm.resultAll_tableParams.data.splice(x, 1);
-                                }
-
-                            }
-
                         }
                     },
                     function (data) {
@@ -533,7 +540,6 @@ angular.module('zimmoApp')
             $(".money").on(
                 "keyup",
                 function (e) {
-                    console.log('dough');
                     var string = $(this).val();
 
                     string = string.replace(/,/g, "");
@@ -686,13 +692,7 @@ angular.module('zimmoApp')
                                     data: {
                                         title: scope.c_tool.currentExpose.energieausweisTyp,
                                         imgString: fr.result,
-                                        source: file,
-                                        kat:{
-                                            "type": "select",
-                                            "name": "Service",
-                                            "value": 'EG',
-                                            "values": ['EG','1.OG']
-                                        }
+                                        source: file
                                     }
                                 });
                             }

@@ -15,17 +15,17 @@ class ExposeModel{
     }
     function getExpose($search=false){
         $user = $_SESSION["userid"];
+
         if($search!==false){
             // Such-Parameter übergeben
-
             $addWhere="";
             // 1. fester Parameter: userid
             $bindParamTyp[] = 'i';
             $bindParam[]=$user;
 
             foreach($search as $key=>$value){
-                if($value==""){
-                    break;
+                if($value==false){
+                    continue;
                 }
                 switch($key) {
                     case "nummer":
@@ -71,7 +71,6 @@ class ExposeModel{
                 WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
                 
                ".$addWhere;
-
             $stmt =  $this->db->mysqli->prepare($prep_stmt);
             if ($stmt) {
                 /* use call_user_func_array, as $stmt->bind_param('s', $param); does not accept params array */
@@ -193,9 +192,19 @@ class ExposeModel{
 
     function setExposedata($data){
        // What is needed:
-
+        $data["userID"] = $_SESSION["userid"];
        $neededKeys = ["geschaeftsart","objekttyp","strasse","ort"];
-       $possibleKeys = ["geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go","lieferung","moebiliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk","stockwerke","stockwerk","haustyp","baujahr","sanierung","renovierung","besonderheit","exposetitel","provision","provisionEinheit","kaution","kautionEinheit","kaltmiete","pauschalmiete","nebenkosten","kaufpreis","stellplatz","stellplatztyp","stellplatzkosten","wohnflaeche","grundstueckflaeche","zimmer","schlafzimmer","balkon","terrasse","aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp","badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung","energiewert","energieausweisTyp","denkmalschutz","zustand","lage","manualTextLage","manualTextAusstattung","manualTextObjekt","updatedatum","userID","map"];
+       $possibleKeys = [
+           "geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go",
+           "lieferung","moebiliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk",
+           "stockwerke","stockwerk","haustyp","baujahr","sanierung","renovierung","besonderheit",
+           "exposetitel","provision","provisionEinheit","kaution","kautionEinheit","kaltmiete",
+           "pauschalmiete","nebenkosten","kaufpreis","stellplatz","stellplatztyp","stellplatzkosten",
+           "wohnflaeche","grundstueckflaeche","zimmer","schlafzimmer","balkon","terrasse",
+           "aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp",
+           "badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung",
+           "energiewert","energieausweisTyp","denkmalschutz","zustand","lage","manualTextLage",
+           "manualTextAusstattung","manualTextObjekt","updatedatum","userID","map","kuechenmarke"];
        foreach($neededKeys as $k=>$v){
            if(!array_key_exists($v,$data)){
                return array("code"=>29,"txt"=>$v.": Missing Key Expose::set");
@@ -247,7 +256,6 @@ class ExposeModel{
 
         $colnames = rtrim($colnames, ",");
         $questionmarks = rtrim($questionmarks, ",");
-        var_dump($param_array);
 
         if (!($stmt = $this->db->mysqli->prepare("INSERT INTO objects($colnames) VALUES ($questionmarks)"))){
             echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
@@ -260,6 +268,6 @@ class ExposeModel{
         if (!$stmt->execute()) {
             echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
         }
-
+        return array("returnID"=>$this->db->mysqli->insert_id);
     }
 }

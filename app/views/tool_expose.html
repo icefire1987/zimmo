@@ -121,7 +121,7 @@
 
                             <label class="control-label col-xs-6 col-md-4 col-md-offset-2">
                                 <span>Bezirk</span>
-                                <input type="text" name="bezirk" placeholder="" class="form-control">
+                                <input type="text" ng-model="c_tool.currentExpose.bezirk" placeholder="" class="form-control" ng-model-options="{ debounce: 500 }">
                             </label>
                             <label class="control-label col-xs-6 col-md-4">
                                 <div>
@@ -161,7 +161,6 @@
                             <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
                                 <leaflet center="c_tool.mapdata.center" markers="c_tool.mapdata.markers"
                                          layers="c_tool.mapdata.layers"></leaflet>
-                                {{c_tool.mapdata.center}}
                             </div>
                         </div>
                     </uib-accordion-group>
@@ -779,10 +778,7 @@
                                                         <div class="col-xs-12">
                                                             <input type="text" value="{{value.title}}" ng-model="c_tool.images.energieausweis[key].title" placeholder="Bildtitel">
                                                         </div>
-                                                        <div class="col-xs-12">
-                                                            <select ng-model="c_tool.images.energieausweis[key].kat.value"
-                                                                    ng-options="v for v in c_tool.images.energieausweis[key].kat.values"></select>
-                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </li>
