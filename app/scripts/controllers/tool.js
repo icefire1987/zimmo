@@ -8,6 +8,7 @@
  * Controller of the zimmoApp
  */
 angular.module('zimmoApp')
+    //NgTableParams
     .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, FileUploader) {
         // on local:
         var scriptbase = 'http://localhost/Zimmo/app/';
@@ -17,7 +18,7 @@ angular.module('zimmoApp')
 
         this.repLB = function(){
             return JSON.stringify(vm.currentExpose,null," ").replace(/,/g,', <br>');
-        }
+        };
 
 
         vm.currentExpose = {};
@@ -32,7 +33,7 @@ angular.module('zimmoApp')
             cImage:{},
             cGrundriss:{},
             cEnergieausweis:{}
-        }
+        };
         vm.images = {object:[],grundriss:[],energieausweis:[]};
 
 
@@ -47,7 +48,7 @@ angular.module('zimmoApp')
         };
 
         vm.accExpo.statusAddress.open = true;
-        vm.myMap = {}
+        vm.myMap = {};
         vm.mapdata = {
             center: {},
             defaults: {
@@ -82,7 +83,7 @@ angular.module('zimmoApp')
         };
 
         this.showFeedback = function (responsedata) {
-            this.timer;
+            this.timer=null;
             vm.feedback.type = responsedata.type;
             vm.feedback.text = responsedata.feedbacktext;
             if (responsedata.addData) {
@@ -90,7 +91,7 @@ angular.module('zimmoApp')
             }
 
             vm.feedbackVisible = true;
-            if (vm.feedback.type == "success") {
+            if (vm.feedback.type === "success") {
                 this.timer = $timeout(function () {
                     vm.feedbackVisible = false;
                 }, 4000);
@@ -98,7 +99,7 @@ angular.module('zimmoApp')
                 $timeout.cancel(this.timer);
             }
 
-        }
+        };
         this.exposeSearch = function (searchOne,searchdata) {
             var credentials = {
                 action: 'exposeSearchAll',
@@ -106,7 +107,7 @@ angular.module('zimmoApp')
             };
             if (searchOne === true) {
                 if(!searchdata){
-                    searchdata= vm.searchObj.formdata
+                    searchdata= vm.searchObj.formdata;
                 }
                 credentials = {
                     action: 'exposeSearchOne',
@@ -190,7 +191,7 @@ angular.module('zimmoApp')
                             }
                         },
                         function (data) {
-                            console.log("err");
+                            console.log("err" + data);
                         }
                     );
             }
@@ -224,7 +225,7 @@ angular.module('zimmoApp')
                     }
                 );
 
-        }
+        };
         this.setRecord = function (id) {
             var credentials = {
                 action: 'echoRecord',
@@ -244,7 +245,7 @@ angular.module('zimmoApp')
                             vm.showFeedback(response.data);
                             for (var key in response.data.text) {
                                 //prevent null and int
-                                response.data.text[key] = (response.data.text[key] || "").toString()
+                                response.data.text[key] = (response.data.text[key] || "").toString();
                             }
 
                             vm.currentExpose = response.data.text;
@@ -267,13 +268,13 @@ angular.module('zimmoApp')
 
                             try {
                                 var dummy = JSON.parse(response.data.text.map);
-                                console.log("then try center")
+                                console.log("then try center");
                                 vm.mapdata.center = {
                                     lat: (dummy.lat) * 1,
                                     lng: (dummy.lng) * 1,
-                                    zoom: parseInt(dummy.zoom),
+                                    zoom: parseInt(dummy.zoom)
                                 };
-                                console.log("then try markers")
+                                console.log("then try markers");
                                 vm.mapdata.markers = {
                                     objekt: {
                                         lat: (dummy.lat) * 1,
@@ -294,7 +295,7 @@ angular.module('zimmoApp')
                         }
                     },
                     function (data) {
-                        console.log("err");
+                        console.log("err" +  data);
                     }
                 );
         };
@@ -305,7 +306,9 @@ angular.module('zimmoApp')
             vm.currentExpose[key] = value;
         };
 
-        this.checkExposeForm = function (event) {
+        this.checkExposeForm = function () {
+            var returnObj = vm.currentExpose;
+                returnObj.images = vm.images;
             return vm.currentExpose;
         };
         this.getMap = function () {
@@ -350,16 +353,16 @@ angular.module('zimmoApp')
                 "class": "place",
                 "type": "house",
                 "importance": 0.321
-            }]
+            }];
             try {
                 if (typeof resdata[0].lon != 'undefined') {
                     var lon_parse = resdata[0].lon;
                     var lat_parse = resdata[0].lat;
-                    console.log("try if")
+                    console.log("try if");
                     vm.mapdata.center = {
                         lat: (lat_parse) * 1,
                         lng: (lon_parse) * 1,
-                        zoom: parseInt(14),
+                        zoom: parseInt(14)
                     };
                     vm.mapdata.markers = {
                         objekt: {
@@ -401,7 +404,7 @@ angular.module('zimmoApp')
             vm.mapdata.center = {
                 lat: (mapdata.lat) * 1,
                 lng: (mapdata.lon) * 1,
-                zoom: parseInt(mapdata.zoom),
+                zoom: parseInt(mapdata.zoom)
             };
             vm.mapdata.markers = {
                 objekt: {
@@ -424,7 +427,7 @@ angular.module('zimmoApp')
         }
         var list_zimmer = [];
         var half=1;
-        for (var i = 1; i <= 20; i++) {
+        for (i= 1; i <= 20; i++) {
             list_zimmer.push(half);
             half+=0.5;
         }
@@ -491,7 +494,9 @@ angular.module('zimmoApp')
             }
 */
             vm.images[obj.arrayname].push(obj.data);
-        }
+
+
+        };
 
         this.uploader =  new FileUploader({
             url: 'upload.php'
@@ -503,12 +508,13 @@ angular.module('zimmoApp')
 
         this.submit_form_expose = function(){
             // vm.currentExpose
-            var obj;
-            if(obj = vm.checkExposeForm()){
+            var obj = vm.checkExposeForm();
+            if(obj!=false){
                 var credentials = {
                     action: 'exposeInsert',
                     formdata: obj
                 };
+
                 $http({
                     url: scriptbase + 'scripts/php/ajaxCtrl.php',
                     method: 'POST',
@@ -525,21 +531,22 @@ angular.module('zimmoApp')
                         }
                     },
                     function (data) {
-                        console.log("err" + data);
+                        console.log("err" + data.toString());
                     }
                 );
+
             }else{
-                console.log("Check failed")
+                console.log("Check failed");
             }
 
-        }
+        };
 
     }])
     .run(
         function () {
             $(".money").on(
                 "keyup",
-                function (e) {
+                function () {
                     var string = $(this).val();
 
                     string = string.replace(/,/g, "");
@@ -553,10 +560,10 @@ angular.module('zimmoApp')
                     }
 
                     var form_string = string.replace(
-                        /(\d+)(\d{2})/, '$1' + ','
-                        + '$2');
+                        /(\d+)(\d{2})/, '$1' + ',' +
+                        '$2');
 
-                    $(this).val(form_string)
+                    $(this).val(form_string);
                 });
         }
     )
@@ -568,9 +575,12 @@ angular.module('zimmoApp')
                     return;
                 }
 
-                ngModelCtrl.$parsers.push(function(val) {
-                    if (angular.isUndefined(val)) {
-                        var val = '';
+                ngModelCtrl.$parsers.push(function(data) {
+                    var val='';
+                    if (angular.isUndefined(data)) {
+                        val = '';
+                    }else{
+                        val = data;
                     }
                     val = val.replace(/,/g, "");
                     val = val.replace(/\./g, "");
@@ -583,8 +593,8 @@ angular.module('zimmoApp')
                     }
 
                     var form_string = val.replace(
-                        /(\d+)(\d{2})/, '$1' + ','
-                        + '$2');
+                        /(\d+)(\d{2})/, '$1' + ',' +
+                        '$2');
 
                         ngModelCtrl.$setViewValue(form_string);
                         ngModelCtrl.$render();
@@ -621,87 +631,87 @@ angular.module('zimmoApp')
     .filter("sanitize", ['$sce', function($sce) {
         return function(htmlCode){
             return $sce.trustAsHtml(htmlCode);
-        }
+        };
     }])
 
     .directive("fileread", [function () {
-        return ({
-            link: link,
-            controller: 'ToolCtrl',
-            controllerAs: 'c_tool',
-            bindToController: true
 
-        });
-        function link( scope, element, attributes ) {
-            element.on("change", function (changeEvent) {
-                scope.$apply(function () {
-                    var file = changeEvent.target.files[0];
-                    var fr = new FileReader();
+        function link( scope, element, attributes,controller ) {
+            function handleClick( changeEvent ) {
+                scope.$apply(
 
-                    fr.onload = function(){
-                        scope.$apply(function() {
+                    function changeViewModel() {
+                        var file = changeEvent.target.files[0];
+                        var fr = new FileReader();
+
+                        fr.onload = function () {
+                            scope.$apply(function () {
 
 
-                            if(attributes.modeltarget == 'cImage') {
-                                scope.c_tool.tempdata.cImage.source = true;
-                                var img = new Image();
-                                img.onload = function () {
+                                if (attributes.modeltarget === 'cImage') {
+                                    scope.c_tool.tempdata.cImage.source = true;
+                                    var img = new Image();
+                                    img.onload = function () {
 
-                                    if (attributes.croparea) {
-                                        if (scope.c_tool.tempdata.cImage.cropper) {
-                                            scope.c_tool.tempdata.cImage.cropper.destroy();
+                                        if (attributes.croparea) {
+                                            if (scope.c_tool.tempdata.cImage.cropper) {
+                                                scope.c_tool.tempdata.cImage.cropper.destroy();
+                                            }
+
+                                            var canvas = document.getElementById(attributes.croparea);
+                                            var ctx = canvas.getContext("2d");
+
+                                            canvas.width = img.width;
+                                            canvas.height = img.height;
+
+                                            ctx.drawImage(img, 0, 0);
+                                            canvas.toDataURL("image/png");
+
+                                            cropperinit(scope, canvas);
                                         }
 
-                                        var canvas = document.getElementById(attributes.croparea);
-                                        var ctx = canvas.getContext("2d");
 
-                                        canvas.width = img.width;
-                                        canvas.height = img.height;
+                                    };
+                                    img.src = fr.result;
 
-                                        ctx.drawImage(img, 0, 0);
-                                        canvas.toDataURL("image/png");
-
-                                        cropperinit(scope, canvas);
-                                    }
-
-
-                                };
-                                img.src = fr.result;
-
-                            }
-                            if(attributes.modeltarget == 'cGrundriss'){
-                                scope.c_tool.addToImages({
-                                    arrayname:'grundriss',
-                                    data: {
-                                        title: '',
-                                        imgString: fr.result,
-                                        source: file,
-                                        kat:{
-                                            "type": "select",
-                                            "name": "Service",
-                                            "value": 'EG',
-                                            "values": ['EG','1.OG']
+                                }
+                                if (attributes.modeltarget === 'cGrundriss') {
+                                    controller.currentExpose.testdata = "ok";
+                                    scope.c_tool.addToImages({
+                                        arrayname: 'grundriss',
+                                        data: {
+                                            title: '',
+                                            imgString: fr.result,
+                                            source: file,
+                                            kat: {
+                                                "type": "select",
+                                                "name": "Service",
+                                                "value": 'EG',
+                                                "values": ['EG', '1.OG']
+                                            }
                                         }
-                                    }
-                                });
-                            }
-                            if(attributes.modeltarget == 'cEnergieausweis'){
-                                console.log(scope.c_tool)
-                                scope.c_tool.addToImages({
-                                    arrayname:'energieausweis',
-                                    data: {
-                                        title: scope.c_tool.currentExpose.energieausweisTyp,
-                                        imgString: fr.result,
-                                        source: file
-                                    }
-                                });
-                            }
-                        });
-                    };
-                    fr.readAsDataURL(file);
+                                    });
+                                }
+                                if (attributes.modeltarget === 'cEnergieausweis') {
 
-                });
-            });
+                                    scope.c_tool.addToImages({
+                                        arrayname: 'energieausweis',
+                                        data: {
+                                            title: scope.c_tool.currentExpose.energieausweisTyp,
+                                            imgString: fr.result,
+                                            source: file
+                                        }
+                                    });
+                                }
+                            });
+                        };
+                        fr.readAsDataURL(file);
+                    }
+                );
+            }
+            element.on("change", handleClick);
+
+
         }
 
         function cropperinit(globscope, image){
@@ -725,7 +735,15 @@ angular.module('zimmoApp')
                 }
             });
         }
+
+        return ({
+            link: link,
+            controller: 'ToolCtrl',
+            controllerAs: 'vm',
+            bindToController: true
+
+
+        });
     }]);
 
 
-;

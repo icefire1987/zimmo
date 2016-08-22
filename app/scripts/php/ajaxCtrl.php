@@ -200,6 +200,39 @@ class AjaxControl{
             if(isset($obj["code"])){
                 echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
             }else{
+                $images = $data["images"];
+                foreach($images as $imgType=>$imgArray){
+                    // imgType : object, grundriss, energieausweis
+                    foreach($imgArray as $imgKey=>$imgObj){
+                        if(strpos($imgObj["imgString"],"base64")){
+                            $imgSource_Base64Encoded = explode("base64,",$imgObj["imgString"]);
+
+
+                            $decodedImgData=base64_decode($imgSource_Base64Encoded);
+                            $f = finfo_open();
+                            $mime_type = finfo_buffer($f, $decodedImgData, FILEINFO_MIME_TYPE);
+                            $filetype = substr($mime_type,(strpos($mime_type,"image/")));
+                            if($filetype!=false){
+                                $filename = $obj["returnID"]."_".$imgType."_".$imgKey.".".$filetype;
+                                echo $filename;
+                                $filepath = "uploads/" . $filename;
+                                if(file_put_contents($filepath, $decodedImgData)){
+                                    $dataobj = {
+                                        "exposeid":$obj["returnID"],
+                                        "filepath":$filepath
+                                    };
+                                    $exposeModel->setImageInDB($dataobj);
+                                }
+                            }else{
+                                echo json_encode(array(
+                                    "type" => "err",
+                                    "text" => "Bild konnte nicht gespeichert werden.".$mime_type.$imgObj["imgString"],
+                                    "code" => $obj["code"]));
+                            }
+                        }
+
+                    }
+                }
                 echo json_encode(array("type" => "success", "feedbacktext" => "Datensatz erfolgreich gespeichert", "code" => 1, "text"=>json_encode($obj),"returnID"=>$obj["returnID"]));
             }
 

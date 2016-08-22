@@ -129,6 +129,7 @@ angular
         this.userObj = undefined;
 
         this.checkAuthenticated = function(){
+            return true;
             var phpcookie = $cookies.get("zuumeoImmoApp_Session_Session");
             console.info("auth")
             if(phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
