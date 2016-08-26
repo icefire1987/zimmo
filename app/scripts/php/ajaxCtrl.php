@@ -10,6 +10,7 @@ class AjaxControl{
 
         $this->Security = new Security("zuumeoImmoApp_Session");
         $this->DB = new myDB();
+        $this->basepath = "../../";
 
     }
     function setHeaders(){
@@ -190,45 +191,100 @@ class AjaxControl{
         }
     }
     function exposeInsert(){
+
         if($this->checkLogin()===true){
             $exposeModel = new ExposeModel($this->DB);
 
             $data = $this->input["formdata"];
-
-            $obj = $exposeModel->setExposedata($data);
-
+            if(isset($data["id"])){
+                $obj = $exposeModel->setExposedata($data,true);
+            }else{
+                $obj = $exposeModel->setExposedata($data);
+            }
             if(isset($obj["code"])){
                 echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
             }else{
                 $images = $data["images"];
                 foreach($images as $imgType=>$imgArray){
                     // imgType : object, grundriss, energieausweis
+                    switch($imgType){
+                        case "object":
+                            $imageTyp=2;
+                            break;
+                        case "grundriss":
+                            $imageTyp=3;
+                            break;
+
+                        case "energieausweis":
+                            $imageTyp=4;
+                            break;
+                        default:
+                            $imageTyp=2;
+                            break;
+                    }
                     foreach($imgArray as $imgKey=>$imgObj){
-                        if(strpos($imgObj["imgString"],"base64")){
-                            $imgSource_Base64Encoded = explode("base64,",$imgObj["imgString"]);
+                        $dataobj  =false;
+                        // new upoloaded image
+                        if(strpos($imgObj["imgString"],"base64")) {
+                            $encoded_array = explode("base64,", $imgObj["imgString"]);
+                            $imgType_Base64Encoded = $encoded_array[0];
+                            $imgSource_Base64Encoded = $encoded_array[1];
 
-
-                            $decodedImgData=base64_decode($imgSource_Base64Encoded);
+                            $decodedImgData = base64_decode($imgSource_Base64Encoded);
+                            $decodedImgType = explode("data:image/", $imgType_Base64Encoded);
+                            /*
                             $f = finfo_open();
                             $mime_type = finfo_buffer($f, $decodedImgData, FILEINFO_MIME_TYPE);
                             $filetype = substr($mime_type,(strpos($mime_type,"image/")));
-                            if($filetype!=false){
-                                $filename = $obj["returnID"]."_".$imgType."_".$imgKey.".".$filetype;
-                                echo $filename;
+                            */
+                            $filetype = substr($decodedImgType[1], 0, -1);
+                            if ($filetype != false) {
+                                $filename = $obj["returnID"] . "_" . $imgType . "_" . $imgKey . "." . $filetype;
                                 $filepath = "uploads/" . $filename;
-                                if(file_put_contents($filepath, $decodedImgData)){
-                                    $dataobj = {
-                                        "exposeid":$obj["returnID"],
-                                        "filepath":$filepath
-                                    };
-                                    $exposeModel->setImageInDB($dataobj);
+                                $filepath_global = $this->basepath . $filepath;
+                                if (file_put_contents($filepath_global, $decodedImgData)) {
+                                    $dataobj = array(
+                                        "exposeID" => $obj["returnID"],
+                                        "imagePath" => $filepath,
+                                        "imageTitle" => $imgObj["title"],
+                                        "imageTyp" => $imageTyp,
+                                        "sort" => $imgKey,
+                                        "imageTag" => 1
+                                    );
+                                }else{
+                                    echo json_encode(array(
+                                        "type" => "err",
+                                        "text" => "Datei ".$imgType." wurde nicht gespeichert.",
+                                        "code" => 5));
+                                    return;
                                 }
                             }else{
                                 echo json_encode(array(
                                     "type" => "err",
-                                    "text" => "Bild konnte nicht gespeichert werden.".$mime_type.$imgObj["imgString"],
-                                    "code" => $obj["code"]));
+                                    "text" => "Dateityp ".$imgType." wurde nicht erkannt.",
+                                    "code" => 5));
+                                return;
                             }
+                        }else{
+                            // image didn't changed
+                            $dataobj = array(
+                                "exposeID" => $obj["returnID"],
+                                "imagePath" => $imgObj["imgString"],
+                                "imageTitle" => $imgObj["title"],
+                                "imageTyp" => $imageTyp,
+                                "sort" => $imgKey,
+                                "imageTag" => 1
+                            );
+                        }
+
+                        if($dataobj!=false) {
+                            $exposeModel->setImageInDB($dataobj);
+                        }else{
+                            echo json_encode(array(
+                                "type" => "err",
+                                "text" => "Datei ".$imgType." wurde nicht erkannt.",
+                                "code" => 5));
+                            return;
                         }
 
                     }
@@ -262,13 +318,19 @@ class AjaxControl{
         if($this->checkLogin()===true) {
             $data = [];
             $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
-            $raw = $this->getExposeRecord($data["id"]);
+            $raw["currentExpose"] = $this->getExposeRecord($data["id"]);
+            $raw["images"] = $this->getExposeImages($data["id"]);
             echo json_encode(array("type" => "success", "feedbacktext" => "Abfrage erfolgreich", "code" => 1, "text"=>$raw));
         }
     }
     function getExposeRecord($id){
         $exposeModel = new ExposeModel($this->DB);
         return $exposeModel->getExposedata(array("id"=>$id));
+    }
+
+    function getExposeImages($id){
+        $exposeModel = new ExposeModel($this->DB);
+        return $exposeModel->getExposeImages(array("id"=>$id));
     }
 }
 

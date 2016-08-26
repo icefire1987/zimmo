@@ -64,7 +64,8 @@ class ExposeModel{
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
                   CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
-                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
+                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart',
+                  zimmer,wohnflaeche
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
                 LEFT JOIN members as me ON me.id = ?
@@ -82,7 +83,8 @@ class ExposeModel{
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
                   CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
-                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart'
+                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart',
+                  zimmer,wohnflaeche
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
                 LEFT JOIN members as me ON me.id = ?
@@ -102,7 +104,7 @@ class ExposeModel{
 
             if ($stmt->num_rows > 0) {
                 // get variables from result.
-                $stmt->bind_result($id, $go, $strasse, $hausnr, $plz, $ort, $ga, $oa);
+                $stmt->bind_result($id, $go, $strasse, $hausnr, $plz, $ort, $ga, $oa,$zimmer,$wohnflaeche);
                 WHILE ($stmt->fetch()) {
                     $dbData[] = array(
                         "id" => $id,
@@ -111,7 +113,9 @@ class ExposeModel{
                         "plz" => $plz,
                         "ort" => $ort,
                         "ga" => $ga,
-                        "oa" => $oa
+                        "oa" => $oa,
+                        "zimmer"=>$zimmer,
+                        "wohnflaeche"=>$wohnflaeche
                     );
                 }
                 $stmt->close();
@@ -166,10 +170,10 @@ class ExposeModel{
 
         $prep_stmt = "
             SELECT 
-              objects.*             
+              objects.*
             FROM objects
             LEFT JOIN members ON objects.userID = members.id
-            LEFT JOIN members as me ON me.id = ?
+            LEFT JOIN members as me ON me.id = ?            
             WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
             AND objects.id = ?
            ";
@@ -189,14 +193,70 @@ class ExposeModel{
             return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
         }
     }
+    function getExposeImages($data){
+        $user = $_SESSION["userid"];
+        $exposeID = $data["id"];
 
-    function setExposedata($data){
+        $prep_stmt = "
+            SELECT 
+              images.*
+            FROM objects
+            LEFT JOIN images ON images.objectID = objects.id
+            LEFT JOIN members ON objects.userID = members.id
+            LEFT JOIN members as me ON me.id = ?            
+            WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+            AND objects.id = ?
+            ORDER BY sort
+           ";
+
+        $stmt =  $this->db->mysqli->prepare($prep_stmt);
+        if ($stmt) {
+            $stmt->bind_param('ii', $user,$exposeID);
+
+            $stmt->execute();
+            $result = $stmt->get_result();
+            //$dbData = new StdClass();
+            WHILE($row = $result->fetch_array(MYSQLI_ASSOC)){
+                if($result->num_rows>0 && $row["imageTyp"]!=null){
+                    switch($row["imageTyp"]){
+                        case 1:
+                        case 2:
+                            $imageTyp = "object";
+                            break;
+                        case 3:
+                            $imageTyp = "grundriss";
+                            break;
+                        case 4:
+                            $imageTyp = "energieausweis";
+                            break;
+                    }
+                    $base64Data = $row["imagePath"];
+                    $dbData[$imageTyp][] = array(
+                        "title"=>$row["title"],
+                        "imgString"=>$base64Data,
+                        "imageTag"=>$row["imageTag"]
+                    );
+                }
+
+            }
+            $stmt->close();
+            if(isset($dbData)) {
+                return $dbData;
+            }
+        } else {
+            print_r($this->db->mysqli->error);
+            return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
+        }
+    }
+
+
+    function setExposedata($data,$update=false){
        // What is needed:
         $data["userID"] = $_SESSION["userid"];
        $neededKeys = ["geschaeftsart","objekttyp","strasse","ort"];
        $possibleKeys = [
-           "geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go",
-           "lieferung","moebiliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk",
+           "id","geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go",
+           "lieferung","moebliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk",
            "stockwerke","stockwerk","haustyp","baujahr","sanierung","renovierung","besonderheit",
            "exposetitel","provision","provisionEinheit","kaution","kautionEinheit","kaltmiete",
            "pauschalmiete","nebenkosten","kaufpreis","stellplatz","stellplatztyp","stellplatzkosten",
@@ -257,11 +317,42 @@ class ExposeModel{
         $colnames = rtrim($colnames, ",");
         $questionmarks = rtrim($questionmarks, ",");
 
-        if (!($stmt = $this->db->mysqli->prepare("INSERT INTO objects($colnames) VALUES ($questionmarks)"))){
-            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        if($update==false){
+            if (!($stmt = $this->db->mysqli->prepare("INSERT INTO objects($colnames) VALUES ($questionmarks)"))){
+                echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+            }
+        }else{
+            // REPLACE INTO ... ?!
+            if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO objects($colnames) VALUES ($questionmarks)"))){
+                echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+            }
         }
 
+
         if (!call_user_func_array(array($stmt, 'bind_param'), $param_array)) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+        return array("returnID"=>$this->db->mysqli->insert_id);
+    }
+
+    function setImageInDB($data){
+        if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO images(objectID,imagePath,imageTyp,sort,title,imageTag) VALUES (?,?,?,?,?,?)"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+        $insertData  = array(
+            "exposeID"=>$data["exposeID"],
+            "imagePath"=>$data["imagePath"],
+            "imageTyp"=>$data["imageTyp"],
+            "sort"=>$data["sort"],
+            "imageTitle"=>$data["imageTitle"],
+            "imageTag"=>$data["imageTag"]
+
+        );
+        if (!$stmt->bind_param('isiisi',$insertData["exposeID"],$insertData["imagePath"],$insertData["imageTyp"],$insertData["sort"],$insertData["imageTitle"],$insertData["imageTag"])) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 

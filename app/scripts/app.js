@@ -63,7 +63,9 @@ angular
                 authenticate: true,
                 roles: [],
                 controller: function($scope,$stateParams){
-
+                    // function to reset
+                    $scope.c_tool.currentExpose = {};
+                    $scope.c_tool.images = {};
                     $scope.c_tool.feedbackVisible = false;
                 }
             })
@@ -129,7 +131,7 @@ angular
         this.userObj = undefined;
 
         this.checkAuthenticated = function(){
-            return true;
+            //return true;
             var phpcookie = $cookies.get("zuumeoImmoApp_Session_Session");
             console.info("auth")
             if(phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){

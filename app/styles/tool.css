@@ -127,6 +127,9 @@ input[type='radio']:checked + .tag{
   font-style: oblique;
 }
 
+.table{
+  box-shadow: 0 0 1px grey;
+}
 
 
 .row-paddingbottom{

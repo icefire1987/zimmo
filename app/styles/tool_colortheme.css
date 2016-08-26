@@ -8,11 +8,18 @@ grün hell: #a5be00
 grün dunkel: #679436
 
 */
+
+.area {
+  background: #EDEAE3;
+
+}
+
 .sidebar{
   background: #f5f5f5;
   color: #427aa1;
   box-shadow: 4px 1px 2px -4px #111;
   padding: 0;
+  z-index: 9;
 }
 
 .sidebar ul{
@@ -43,6 +50,10 @@ grün dunkel: #679436
 
 .sidebar ul .logout a{
   color: darkred !important;
+}
+
+table{
+  background: white;
 }
 
 input[type='checkbox']:not(:checked) + .tag::before,
@@ -78,7 +89,7 @@ input[type='radio']:checked + .tag::after{
   background-color: #427aa1;
 }
 .box-dark{
-  background-color: #7ecbc4 ;
+  background-color: #ddd ;
 }
 
 .panel-body h4{

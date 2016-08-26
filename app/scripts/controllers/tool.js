@@ -137,6 +137,8 @@ angular.module('zimmoApp')
                             {field: "ort", title: "Ort", sortable: "ort", show: true},
                             {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
                             {field: "oa", title: "Objektart", sortable: "oa", show: true},
+                            {field: "zimmer", title: "Zimmer", sortable: "zimmer", show: true},
+                            {field: "wohnflaeche", title: "Wohnfläche", sortable: "wohnflaeche", show: true},
                             {field: "action", title: "", dataType: "command", show: true}
                         ];
                         vm.resultAll_tableParams = new NgTableParams({}, {dataset: resultset});
@@ -240,15 +242,15 @@ angular.module('zimmoApp')
             })
                 .then(
                     function (response) {
-
                         if (response.data.type === "success" || response.data.type === "err") {
                             vm.showFeedback(response.data);
-                            for (var key in response.data.text) {
+                            for (var key in response.data.text.currentExpose) {
                                 //prevent null and int
-                                response.data.text[key] = (response.data.text[key] || "").toString();
+                                response.data.text.currentExpose[key] = (response.data.text.currentExpose[key] || "").toString();
                             }
-
-                            vm.currentExpose = response.data.text;
+                            console.log(response.data.text)
+                            vm.images = response.data.text.images;
+                            vm.currentExpose = response.data.text.currentExpose;
                             // input: number
                             vm.currentExpose.kaufpreis = parseInt(vm.currentExpose.kaufpreis);
                             vm.currentExpose.pauschalmiete = parseFloat(vm.currentExpose.pauschalmiete);
@@ -263,31 +265,39 @@ angular.module('zimmoApp')
                             vm.currentExpose.innenausstattung = JSON.parse(vm.currentExpose.innenausstattung);
                             vm.currentExpose.boden = JSON.parse(vm.currentExpose.boden);
                             vm.currentExpose.kuechenausstattung = JSON.parse(vm.currentExpose.kuechenausstattung);
-
+                            // checkboxes:
+                            vm.currentExpose.kueche = !!+vm.currentExpose.kueche;
+                            vm.currentExpose.moebliert = !!+vm.currentExpose.moebliert;
+                            vm.currentExpose.saniert = !!+vm.currentExpose.saniert;
+                            vm.currentExpose.renoviert = !!+vm.currentExpose.renoviert;
+                            vm.currentExpose.denkmalschutz = !!+vm.currentExpose.denkmalschutz;
 
 
                             try {
-                                var dummy = JSON.parse(response.data.text.map);
-                                console.log("then try center");
-                                vm.mapdata.center = {
-                                    lat: (dummy.lat) * 1,
-                                    lng: (dummy.lng) * 1,
-                                    zoom: parseInt(dummy.zoom)
-                                };
-                                console.log("then try markers");
-                                vm.mapdata.markers = {
-                                    objekt: {
+                                if(response.data.text.map){
+                                    var dummy = JSON.parse(response.data.text.map);
+                                    console.log("then try center");
+                                    vm.mapdata.center = {
                                         lat: (dummy.lat) * 1,
                                         lng: (dummy.lng) * 1,
-                                        focus: true,
-                                        draggable: true
-                                    }
-                                };
-                                leafletData.getMap().then(function (map) {
-                                    $timeout(function () {
-                                        map.invalidateSize();
-                                    }, 300);
-                                });
+                                        zoom: parseInt(dummy.zoom)
+                                    };
+                                    console.log("then try markers");
+                                    vm.mapdata.markers = {
+                                        objekt: {
+                                            lat: (dummy.lat) * 1,
+                                            lng: (dummy.lng) * 1,
+                                            focus: true,
+                                            draggable: true
+                                        }
+                                    };
+                                    leafletData.getMap().then(function (map) {
+                                        $timeout(function () {
+                                            map.invalidateSize();
+                                        }, 300);
+                                    });
+                                }
+
                             }catch(e){
                                 console.log(e);
                             }
@@ -309,7 +319,7 @@ angular.module('zimmoApp')
         this.checkExposeForm = function () {
             var returnObj = vm.currentExpose;
                 returnObj.images = vm.images;
-            return vm.currentExpose;
+            return returnObj;
         };
         this.getMap = function () {
             try {
@@ -432,6 +442,11 @@ angular.module('zimmoApp')
             half+=0.5;
         }
 
+        var list_geschoss = [];
+        for (i= -1; i <= 10; i++) {
+            list_geschoss.push(i);
+        }
+
         this.datalists = {
             land:["Deutschland","Schweiz","Österreich"],
             stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
@@ -447,8 +462,12 @@ angular.module('zimmoApp')
             bodenbelag: [
                 "Echtholz-Parkett","hochwertiges Parkett","Fussbodenheizung","Dielen"
             ],
+            bildtitel: [
+                "Schlafzimmer","Esszimmer","Wohnzimmer","Küche","Ausblick","Flur","Zimmer","Hausansicht","Balkon","Terrasse","Kinderzimmer","Gäste-WC","Badezimmer",
+            ],
             jahreszahl: list_jahre,
-            zimmer: list_zimmer
+            zimmer: list_zimmer,
+            geschoss: list_geschoss
         };
 
         this.clickElement = function(id){
@@ -493,9 +512,12 @@ angular.module('zimmoApp')
             title,imgString,source,kat(additional dropdown data)
             }
 */
+            console.log("addToImages");
+            console.log(obj);
+            if(!vm.images[obj.arrayname]){
+                vm.images[obj.arrayname] = [];
+            }
             vm.images[obj.arrayname].push(obj.data);
-
-
         };
 
         this.uploader =  new FileUploader({
@@ -509,12 +531,12 @@ angular.module('zimmoApp')
         this.submit_form_expose = function(){
             // vm.currentExpose
             var obj = vm.checkExposeForm();
+
             if(obj!=false){
                 var credentials = {
-                    action: 'exposeInsert',
+                    action: "exposeInsert",
                     formdata: obj
                 };
-
                 $http({
                     url: scriptbase + 'scripts/php/ajaxCtrl.php',
                     method: 'POST',
@@ -661,10 +683,26 @@ angular.module('zimmoApp')
                                             var canvas = document.getElementById(attributes.croparea);
                                             var ctx = canvas.getContext("2d");
 
-                                            canvas.width = img.width;
-                                            canvas.height = img.height;
+                                            var MAX_WIDTH = 1440;
+                                            var MAX_HEIGHT = 900;
+                                            var width = img.width;
+                                            var height = img.height;
 
-                                            ctx.drawImage(img, 0, 0);
+                                            if (width > height) {
+                                                if (width > MAX_WIDTH) {
+                                                    height *= MAX_WIDTH / width;
+                                                    width = MAX_WIDTH;
+                                                }
+                                            } else {
+                                                if (height > MAX_HEIGHT) {
+                                                    width *= MAX_HEIGHT / height;
+                                                    height = MAX_HEIGHT;
+                                                }
+                                            }
+                                            canvas.width = width;
+                                            canvas.height = height;
+
+                                            ctx.drawImage(img, 0, 0, width, height);
                                             canvas.toDataURL("image/png");
 
                                             cropperinit(scope, canvas);
@@ -684,10 +722,9 @@ angular.module('zimmoApp')
                                             imgString: fr.result,
                                             source: file,
                                             kat: {
-                                                "type": "select",
-                                                "name": "Service",
-                                                "value": 'EG',
-                                                "values": ['EG', '1.OG']
+                                                "type": "datalist",
+                                                "value": '',
+                                                "values": scope.c_tool.datalists.geschoss
                                             }
                                         }
                                     });
