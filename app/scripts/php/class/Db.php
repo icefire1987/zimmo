@@ -9,17 +9,18 @@
 class myDB{
 
     function __construct(){
+        /*
         define("HOST", "localhost");
         define("USER", "root");
         define("PASSWORD", "");
         define("DATABASE", "immo");
-
-        /*
-        define("HOST", "localhost");     // The host you want to connect to.
-        define("USER", "root");    // The database username.
-        define("PASSWORD", "");    // The database password.
-        define("DATABASE", "immo");    // The database name.
 */
+
+        define("HOST", "localhost");     // The host you want to connect to.
+        define("USER", "db11206237-ex");    // The database username.
+        define("PASSWORD", "zuumeo001");    // The database password.
+        define("DATABASE", "db11206237-expose");    // The database name.
+
         define("CAN_REGISTER", "any");
         define("DEFAULT_ROLE", "member");
         define("SECURE", true);

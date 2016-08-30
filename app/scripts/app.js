@@ -65,7 +65,7 @@ angular
                 controller: function($scope,$stateParams){
                     // function to reset
                     $scope.c_tool.currentExpose = {};
-                    $scope.c_tool.images = {};
+                    $scope.c_tool.images = {object:[],grundriss:[],energieausweis:[]};
                     $scope.c_tool.feedbackVisible = false;
                 }
             })

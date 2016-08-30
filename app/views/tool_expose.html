@@ -149,13 +149,14 @@
                                       id="saveMap"> Karte speichern</span>
                                 <span class="text-success" style="display: none" id="saveMap_return">gespeichert &#10004;</span>
                             </label>
-
+<!--
                             <div class="checkbox_custom col-xs-6 col-md-3">
                                 <label class="">
                                     <input type="checkbox" ng-checked="c_tool.currentExpose.showMap">
                                     <span>Im Exposé anzeigen</span>
                                 </label>
                             </div>
+                            -->
                         </div>
                         <div class="row">
                             <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
@@ -180,7 +181,7 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="number" name="kaufpreis" placeholder="in €" class="form-control" step="0.01"
+                                <input type="number" name="kaufpreis" placeholder="in €" class="form-control" step="1"
                                        ng-model="c_tool.currentExpose.kaufpreis" ng-model-options="{ debounce: 500 }" required>
                             </label>
                             <label class="control-label col-xs-6">
@@ -192,7 +193,7 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="number" name="wohngeld" placeholder="in €" class="form-control" step="0.01"
+                                <input type="number" name="wohngeld" placeholder="in €" class="form-control" step="1"
                                        ng-model="c_tool.currentExpose.wohngeld" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
@@ -206,7 +207,7 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="number" name="kaltmiete" placeholder="in €" class="form-control" step="0.01"
+                                <input type="number" name="kaltmiete" placeholder="in €" class="form-control" step="1"
                                        ng-required="!c_tool.currentExpose.pauschalmiete"
                                        ng-model="c_tool.currentExpose.kaltmiete" ng-model-options="{ debounce: 500 }"
                                        ng-change="c_tool.clearOtherVal('kaltmiete','pauschalmiete')">
@@ -233,7 +234,7 @@
                                         <div ng-messages-include="views/regForm_messages.html"></div>
                                     </div>
                                 </div>
-                                <input type="number" name="pauschalmiete" placeholder="in €" class="form-control" step="0.01"
+                                <input type="number" name="pauschalmiete" placeholder="in €" class="form-control" step="1"
                                        ng-required="!c_tool.currentExpose.kaltmiete"
                                        ng-model="c_tool.currentExpose.pauschalmiete" ng-model-options="{ debounce: 500 }"
                                        ng-change="c_tool.clearOtherVal('pauschalmiete',['kaltmiete','nebenkosten'])">
@@ -461,6 +462,18 @@
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
                                     <div class="text-inline">
+                                        <span>Nutzfläche</span>
+                                    </div>
+                                    <div class="text-inline form-error" ng-messages="form_object.nutzflaeche.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <input type="text" name="nutzflaeche" placeholder="Fläche in m²" class="form-control"
+                                       ng-model="c_tool.currentExpose.nutzflaeche" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <div>
+                                    <div class="text-inline">
                                         <span>Wohnfläche</span>
                                     </div>
                                     <div class="text-inline form-error" ng-messages="form_object.wohnflaeche.$error">
@@ -523,7 +536,26 @@
                                 <input type="text" name="schlafzimmer" placeholder="" class="form-control" list="datalist_zimmer"
                                        ng-model="c_tool.currentExpose.schlafzimmer" ng-model-options="{ debounce: 500 }">
                             </label>
+                            <label class="control-label col-xs-4 col-sm-3"  ng-if="c_tool.currentExpose.objekttyp!=3">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Stockwerkanzahl Haus</span>
+                                    </div>
+                                </div>
+                                <input type="text" name="stockwerke" placeholder="" class="form-control" list="datalist_geschoss" required
+                                       ng-model="c_tool.currentExpose.stockwerke" ng-model-options="{ debounce: 500 }">
+                            </label>
+                            <label class="control-label col-xs-4 col-sm-3" ng- ng-if="c_tool.currentExpose.objekttyp==2">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Stockwerk der Wohnung</span>
+                                    </div>
+                                </div>
+                                <input type="text" name="stockwerk" placeholder="" class="form-control" list="datalist_geschoss" required
+                                       ng-model="c_tool.currentExpose.stockwerk" ng-model-options="{ debounce: 500 }">
+                            </label>
                         </div>
+                        <!--
                         <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
@@ -550,6 +582,7 @@
                                        ng-model="c_tool.currentExpose.terrasse" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
+                        -->
                         <div class="row row-paddingbottom">
                             <label class="control-label col-xs-4 col-sm-3">
                                 <div>
@@ -568,10 +601,11 @@
                             </label>
                         </div>
                         <div class="row row-paddingbottom">
-                            <label class="control-label col-xs-4 col-sm-3">
+                            <label class="control-label col-xs-6">
                                 <div>
                                     <div class="text-inline">
                                         <span>Objektbeschreibung</span>
+                                        <br>
                                     </div>
                                     <div class="text-inline form-error" ng-messages="form_object.objektbeschreibung.$error">
                                         <div ng-messages-include="views/exposeForm_messages.html"></div>
@@ -580,6 +614,25 @@
                                 <textarea name="objektbeschreibung" ng-model="c_tool.currentExpose.objektbeschreibung" ng-model-options="{ debounce: 500 }" class="form-control" ng-minlength="300"></textarea>
 
                             </label>
+                            <label class="control-label col-xs-6">
+                                <div>
+                                    <div class="row">
+                                        <span class="col-xs-6 col-sm-4">Lagebeschreibung</span>
+                                        <select name="land" class="col-xs-6 col-sm-4" ng-model="item"
+                                                ng-model-options="{ debounce: 500 }" ng-options="item as item.bezirk for item in c_tool.datalists.lagebeschreibung | orderBy:'toString()'"
+                                                ng-change="c_tool.currentExpose.lagebeschreibung = item.beschreibung">
+                                            <option value="">Vorlage wählen</option>
+
+                                        </select>
+                                    </div>
+                                    <div class="row form-error" ng-messages="form_object.lagebeschreibung.$error">
+                                        <div ng-messages-include="views/exposeForm_messages.html"></div>
+                                    </div>
+                                </div>
+                                <textarea name="lagebeschreibung" ng-model="c_tool.currentExpose.lagebeschreibung" ng-model-options="{ debounce: 500 }" class="form-control" ng-minlength="300"></textarea>
+
+                            </label>
+
                         </div>
                     </uib-accordion-group>
                     <uib-accordion-group is-open="c_tool.accExpo.statusAusstattung.open">
@@ -612,12 +665,13 @@
                         </div>
 
                         <div class="row row-paddingbottom">
-                            <label class="control-label col-xs-4 col-sm-3">
+                            <div class="control-label col-xs-4 col-sm-3">
+                                <h4>Einbauküche</h4>
                                 <label class="control-label col-xs-12">
                                     <input type="checkbox" name="Einbauküche" ng-model="c_tool.currentExpose.kueche" ng-checked="c_tool.currentExpose.kueche">
                                     <span class="tag">Einbauküche vorhanden</span>
                                 </label>
-                            </label>
+                            </div>
                             <div class="col-xs-8 col-sm-9" ng-if="c_tool.currentExpose.kueche">
                                 <div class="row row-paddingbottom">
                                     <div class="control-label col-xs-12">
@@ -644,7 +698,48 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row row-paddingbottom">
+                            <div class="control-label col-xs-12">
+                                <h4>Badezimmer</h4>
+                                <div class="row row-paddingbottom">
+                                    <div class="col-xs-6 col-sm-3">
+                                        <select name="badezimmer" class="form-control" ng-options="item as item for item in c_tool.datalists.badezimmer" ng-model="badezimmer">
+                                        </select>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-3">
+                                        <button type="button" class="btn btn-large btn-default" ng-click="c_tool.currentExpose.badezimmer.push({'type':badezimmer,'enSuite':false})">Badezimmer hinzufügen</button>
+                                    </div>
+                                </div>
+                                <div class="row row-paddingbottom" ng-repeat="(key, value) in c_tool.currentExpose.badezimmer track by key">
 
+
+                                            <ul class="list-inline col-xs-12 col-sm-6">
+                                                <li>
+                                                    <span class="btn btn-danger glyphicon glyphicon-remove" ng-click="c_tool.currentExpose.badezimmer.splice(key,1)"></span>
+                                                </li>
+                                                <li style="margin-left:10px;width:50%;vertical-align: middle;">
+                                                    <div class="box-dark" style="height: 40px;">
+                                                        <div class="col-xs-6">
+                                                            <span class="lead">{{value.type}}</span>
+                                                        </div>
+                                                        <div class="col-xs-6" style="margin-top:5px;">
+                                                            <label class="control-label" style="position: relative">
+                                                                <input type="checkbox" name="enSuite" ng-model="c_tool.currentExpose.badezimmer[key].enSuite">
+                                                                <span class="tag marginLeft10">en Suite</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                </li>
+                                            </ul>
+
+
+                                </div>
+                            </div>
+                        </div>
                     </uib-accordion-group>
                     <uib-accordion-group is-open="c_tool.accExpo.statusBilder.open" class="acc_bilder">
                         <uib-accordion-heading>
@@ -750,11 +845,9 @@
                                                 <div class="col-xs-12 col-sm-6">
                                                     <div class="row">
                                                         <div class="col-xs-12">
-                                                            Geschoss: <input type="text" list="datalist_geschoss" ng-model="c_tool.images.grundriss[key].title"
+                                                            Geschoss: <input type="text" list="datalist_geschoss_zusatz" ng-model="c_tool.images.grundriss[key].title"
                                                                     placeholder="Doppelklick für Vorlagen" ng-model-options="{ debounce: 500 }">
-                                                            <datalist id="datalist_geschoss">
-                                                                <option  data-ng-repeat="dl_opt in c_tool.datalists.geschoss | orderBy: dl_opt" value="{{dl_opt}}">
-                                                            </datalist>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -810,7 +903,7 @@
 
 
             </form>
-            <div class="well">
+            <div class="well hidden">
 
                 <div ng-bind-html="c_tool.repLB() | sanitize"></div>
             </div>
@@ -820,6 +913,12 @@
 
 <datalist id="datalist_bildtitel">
     <option  data-ng-repeat="dl_opt in c_tool.datalists.bildtitel | orderBy: 'toString()'" value="{{dl_opt}}">
+</datalist>
+<datalist id="datalist_geschoss">
+    <option  data-ng-repeat="dl_opt in c_tool.datalists.geschoss | orderBy: dl_opt" value="{{dl_opt}}">
+</datalist>
+<datalist id="datalist_geschoss_zusatz">
+    <option  data-ng-repeat="dl_opt in c_tool.datalists.geschoss_zusatz | orderBy: dl_opt" value="{{dl_opt}}">
 </datalist>
 
 <!--

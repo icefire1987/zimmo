@@ -12,6 +12,7 @@ class ExposeModel{
      */
     function __construct($dbCLassObj){
         $this->db = $dbCLassObj;
+        $this->basepath = "../../";
     }
     function getExpose($search=false){
         $user = $_SESSION["userid"];
@@ -263,8 +264,8 @@ class ExposeModel{
            "wohnflaeche","grundstueckflaeche","zimmer","schlafzimmer","balkon","terrasse",
            "aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp",
            "badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung",
-           "energiewert","energieausweisTyp","denkmalschutz","zustand","lage","manualTextLage",
-           "manualTextAusstattung","manualTextObjekt","updatedatum","userID","map","kuechenmarke"];
+           "energiewert","energieausweisTyp","denkmalschutz","zustand","lage","lagebeschreibung",
+           "objektbeschreibung","sonstiges","updatedatum","userID","map","kuechenmarke","nutzflaeche"];
        foreach($neededKeys as $k=>$v){
            if(!array_key_exists($v,$data)){
                return array("code"=>29,"txt"=>$v.": Missing Key Expose::set");
@@ -360,5 +361,50 @@ class ExposeModel{
             echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
         }
         return array("returnID"=>$this->db->mysqli->insert_id);
+    }
+    function removeImageInDB($data){
+        if (!($stmt = $this->db->mysqli->prepare("DELETE FROM images WHERE imagePath=?"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        if (!$stmt->bind_param('s',$data)) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+    }
+    function delete_unused_files($files_used,$path){
+        $files_removed=array();
+        try{
+            $iterator = new DirectoryIterator($path);
+            foreach ( $iterator as $fileinfo ) {
+                if($fileinfo->isDot())continue;
+
+                if($fileinfo->isDir()){
+                    if($this->is_dir_empty($fileinfo->getPathname())){
+
+                        @rmdir($fileinfo->getPathname());
+                    }else{
+                        $this->delete_unused_files($files_used,$fileinfo->getPathname());
+                    }
+                }
+
+                if($fileinfo->isFile()){
+                    $filename = $fileinfo->getFilename();
+                    if(!in_array($filename,$files_used)){
+                        $files_removed[]= $filename;
+                        @unlink($fileinfo->getPathname());
+                    }
+                }
+            }
+        } catch ( Exception $e ){
+            print_r($e);
+            return false;
+        }
+        return $files_removed;
+
     }
 }

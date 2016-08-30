@@ -11,11 +11,13 @@ class AjaxControl{
         $this->Security = new Security("zuumeoImmoApp_Session");
         $this->DB = new myDB();
         $this->basepath = "../../";
+        $this->uploadpath =   $this->basepath ."uploads/";
 
     }
     function setHeaders(){
         header("Access-Control-Allow-Credentials: true");
-        header("Access-Control-Allow-Origin: http://localhost:9002");
+        //header("Access-Control-Allow-Origin: http://localhost:9002");
+        header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
     }
@@ -193,6 +195,8 @@ class AjaxControl{
     function exposeInsert(){
 
         if($this->checkLogin()===true){
+
+
             $exposeModel = new ExposeModel($this->DB);
 
             $data = $this->input["formdata"];
@@ -204,7 +208,11 @@ class AjaxControl{
             if(isset($obj["code"])){
                 echo json_encode(array("type" => "err", "text" => "fehlerhafte Abfrage.".$obj["txt"], "code" => $obj["code"]));
             }else{
+                $this->uploadpath = $this->uploadpath . $obj["returnID"]."/";
+
                 $images = $data["images"];
+                $images_added = array();
+                $err = false;
                 foreach($images as $imgType=>$imgArray){
                     // imgType : object, grundriss, energieausweis
                     switch($imgType){
@@ -226,6 +234,11 @@ class AjaxControl{
                         $dataobj  =false;
                         // new upoloaded image
                         if(strpos($imgObj["imgString"],"base64")) {
+
+                            if ( ! is_dir($this->uploadpath)) {
+                                mkdir($this->uploadpath);
+                            }
+
                             $encoded_array = explode("base64,", $imgObj["imgString"]);
                             $imgType_Base64Encoded = $encoded_array[0];
                             $imgSource_Base64Encoded = $encoded_array[1];
@@ -239,9 +252,9 @@ class AjaxControl{
                             */
                             $filetype = substr($decodedImgType[1], 0, -1);
                             if ($filetype != false) {
-                                $filename = $obj["returnID"] . "_" . $imgType . "_" . $imgKey . "." . $filetype;
-                                $filepath = "uploads/" . $filename;
-                                $filepath_global = $this->basepath . $filepath;
+                                $filename = $imgType . "_" . $imgKey . "." . $filetype;
+                                $filepath = "uploads/".$obj["returnID"] ."/". $filename ;
+                                $filepath_global = $this->uploadpath . $filename;
                                 if (file_put_contents($filepath_global, $decodedImgData)) {
                                     $dataobj = array(
                                         "exposeID" => $obj["returnID"],
@@ -256,14 +269,16 @@ class AjaxControl{
                                         "type" => "err",
                                         "text" => "Datei ".$imgType." wurde nicht gespeichert.",
                                         "code" => 5));
-                                    return;
+                                    $err = true;
+
                                 }
                             }else{
                                 echo json_encode(array(
                                     "type" => "err",
                                     "text" => "Dateityp ".$imgType." wurde nicht erkannt.",
                                     "code" => 5));
-                                return;
+                                $err = true;
+
                             }
                         }else{
                             // image didn't changed
@@ -278,18 +293,28 @@ class AjaxControl{
                         }
 
                         if($dataobj!=false) {
+                            //only filename
+                            $lastslash = substr($dataobj["imagePath"], strrpos($dataobj["imagePath"], '/') + 1);
+                            $images_added[] = $lastslash;
                             $exposeModel->setImageInDB($dataobj);
                         }else{
                             echo json_encode(array(
                                 "type" => "err",
                                 "text" => "Datei ".$imgType." wurde nicht erkannt.",
                                 "code" => 5));
-                            return;
+                            $err = true;
                         }
 
                     }
                 }
-                echo json_encode(array("type" => "success", "feedbacktext" => "Datensatz erfolgreich gespeichert", "code" => 1, "text"=>json_encode($obj),"returnID"=>$obj["returnID"]));
+                $images_unused = $exposeModel->delete_unused_files($images_added,$this->uploadpath);
+                // returnvalue = filename -> add uploadpath
+                foreach($images_unused as $imgPath){
+                    $exposeModel->removeImageInDB("uploads/".$obj["returnID"]."/".$imgPath);
+                }
+                if($err===false) {
+                    echo json_encode(array("type" => "success", "feedbacktext" => "Datensatz erfolgreich gespeichert", "code" => 1, "text" => json_encode($obj), "returnID" => $obj["returnID"]));
+                }
             }
 
         }

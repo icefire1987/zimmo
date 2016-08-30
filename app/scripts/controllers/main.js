@@ -38,8 +38,8 @@ angular.module('zimmoApp')
       //$event.preventDefault();
         var credentials = {'action':'login','formdata':vm.loginObj.formdata};
         $http({
-            //url: 'scripts/php/ajaxCtrl.php',
-            url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+            url: 'scripts/php/ajaxCtrl.php',
+            //url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
             method: 'POST',
             data: JSON.stringify(credentials),
             withCredentials: true

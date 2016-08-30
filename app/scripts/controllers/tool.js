@@ -11,9 +11,9 @@ angular.module('zimmoApp')
     //NgTableParams
     .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, FileUploader) {
         // on local:
-        var scriptbase = 'http://localhost/Zimmo/app/';
+        //var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
-        //var scriptbase = '';
+        var scriptbase = '';
         var vm = this;
 
         this.repLB = function(){
@@ -248,8 +248,13 @@ angular.module('zimmoApp')
                                 //prevent null and int
                                 response.data.text.currentExpose[key] = (response.data.text.currentExpose[key] || "").toString();
                             }
-                            console.log(response.data.text)
-                            vm.images = response.data.text.images;
+
+                            if(response.data.text.images == null){
+                                vm.images = {object:[],grundriss:[],energieausweis:[]};
+                            }else{
+                                vm.images = response.data.text.images;
+                            }
+
                             vm.currentExpose = response.data.text.currentExpose;
                             // input: number
                             vm.currentExpose.kaufpreis = parseInt(vm.currentExpose.kaufpreis);
@@ -271,7 +276,7 @@ angular.module('zimmoApp')
                             vm.currentExpose.saniert = !!+vm.currentExpose.saniert;
                             vm.currentExpose.renoviert = !!+vm.currentExpose.renoviert;
                             vm.currentExpose.denkmalschutz = !!+vm.currentExpose.denkmalschutz;
-
+                            vm.currentExpose.badezimmer = JSON.parse(vm.currentExpose.badezimmer);
 
                             try {
                                 if(response.data.text.map){
@@ -330,27 +335,28 @@ angular.module('zimmoApp')
 
             }
 
-            /* CrossOrigin-Problem auf localhost
+            /* CrossOrigin-Problem auf localhost */
 
-             $http({
-             url: "http://nominatim.openstreetmap.org/search?street="
-             + vm.currentExpose.hausnummer
-             + " "
-             + vm.currentExpose.strasse
-             + "&city="
-             + vm.currentExpose.ort
-             + "&country=de"
-             + "&postalcode="
-             + vm.currentExpose.plz
-             + "&format=json&limit=1&addressdetails=0",
-             method: 'GET'
-             })
-             .then(
-             function (response) {
-             console.log(response);
-             }
-             );
-             */
+             /*$http({
+                 url: "http://nominatim.openstreetmap.org/search?street="
+                 + vm.currentExpose.hausnummer
+                 + " "
+                 + vm.currentExpose.strasse
+                 + "&city="
+                 + vm.currentExpose.ort
+                 + "&country=de"
+                 + "&postalcode="
+                 + vm.currentExpose.plz
+                 + "&format=json&limit=1&addressdetails=0",
+                 method: 'GET'
+                 })
+                 .then(
+                 function (response) {
+                    console.log(response);
+                     var resdata = response;
+                 }
+             );*/
+
             var resdata = [{
                 "place_id": "33098231",
                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http:\/\/www.openstreetmap.org\/copyright",
@@ -446,7 +452,9 @@ angular.module('zimmoApp')
         for (i= -1; i <= 10; i++) {
             list_geschoss.push(i);
         }
-
+        var list_geschoss_zusatz = [];
+        angular.copy(list_geschoss,list_geschoss_zusatz);
+        list_geschoss_zusatz.push("Dachgeschoss");
         this.datalists = {
             land:["Deutschland","Schweiz","Österreich"],
             stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
@@ -455,9 +463,9 @@ angular.module('zimmoApp')
             energieausweis: ["Bedarfsausweis","Verbrauchsausweis"],
             heizung: ["Fernwärme","Gaszentral","Gasetage","Ölzentral","Palletheizung","Erdwärme","Blockheizkraftwerk"],
             kuechenmarke: ["Bulthaup","Nolte","Alno","Nobilia","SieMatic","IKEA"],
-            kuechenausstattung:["offene Küche","Wohnküche","hochwertig","modern","klassisch"],
+            kuechenausstattung:["offene Küche","Wohnküche"],
             innenausstattung: [
-                "Hauswirtschaftsraum","Klimaanlage","Aufzug","Wämde gespachtelt","Keller","Doppelkastenfenster","Stuck","Barrierefrei","Kamin","Flügeltüren"
+                "Hauswirtschaftsraum","Klimaanlage","Aufzug","Wämde gespachtelt","Keller","Doppelkastenfenster","Stuck","Barrierefrei","Kamin","Flügeltüren","Balkon","Terrasse"
             ],
             bodenbelag: [
                 "Echtholz-Parkett","hochwertiges Parkett","Fussbodenheizung","Dielen"
@@ -467,7 +475,14 @@ angular.module('zimmoApp')
             ],
             jahreszahl: list_jahre,
             zimmer: list_zimmer,
-            geschoss: list_geschoss
+            geschoss: list_geschoss,
+            geschoss_zusatz: list_geschoss_zusatz,
+            lagebeschreibung : [
+                {"bezirk":"Lichtenberg","beschreibung":"Der heutige Ortsteil geht zurück auf das im 13. Jahrhundert im Barnim gegründete Dorf Lichtenberg. Dieses Dorf blieb über viele Jahrhunderte eine kleine, landwirtschaftlich geprägte Siedlung mit wenigen hundert Einwohnern im Osten der Stadt Berlin. Erst Ende des 19. Jahrhunderts stieg durch die Industrialisierung die Einwohnerzahl Lichtenbergs um ein Vielfaches, sodass der Ortschaft 1907 das Stadtrecht verliehen wurde. Durch die Gründung von Groß-Berlin im Jahr 1920 wurde die Stadt Lichtenberg jedoch nach Berlin eingemeindet und bildet seitdem den namensgebenden Ortsteil für den Berliner Bezirk Lichtenberg."}
+            ],
+            badezimmer: [
+                "Vollbad","Duschbad","Gäste-WC"
+            ]
         };
 
         this.clickElement = function(id){
@@ -475,7 +490,9 @@ angular.module('zimmoApp')
 
         };
 
-
+        this.setExposeModelData = function(model,item){
+            vm.currentExpose[model]= item;
+        }
         this.addImage = function(kat){
 
             var canvas =  vm.tempdata.cImage.cropper.getCroppedCanvas();
