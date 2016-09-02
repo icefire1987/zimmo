@@ -9,7 +9,7 @@
  */
 
 angular.module('zimmoApp')
-  .controller('MainCtrl',['$http','$state','$location','$rootScope','AuthService', function ($http,$state,$location,$rootScope,AuthService) {
+  .controller('MainCtrl',['$http','$cookies','$state','$location','$rootScope','$localStorage','AuthService', function ($http,$cookies,$state,$location,$rootScope,$localStorage,AuthService) {
     var vm = this;
     this.dataLoading = false;
 
@@ -38,8 +38,8 @@ angular.module('zimmoApp')
       //$event.preventDefault();
         var credentials = {'action':'login','formdata':vm.loginObj.formdata};
         $http({
-            url: 'scripts/php/ajaxCtrl.php',
-            //url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+            //url: 'scripts/php/ajaxCtrl.php',
+            url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
             method: 'POST',
             data: JSON.stringify(credentials),
             withCredentials: true
@@ -50,7 +50,8 @@ angular.module('zimmoApp')
             try{
                 var resObj = response.data;
                 if(resObj.code===1) {
-                    AuthService.userObj = {isAuthenticated:true};
+                    AuthService.userObj.isAuthenticated = true;
+                    $localStorage.user = JSON.parse(resObj.data);
                     // LOGIN erfolgreich
                     if ($rootScope.returnToState){
                         $state.go($rootScope.returnToState);

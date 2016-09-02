@@ -1,35 +1,99 @@
 <div class="container">
+    <div class="row">
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#menu1" id="button-admin_userprofile">Nutzerprofil</a></li>
-        <li><a data-toggle="tab" href="#menu2" id="button-admin_manageusers">Nutzer verwalten</a></li>
-        <li><a data-toggle="tab" href="#menu3">Systemeinstellungen</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="menu1" class="tab-pane fade in active">
-            <div id="area-admin_userprofile">
-                <table id="table-admin_userprofile" class="tablesorter">
-                    <thead>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <div id="noSearchResult-admin_userprofile"></div>
-            </div>
-        </div>
-        <div id="menu2" class="tab-pane fade">
-            <div id="area-admin_manageusers">
-                <table id="table-admin_manageusers" class="tablesorter">
-                    <thead>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <div id="noSearchResult-admin_manageusers"></div>
-            </div>
-        </div>
-        <div id="menu3" class="tab-pane fade">
-            <div id="area-admin_config"></div>
-        </div>
+            <uib-accordion close-others="true" class="col-xs-12">
+                <uib-accordion-group is-open="c_tool.accExpo.statusAddress.open" ng-click="c_tool.doopen()">
+                    <uib-accordion-heading>
+                        Eigene Daten
+                        <i class="pull-right glyphicon"
+                           ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusAddress.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusAddress.open}"></i>
+                    </uib-accordion-heading>
+                    <div class="row">
+                        <form name="change_password" class="col-xs-12">
+                            <h4><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Passwort ändern</h4>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Altes Passwort</span>
+                                    <input class="col-xs-4" id="reg_pass_old" type="password" name="pass_old" placeholder="Passwort" required
+                                           ng-model="c_tool.userObj.password.old" ng-model-options="{ debounce: 500 }">
+
+                                    <div class="col-xs-4 errorArea" ng-messages="change_password.pass_old.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Neues Passwort</span>
+                                    <input class="col-xs-4" id="reg_pass" type="password" name="pass" placeholder="Passwort" required
+                                           ng-model="c_tool.userObj.password.new" ng-model-options="{ debounce: 500 }"
+                                           ng-minlength="8" ng-pattern="/^(?=.*[A-Z])(?=.*\d).+$/">
+                                    <div class="col-xs-4 errorArea" ng-messages="change_password.pass.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Neues Passwort wiederholen</span>
+                                    <input class="col-xs-4" id="reg_pass_confirm" type="password" name="pass_confirm" placeholder="Passwort" required
+                                           ng-model="c_tool.userObj.password.new_confirmed" ng-model-options="{ debounce: 500 }"
+                                           ng-minlength="8" ng-pattern="/^(?=.*[A-Z])(?=.*\d).+$/">
+                                    <div class="col-xs-4 errorArea" ng-messages="change_password.pass_confirm.$error">
+                                        <div ng-messages-include="views/regForm_messages.html"></div>
+                                    </div>
+                                </label>
+                            </div>
+                                <button type="button" class="btn btn-success"ng-click="c_tool.userChangePW()">Änderung speichern</button>
+                          </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Profilinformationen ändern</h4>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Vorname</span>
+                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.prename">
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Nachname</span>
+                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.lastname">
+                                </label>
+                            </div>
+
+                            <button type="button" class="btn btn-success" ng-click="c_tool.userEdit()">Änderung speichern</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h4><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> Teamzugehörigkeit</h4>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Einladung annehmen</span>
+                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.invitecode" placeholder="Einladungscode">
+                                    <div class="col-xs-4"><button type="button" class="btn btn-success" ng-click="c_tool.userEdit()">Einladungscode prüfen</button></div>
+                                    <span class="col-xs-12 ">{{c_tool.userObj.invitecode_feeedback}}</span>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Dein Team</span>
+                                    <span>{{c_tool.userObj.team.name || 'Du bist keinem Team zugeordnet'}}</span>
+                                </label>
+                            </div>
+                            <div class="row">
+                                <label class="col-xs-12 col-sm-8">
+                                    <span class="col-xs-4 text-right">Deine Nutzerrolle</span>
+                                    <span>{{c_tool.userObj.role || 'Basis'}}</span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                </uib-accordion-group>
+            </uib-accordion>
+        {{c_tool.userObj}}
     </div>
 </div>

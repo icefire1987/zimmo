@@ -20,8 +20,9 @@ class LoginModel{
         $input_password= $data["password"];
 
         // Using prepared statements means that SQL injection is not possible.
-        if ($stmt =  $this->db->mysqli->prepare("SELECT id, email, passwordhash
+        if ($stmt =  $this->db->mysqli->prepare("SELECT members.id, members.email, passwordhash,prename,lastname,role.name as role
 									FROM members
+									LEFT JOIN role ON role.id = members.roleID
 							       	WHERE email = ?
 							        LIMIT 1")) {
             $stmt->bind_param('s', $input_email);  // Bind "$email" to parameter.
@@ -29,10 +30,9 @@ class LoginModel{
             $stmt->store_result();
 
 
-
             if ($stmt->num_rows == 1) {
                 // get variables from result.
-                $stmt->bind_result($user_id, $user_email, $db_password);
+                $stmt->bind_result($user_id, $user_email, $db_password,$prename,$lastname,$role);
                 $stmt->fetch();
                 
                 // If the user exists we check if the account is locked
@@ -61,7 +61,7 @@ class LoginModel{
                         $_SESSION['login_string'] = hash('sha512',
                             $db_password . $user_browser);
                         // Login successful.
-                        return array("code"=>1,"txt"=>"Login erfolgreich");
+                        return array("code"=>1,"txt"=>"Login erfolgreich","data"=>json_encode(array("prename"=>$prename,"lastname"=>$lastname,"role"=>$role)));
                     } else {
                         // Password is not correct
                         // We record this attempt in the database
@@ -76,10 +76,45 @@ class LoginModel{
                 return array("code"=>5,"txt"=>"Nutzer unbekannt");
             }
 
+        }else{
+            return array("code"=>9,"txt"=>"Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error);
         }
     }
 
 
+    function editUser($data){
+
+        if (!($stmt = $this->db->mysqli->prepare("UPDATE members SET prename=?, lastname=? WHERE id=?"))){
+            return array("code"=>9,"txt"=>"Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error);
+        }
+
+        if (!$stmt->bind_param('ssi',$data["prename"],$data["lastname"],$data["userid"])) {
+            return array("code"=>9,"txt"=>"Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+        }
+
+        if (!$stmt->execute()) {
+            return array("code"=>9,"txt"=>"Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+        }else{
+            return array("code"=>1);
+        }
+
+    }
+
+    function editPassword($data){
+        if (!($stmt = $this->db->mysqli->prepare("UPDATE members SET passwordhash=? WHERE id=?"))){
+            return array("code"=>9,"txt"=>"Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error);
+        }
+
+        if (!$stmt->bind_param('si',$data["password"],$data["userid"])) {
+            return array("code"=>9,"txt"=>"Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error);
+        }
+
+        if (!$stmt->execute()) {
+            return array("code"=>9,"txt"=>"Execute failed: (" . $stmt->errno . ") " . $stmt->error);
+        }else{
+            return array("code"=>1);
+        }
+    }
     function checkbrute($user_id) {
         // Get timestamp of current time
         $now = time();
@@ -163,8 +198,7 @@ class LoginModel{
         $password=$data["password"];
         $password_hash=password_hash($password,PASSWORD_DEFAULT);
 
-        echo $password."\r\n";
-        echo $password_hash."\r\n";
+
 
 
         $prep_stmt = "SELECT id FROM members WHERE email = ? LIMIT 1";

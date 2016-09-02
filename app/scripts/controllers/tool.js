@@ -9,17 +9,19 @@
  */
 angular.module('zimmoApp')
     //NgTableParams
-    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope, FileUploader) {
+    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope,$localStorage, FileUploader) {
         // on local:
-        //var scriptbase = 'http://localhost/Zimmo/app/';
+        var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
-        var scriptbase = '';
+        //var scriptbase = '';
         var vm = this;
 
         this.repLB = function(){
             return JSON.stringify(vm.currentExpose,null," ").replace(/,/g,', <br>');
         };
 
+        vm.userObj = $localStorage.user;
+        vm.userObj.password = {};
 
         vm.currentExpose = {};
 
@@ -159,8 +161,8 @@ angular.module('zimmoApp')
 
             })
                 .then(function (response) {
-                    console.log(response);
-                    AuthService.userObj = undefined;
+                    AuthService.userObj = {};
+                    $localStorage.$reset();
                     $state.go("exit");
                 })
             ;
@@ -579,6 +581,55 @@ angular.module('zimmoApp')
             }
 
         };
+        this.userEdit = function(){
+            var credentials = {
+                action: "userEdit",
+                formdata: vm.userObj
+            };
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                    }
+                );
+        }
+        this.userChangePW = function(){
+            var credentials = {
+                action: "userChangePW",
+                formdata: vm.userObj.password
+            };
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.userObj.password = {}
+                            vm.showFeedback(response.data);
+
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                    }
+                );
+        }
 
     }])
     .run(

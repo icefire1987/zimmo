@@ -8,7 +8,7 @@ class AjaxControl{
         require_once("class/ExposeModel.php");
         require_once("class/PDFModel.php");
 
-        $this->Security = new Security("zuumeoImmoApp_Session");
+        $this->Security = new Security("zuumeoImmoApp");
         $this->DB = new myDB();
         $this->basepath = "../../";
         $this->uploadpath =   $this->basepath ."uploads/";
@@ -16,8 +16,8 @@ class AjaxControl{
     }
     function setHeaders(){
         header("Access-Control-Allow-Credentials: true");
-        //header("Access-Control-Allow-Origin: http://localhost:9002");
-        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Origin: http://localhost:9002");
+        //header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
     }
@@ -59,6 +59,12 @@ class AjaxControl{
                     break;
                 case "logout":
                     $this->logout();
+                    break;
+                case "userEdit":
+                    $this->userEdit();
+                    break;
+                case "userChangePW":
+                    $this->userChangePW();
                     break;
             }
 
@@ -110,6 +116,44 @@ class AjaxControl{
         }else{
                 $loginObj = $loginModel->registerUser($data);
                 echo json_encode($loginObj);
+        }
+    }
+
+    function userEdit(){
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["prename"] = $this->Security->validateInput('string',$this->input["formdata"],'prename');
+        $data["lastname"] = $this->Security->validateInput('string',$this->input["formdata"],'lastname');
+        $data["userid"] = $_SESSION['userid'];
+        $userObj = $loginModel->editUser($data);
+        if(isset($userObj["code"]) && $userObj["code"]==1) {
+            echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert"));
+        }else if(isset($userObj["code"]) && $userObj["code"]!=1){
+            echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+        }else{
+            echo json_encode(array("type" => "err", "feedbacktext" => "Daten konnten nciht gespeichert werden"));
+        }
+    }
+    function userChangePW()
+    {
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["old"] = $this->Security->validateInput('string', $this->input["formdata"], 'old');
+        $data["new"] = $this->Security->validateInput('string', $this->input["formdata"], 'new');
+        $data["new_confirm"] = $this->Security->validateInput('string', $this->input["formdata"], 'new_confirmed');
+        if(strlen($data["new"])>7 && $data["new"] === $data["new_confirm"]){
+            $data["password"] = password_hash($data["new"],PASSWORD_DEFAULT);
+            $data["userid"] = $_SESSION['userid'];
+            $userObj = $loginModel->editPassword($data);
+            if (isset($userObj["code"]) && $userObj["code"] == 1) {
+                echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert"));
+            } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
+                echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+            } else {
+                echo json_encode(array("type" => "err", "feedbacktext" => "Daten konnten nciht gespeichert werden"));
+            }
+        }else{
+            echo json_encode(array("type" => "err", "feedbacktext" => "Die Wiederholung des Passworts ist nicht identisch"));
         }
     }
 

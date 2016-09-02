@@ -75,7 +75,6 @@ class Security{
             $https,
             false
         );
-        setcookie("AT", session_id(), time()+$lifetime);  /* verfällt in 1 Stunde */
 
         // Make sure the session hasn't expired, and destroy it if it has
         if(self::validateSession())

@@ -9,7 +9,7 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angularFileUpload'])
+    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angularFileUpload','ngStorage'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider,$locationProvider) {
         $httpProvider.defaults.withCredentials = true;
@@ -55,7 +55,10 @@ angular
                 url: '/user',
                 templateUrl: 'views/tool_user.html',
                 authenticate: true,
-                roles: []
+                roles: [],
+                controller: function($scope,$stateParams) {
+                    $scope.c_tool.userObj.password = {};
+                }
             })
             .state('tool.expose', {
                 url: '/expose',
@@ -128,17 +131,16 @@ angular
     }])
     .service('AuthService',['$cookies', function($cookies){
         var self = this;
-        this.userObj = undefined;
-
+        this.userObj = {};
+        console.log($cookies.getAll())
         this.checkAuthenticated = function(){
             //return true;
-            var phpcookie = $cookies.get("zuumeoImmoApp_Session_Session");
-            console.info("auth")
-            if(phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
+            var phpcookie = $cookies.get("zuumeoImmoApp_Session");
+            if( phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
                 //Update Cookie
                 var now = new Date(),
                 exp = new Date(now.getFullYear(), now.getMonth(), now.getDate()+2);
-                $cookies.put("zuumeoImmoApp_Session_Session",phpcookie,{expires: exp});
+                $cookies.put("zuumeoImmoApp_Session",phpcookie,{expires: exp});
                 return true;
             }
 
