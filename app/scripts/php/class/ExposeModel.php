@@ -70,7 +70,7 @@ class ExposeModel{
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
                 LEFT JOIN members as me ON me.id = ?
-                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+                WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
                 
                ".$addWhere;
             $stmt =  $this->db->mysqli->prepare($prep_stmt);
@@ -89,7 +89,7 @@ class ExposeModel{
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
                 LEFT JOIN members as me ON me.id = ?
-                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+                WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
                ";
             $stmt =  $this->db->mysqli->prepare($prep_stmt);
             if ($stmt) {
@@ -143,7 +143,7 @@ class ExposeModel{
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
                 LEFT JOIN members as me ON me.id = ?
-                WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+                WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
                 AND objects.id = ?
                ";
         $stmt =  $this->db->mysqli->prepare($prep_stmt);
@@ -175,7 +175,7 @@ class ExposeModel{
             FROM objects
             LEFT JOIN members ON objects.userID = members.id
             LEFT JOIN members as me ON me.id = ?            
-            WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+            WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
             AND objects.id = ?
            ";
 
@@ -205,7 +205,7 @@ class ExposeModel{
             LEFT JOIN images ON images.objectID = objects.id
             LEFT JOIN members ON objects.userID = members.id
             LEFT JOIN members as me ON me.id = ?            
-            WHERE members.departmentID = me.departmentID AND (members.roleID < me.roleID OR members.id = me.id)
+            WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
             AND objects.id = ?
             ORDER BY sort
            ";
@@ -257,7 +257,7 @@ class ExposeModel{
        $neededKeys = ["geschaeftsart","objekttyp","strasse","ort"];
        $possibleKeys = [
            "id","geschaeftsart","strasse","hausnummer","plz","ort","bezirk","land","go",
-           "lieferung","moebliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk",
+           "lieferung","bezugsfrei","moebliert","saniert","renoviert","objekttyp","lageHaus","lageStockwerk",
            "stockwerke","stockwerk","haustyp","baujahr","sanierung","renovierung","besonderheit",
            "exposetitel","provision","provisionEinheit","kaution","kautionEinheit","kaltmiete",
            "pauschalmiete","nebenkosten","kaufpreis","stellplatz","stellplatztyp","stellplatzkosten",
@@ -265,7 +265,8 @@ class ExposeModel{
            "aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp",
            "badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung",
            "energiewert","energieausweisTyp","denkmalschutz","zustand","lage","lagebeschreibung",
-           "objektbeschreibung","sonstiges","updatedatum","userID","map","kuechenmarke","nutzflaeche"];
+           "objektbeschreibung","sonstiges","updatedatum","userID","map","kuechenmarke","nutzflaeche",
+            ];
        foreach($neededKeys as $k=>$v){
            if(!array_key_exists($v,$data)){
                return array("code"=>29,"txt"=>$v.": Missing Key Expose::set");

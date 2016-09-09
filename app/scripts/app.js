@@ -56,8 +56,9 @@ angular
                 templateUrl: 'views/tool_user.html',
                 authenticate: true,
                 roles: [],
-                controller: function($scope,$stateParams) {
-                    $scope.c_tool.userObj.password = {};
+                controller: function($scope,$stateParams,UserService) {
+                    angular.copy($scope.c_tool.userObj,$scope.c_tool.userObjTemp);
+                    $scope.c_tool.checkInvite();
                 }
             })
             .state('tool.expose', {
@@ -118,7 +119,8 @@ angular
 
     }])
 
-    .run(['$rootScope', '$state', 'AuthService',function ($rootScope, $state, AuthService) {
+    .run(['$rootScope', '$state', 'AuthService','UserService',function ($rootScope, $state, AuthService, UserService) {
+
         // Redirect to login if route requires auth and you're not logged in
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && !AuthService.checkAuthenticated()){
@@ -129,20 +131,71 @@ angular
             }
         });
     }])
-    .service('AuthService',['$cookies', function($cookies){
+    .service('AuthService',['UserService','$cookies','$rootScope', function(UserService,$cookies,$rootScope){
         var self = this;
-        this.userObj = {};
-        console.log($cookies.getAll())
         this.checkAuthenticated = function(){
             //return true;
             var phpcookie = $cookies.get("zuumeoImmoApp_Session");
-            if( phpcookie || (self.userObj !== undefined && self.userObj.isAuthenticated) ){
+            if( phpcookie || (UserService.userObj !== undefined && UserService.userObj.isAuthenticated) ){
+                UserService.updateUserFromDB();
                 //Update Cookie
                 var now = new Date(),
                 exp = new Date(now.getFullYear(), now.getMonth(), now.getDate()+2);
                 $cookies.put("zuumeoImmoApp_Session",phpcookie,{expires: exp});
                 return true;
             }
+
+        };
+
+        this.UserIsAuthenticated = function(){
+            UserService.userObj.isAuthenticated = true;
+        }
+
+    }])
+    .service('UserService',['$rootScope','$http','$localStorage','$q', function($rootScope,$http,$localStorage,$q){
+        var self = this;
+            self.userObj = {};
+
+        this.getUserFromStorage = function(){
+            self.userObj = $localStorage.user;
+        };
+        this.updateUserFromDB = function(){
+            var credentials = {'action':'getCurrentUser','formdata':{}};
+
+            $http({
+                //url: 'scripts/php/ajaxCtrl.php',
+                url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(function(response) {
+                    try{
+                        var resObj = response.data;
+                        if(resObj.code===1) {
+                            self.userObj = JSON.parse(resObj.txt);
+                        }
+                    }catch(e){
+                        console.log(e);
+                    }
+
+                });
+        };
+
+        this.updateUserObj = function(key,val){
+            self.userObj[key] = val;
+        };
+        this.updateUserObjTeam = function(key,val){
+            self.userObj.team[key] = val;
+        };
+
+        this.clear = function(){
+            self.userObj = {};
+        };
+
+        this.getUser = function () {
+            return self.userObj;
 
         };
 

@@ -80,7 +80,37 @@ class LoginModel{
             return array("code"=>9,"txt"=>"Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error);
         }
     }
+    function getCurrentUser($data){
+        if (!($stmt = $this->db->mysqli->prepare("
+            SELECT prename, lastname, teams.name as team,role.name
+            
+            FROM members 
+            LEFT JOIN teams ON teams.id = members.teamID
+            LEFT JOIN role ON role.id = members.roleID
+            WHERE members.id = ?"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+        $insertData  = array(
+            "userid"=>$data["userid"]
+        );
+        if (!$stmt->bind_param('i',$insertData["userid"])) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
 
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }else{
+            $stmt->store_result();
+
+            if ($stmt->num_rows == 1) {
+                // get variables from result.
+                $stmt->bind_result($prename, $lastname, $team,$role);
+                $stmt->fetch();
+
+                return array("code" => 1, "txt" => json_encode(array("prename" => $prename, "lastname" => $lastname,"team"=>array("name"=>$team),"role"=>$role)));
+            }
+        }
+    }
 
     function editUser($data){
 
@@ -241,6 +271,63 @@ class LoginModel{
 
 
 
+    }
+
+    function checkInvite($data){
+        $one = 1;
+        if ($stmt =  $this->db->mysqli->prepare("
+                                    SELECT invites.teamID,teams.name, CONCAT(membersAdmin.prename,' ',membersAdmin.lastname) as admin , invites.send  
+									FROM invites
+									LEFT JOIN teams ON invites.teamID = teams.id
+									LEFT JOIN members as membersAdmin ON teams.adminID = membersAdmin.id
+							       	WHERE userID=? AND isOpen = ?
+							        LIMIT 1")) {
+            $stmt->bind_param('ii', $data["userid"],$one);  // Bind "code" to parameter.
+            $stmt->execute();    // Execute the prepared query.
+            $stmt->store_result();
+
+
+            if ($stmt->num_rows == 1) {
+                // get variables from result.
+                $stmt->bind_result($teamid,$name, $admin, $send);
+                $stmt->fetch();
+
+                return array("code"=>1,"txt"=>json_encode(array("team"=>$name,"admin"=>$admin,"send"=>$send,"teamID"=>$teamid)));
+            }
+
+        }
+    }
+
+    function userJoinTeam($data){
+
+        if (!($stmt = $this->db->mysqli->prepare("UPDATE members SET teamID = ? WHERE id=?"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        if (!$stmt->bind_param('ii',$data["teamID"],$data["userid"])) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }else{
+            if (!($stmt = $this->db->mysqli->prepare("UPDATE invites SET isOpen = ?, accepted = NOW() WHERE userID=? AND isOpen = ?"))){
+                echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+            }
+            $insertData  = array(
+                "userid"=>$data["userid"],
+                "one"=>1,
+                "zero"=>0
+            );
+            if (!$stmt->bind_param('iii',$insertData["zero"],$insertData["userid"],$insertData["one"])) {
+                echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+            }
+
+            if (!$stmt->execute()) {
+                echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+            }
+        }
+        return array("code"=>1);
     }
 
 }

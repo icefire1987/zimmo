@@ -9,7 +9,7 @@
  */
 angular.module('zimmoApp')
     //NgTableParams
-    .controller('ToolCtrl', ['$http', '$state', 'AuthService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','FileUploader', function ($http, $state, AuthService, NgTableParams, $timeout, leafletData, $scope,$localStorage, FileUploader) {
+    .controller('ToolCtrl', ['$http', '$state', 'AuthService','UserService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','$q','FileUploader', function ($http, $state, AuthService,UserService, NgTableParams, $timeout, leafletData, $scope,$localStorage,$q,FileUploader) {
         // on local:
         var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
@@ -20,36 +20,155 @@ angular.module('zimmoApp')
             return JSON.stringify(vm.currentExpose,null," ").replace(/,/g,', <br>');
         };
 
-        vm.userObj = $localStorage.user;
-        vm.userObj.password = {};
+    // USER
+        vm.userObj = {};
 
+        $scope.$watch(UserService.getUser, function (userObj) { ///adding watcher on someService.getChange, it will fire when change changes value
+            vm.userObj = userObj; //setting change to controller here you can put some extra logic
+        }.bind(this));
+
+        // SET BY INPUT-FIELD
+        vm.userObjTemp = {};
+
+        this.userEdit = function(){
+            var credentials = {
+                action: "userEdit",
+                formdata: vm.userObjTemp
+            };
+            var defer = $q.defer();
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+                            UserService.updateUserObj("prename",vm.userObjTemp.prename);
+                            UserService.updateUserObj("lastname",vm.userObjTemp.lastname);
+                            defer.resolve(true);
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                        defer.resolve(false);
+                    }
+                );
+            return defer.promise;
+        }
+        this.userChangePW = function(){
+            var credentials = {
+                action: "userChangePW",
+                formdata: vm.userObj.password
+            };
+            var defer = $q.defer();
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+                            if(response.data.type=="success"){
+                                defer.resolve(true);
+                            }else{
+                                defer.resolve(false);
+                            }
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                    }
+                );
+            return defer.promise;
+        }
+        this.checkInvite = function(){
+
+            var credentials = {
+                action: "userCheckInvite",
+                formdata: {
+                    code: null
+                }
+            };
+            var defer = $q.defer();
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            UserService.updateUserObj("password",{});
+                            if(response.data.type=="success"){
+                                vm.invitecode_feeedback = JSON.parse(response.data.txt);
+                                defer.resolve(true);
+                            }else{
+                                vm.showFeedback(response.data);
+                            }
+                        }else{
+                            console.log(response);
+                            vm.showFeedback(response.data);
+                            defer.resolve(false);
+                        }
+                    },
+                    function (data) {
+                        console.log("err");
+                        console.log(data);
+                    }
+                );
+            return defer.promise;
+        }
+
+        this.userJoinTeam = function(){
+            var credentials = {
+                action: "userJoinTeam",
+                formdata: {
+                    teamID: vm.invitecode_feeedback.teamID
+                }
+            };
+            var defer = $q.defer();
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+                            if(response.data.type=="success"){
+                                UserService.updateUserObjTeam("name",vm.invitecode_feeedback.team);
+                                vm.invitecode_feeedback = null;
+                                defer.resolve(true);
+                            }
+                        }else{
+                            console.log(response);
+                            vm.showFeedback(response.data);
+                            defer.resolve(false);
+                        }
+                    },
+                    function (data) {
+                        console.log("err");
+                        console.log(data);
+                    }
+                );
+            return defer.promise;
+        }
+    // EXPOSE
         vm.currentExpose = {};
 
-        vm.feedback = {};
-        vm.feedbackVisible = false;
-
-        vm.accExpo = {
-            statusAddress: {}
-        };
-        vm.tempdata = {
-            cImage:{},
-            cGrundriss:{},
-            cEnergieausweis:{}
-        };
-        vm.images = {object:[],grundriss:[],energieausweis:[]};
-
-
-        this.doopen = function () {
-            if (vm.accExpo.statusAddress.open) {
-                leafletData.getMap().then(function (map) {
-                    $timeout(function () {
-                        map.invalidateSize();
-                    }, 300);
-                });
-            }
-        };
-
-        vm.accExpo.statusAddress.open = true;
         vm.myMap = {};
         vm.mapdata = {
             center: {},
@@ -76,97 +195,13 @@ angular.module('zimmoApp')
             }
         };
 
-        this.searchObj = {
-            formdata: {
-                nummer: '',
-                strasse: '',
-                id: ''
-            }
+        vm.tempdata = {
+            cImage:{},
+            cGrundriss:{},
+            cEnergieausweis:{}
         };
+        vm.images = {object:[],grundriss:[],energieausweis:[]};
 
-        this.showFeedback = function (responsedata) {
-            this.timer=null;
-            vm.feedback.type = responsedata.type;
-            vm.feedback.text = responsedata.feedbacktext;
-            if (responsedata.addData) {
-                vm.feedback.addData = responsedata.addData;
-            }
-
-            vm.feedbackVisible = true;
-            if (vm.feedback.type === "success") {
-                this.timer = $timeout(function () {
-                    vm.feedbackVisible = false;
-                }, 4000);
-            } else {
-                $timeout.cancel(this.timer);
-            }
-
-        };
-        this.exposeSearch = function (searchOne,searchdata) {
-            var credentials = {
-                action: 'exposeSearchAll',
-                formdata: false
-            };
-            if (searchOne === true) {
-                if(!searchdata){
-                    searchdata= vm.searchObj.formdata;
-                }
-                credentials = {
-                    action: 'exposeSearchOne',
-                    formdata: searchdata
-                };
-            }
-            vm.showFeedback({type: "info", feedbacktext: "Anfrage in Bearbeitung..."});
-            $http({
-                url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                method: 'POST',
-                data: JSON.stringify(credentials),
-                withCredentials: true
-
-            })
-                .then(function (response) {
-                    console.log(response);
-                    if (response.data.type === "success" || response.data.type === "err") {
-                        vm.showFeedback(response.data);
-                    }
-                    if (response.data.type === "success") {
-                        var resultset = JSON.parse(response.data.text);
-                        vm.cols = [
-                            {field: "id", title: "ID", sortable: "id", show: true},
-                            {field: "go", title: "Nummer", sortable: "go", show: true},
-                            {field: "strasse", title: "Strasse", sortable: "strasse", show: true},
-                            {field: "plz", title: "PLZ", sortable: "plz", show: true},
-                            {field: "ort", title: "Ort", sortable: "ort", show: true},
-                            {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
-                            {field: "oa", title: "Objektart", sortable: "oa", show: true},
-                            {field: "zimmer", title: "Zimmer", sortable: "zimmer", show: true},
-                            {field: "wohnflaeche", title: "Wohnfläche", sortable: "wohnflaeche", show: true},
-                            {field: "action", title: "", dataType: "command", show: true}
-                        ];
-                        vm.resultAll_tableParams = new NgTableParams({}, {dataset: resultset});
-                    }
-                })
-            ;
-        };
-
-        this.logout = function () {
-            var credentials = {
-                action: 'logout'
-            };
-            $http({
-                url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                method: 'POST',
-                data: JSON.stringify(credentials),
-                withCredentials: true
-
-            })
-                .then(function (response) {
-                    AuthService.userObj = {};
-                    $localStorage.$reset();
-                    $state.go("exit");
-                })
-            ;
-        };
         this.del = function (obj) {
             if (window.confirm('Datensatz unwiederruflich löschen?')) {
                 var credentials = {
@@ -200,36 +235,45 @@ angular.module('zimmoApp')
                     );
             }
         };
-        this.pdf = function (obj) {
-            var credentials = {
-                action: 'createPDF',
-                formdata: obj
-            };
-            vm.showFeedback({type: "info", feedbacktext: "Anfrage in Bearbeitung..."});
-            $http({
-                url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                method: 'POST',
-                data: JSON.stringify(credentials),
-                withCredentials: true
 
-            })
-                .then(
-                    function (response) {
-                        console.log(response.data);
-                        if (response.data.type === "success" || response.data.type === "err" || response.data.type === "info") {
-                            vm.showFeedback(response.data);
-                        } else {
+        this.submit_form_expose = function(){
+            // vm.currentExpose
+            var obj = vm.checkExposeForm();
+
+            if(obj!=false){
+                var credentials = {
+                    action: "exposeInsert",
+                    formdata: obj
+                };
+                var defer = $q.defer();
+                $http({
+                    url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                    method: 'POST',
+                    data: JSON.stringify(credentials),
+                    withCredentials: true
+
+                })
+                    .then(
+                        function (response) {
                             console.log(response);
-                            vm.showFeedback({type: "err", feedbacktext: "Anfrage fehlgeschlagen. siehe Konsole"});
+                            if (response.data.type === "success" || response.data.type === "err") {
+                                defer.resolve(true);
+                                $state.go("tool.sucheOne", {exposeid: response.data.returnID});
+                                vm.showFeedback(response.data);
+                            }
+                        },
+                        function (data) {
+                            console.log("err" + data.toString());
+                            defer.resolve(false);
                         }
-                    },
-                    function (data) {
-                        console.log(data);
-                        vm.showFeedback({type: "err", feedbacktext: "Anfrage fehlgeschlagen. siehe Konsole"});
-                    }
-                );
+                    );
 
+            }else{
+                console.log("Check failed");
+            }
+            return defer.promise;
         };
+
         this.setRecord = function (id) {
             var credentials = {
                 action: 'echoRecord',
@@ -275,6 +319,7 @@ angular.module('zimmoApp')
                             // checkboxes:
                             vm.currentExpose.kueche = !!+vm.currentExpose.kueche;
                             vm.currentExpose.moebliert = !!+vm.currentExpose.moebliert;
+                            vm.currentExpose.bezugsfrei = !!+vm.currentExpose.bezugsfrei;
                             vm.currentExpose.saniert = !!+vm.currentExpose.saniert;
                             vm.currentExpose.renoviert = !!+vm.currentExpose.renoviert;
                             vm.currentExpose.denkmalschutz = !!+vm.currentExpose.denkmalschutz;
@@ -316,16 +361,56 @@ angular.module('zimmoApp')
                     }
                 );
         };
-        this.deleteProp = function (key) {
-            delete vm.currentExpose[key];
+        this.setExposeModelData = function(model,item){
+            vm.currentExpose[model]= item;
+        }
+        this.addImage = function(kat){
+
+            var canvas =  vm.tempdata.cImage.cropper.getCroppedCanvas();
+
+            vm.addToImages({
+                arrayname:'object',
+                data: {
+                    title:angular.copy(vm.tempdata.cImage.title),
+                    imgString:canvas.toDataURL(),
+                    source:vm.tempdata.cImage.source,
+                    kat:{
+                        "type": "select",
+                        "name": "Service",
+                        "value": kat,
+                        "values": [ "Titelbild", "Objektbild"]
+                    }
+                }
+            });
+
+            // empty CroppArea
+            vm.tempdata.cImage.cropper.destroy();
+            vm.tempdata.cImage.source = null;
+            vm.tempdata.cImage.title = "";
+
+            var c=document.getElementById("canvas_crop");
+            var ctx=c.getContext("2d");
+            ctx.clearRect(0,0,c.width,c.height);
+
         };
-        this.setProp = function (key, value) {
-            vm.currentExpose[key] = value;
+
+        this.addToImages = function(obj){
+            /*
+             data = {
+             title,imgString,source,kat(additional dropdown data)
+             }
+             */
+            console.log("addToImages");
+            console.log(obj);
+            if(!vm.images[obj.arrayname]){
+                vm.images[obj.arrayname] = [];
+            }
+            vm.images[obj.arrayname].push(obj.data);
         };
 
         this.checkExposeForm = function () {
             var returnObj = vm.currentExpose;
-                returnObj.images = vm.images;
+            returnObj.images = vm.images;
             return returnObj;
         };
         this.getMap = function () {
@@ -339,24 +424,24 @@ angular.module('zimmoApp')
 
             /* CrossOrigin-Problem auf localhost */
 
-             /*$http({
-                 url: "http://nominatim.openstreetmap.org/search?street="
-                 + vm.currentExpose.hausnummer
-                 + " "
-                 + vm.currentExpose.strasse
-                 + "&city="
-                 + vm.currentExpose.ort
-                 + "&country=de"
-                 + "&postalcode="
-                 + vm.currentExpose.plz
-                 + "&format=json&limit=1&addressdetails=0",
-                 method: 'GET'
-                 })
-                 .then(
-                 function (response) {
-                    console.log(response);
-                     var resdata = response;
-                 }
+            /*$http({
+             url: "http://nominatim.openstreetmap.org/search?street="
+             + vm.currentExpose.hausnummer
+             + " "
+             + vm.currentExpose.strasse
+             + "&city="
+             + vm.currentExpose.ort
+             + "&country=de"
+             + "&postalcode="
+             + vm.currentExpose.plz
+             + "&format=json&limit=1&addressdetails=0",
+             method: 'GET'
+             })
+             .then(
+             function (response) {
+             console.log(response);
+             var resdata = response;
+             }
              );*/
 
             var resdata = [{
@@ -404,20 +489,7 @@ angular.module('zimmoApp')
                 console.log("try: get map # " + e);
             }
         };
-        this.clearOtherVal = function(source,targetToClear){
-            if(angular.isArray(targetToClear)){
-                for(var i=0;i<targetToClear.length;i++){
-                    if(vm.currentExpose[source]!=""){
-                        vm.currentExpose[targetToClear[i]]="";
-                    }
-                }
-            }else{
-                if(vm.currentExpose[source]!=""){
-                    vm.currentExpose[targetToClear]="";
-                }
-            }
 
-        };
         this.setMap = function(mapdata){
             vm.mapdata.center = {
                 lat: (mapdata.lat) * 1,
@@ -439,6 +511,193 @@ angular.module('zimmoApp')
                 }, 300);
             });
         };
+
+        this.pdf = function (obj) {
+            var credentials = {
+                action: 'createPDF',
+                formdata: obj
+            };
+            vm.showFeedback({type: "info", feedbacktext: "Anfrage in Bearbeitung..."});
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        console.log(response.data);
+                        if (response.data.type === "success" || response.data.type === "err" || response.data.type === "info") {
+                            vm.showFeedback(response.data);
+                        } else {
+                            console.log(response);
+                            vm.showFeedback({type: "err", feedbacktext: "Anfrage fehlgeschlagen. siehe Konsole"});
+                        }
+                    },
+                    function (data) {
+                        console.log(data);
+                        vm.showFeedback({type: "err", feedbacktext: "Anfrage fehlgeschlagen. siehe Konsole"});
+                    }
+                );
+
+        };
+    // SUCHE
+        this.searchObj = {
+            formdata: {
+                nummer: '',
+                strasse: '',
+                id: ''
+            }
+        };
+
+        this.exposeSearch = function (searchOne,searchdata) {
+            var credentials = {
+                action: 'exposeSearchAll',
+                formdata: false
+            };
+            if (searchOne === true) {
+                if(!searchdata){
+                    searchdata= vm.searchObj.formdata;
+                }
+                credentials = {
+                    action: 'exposeSearchOne',
+                    formdata: searchdata
+                };
+            }
+            vm.showFeedback({type: "info", feedbacktext: "Anfrage in Bearbeitung..."});
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(function (response) {
+                    console.log(response);
+                    if (response.data.type === "success" || response.data.type === "err") {
+                        vm.showFeedback(response.data);
+                    }
+                    if (response.data.type === "success") {
+                        var resultset = JSON.parse(response.data.text);
+                        vm.cols = [
+                            {field: "id", title: "ID", sortable: "id", show: true},
+                            {field: "go", title: "Nummer", sortable: "go", show: true},
+                            {field: "strasse", title: "Strasse", sortable: "strasse", show: true},
+                            {field: "plz", title: "PLZ", sortable: "plz", show: true},
+                            {field: "ort", title: "Ort", sortable: "ort", show: true},
+                            {field: "ga", title: "Geschäftsart", sortable: "ga", show: true},
+                            {field: "oa", title: "Objektart", sortable: "oa", show: true},
+                            {field: "zimmer", title: "Zimmer", sortable: "zimmer", show: true},
+                            {field: "wohnflaeche", title: "Wohnfläche", sortable: "wohnflaeche", show: true},
+                            {field: "action", title: "", dataType: "command", show: true}
+                        ];
+                        vm.resultAll_tableParams = new NgTableParams({}, {dataset: resultset});
+                    }
+                })
+            ;
+        };
+    // ACC-Tabs
+        vm.accExpo = {
+            statusAddress: {}
+        };
+
+        vm.accExpo.statusAddress.open = true;
+
+        this.doopen = function () {
+            if (vm.accExpo.statusAddress.open) {
+                leafletData.getMap().then(function (map) {
+                    $timeout(function () {
+                        map.invalidateSize();
+                    }, 300);
+                });
+            }
+        };
+
+    // VIEWS
+        vm.feedback = {};
+        vm.feedbackVisible = false;
+
+
+        this.showFeedback = function (responsedata) {
+            this.timer=null;
+            vm.feedback.type = responsedata.type;
+            vm.feedback.text = responsedata.feedbacktext;
+            if (responsedata.addData) {
+                vm.feedback.addData = responsedata.addData;
+            }
+
+            vm.feedbackVisible = true;
+            if (vm.feedback.type === "success") {
+                this.timer = $timeout(function () {
+                    vm.feedbackVisible = false;
+                }, 4000);
+            } else {
+                $timeout.cancel(this.timer);
+            }
+
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        this.logout = function () {
+            var credentials = {
+                action: 'logout'
+            };
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(credentials),
+                withCredentials: true
+
+            })
+                .then(function (response) {
+                    UserService.clear();
+                    $localStorage.$reset();
+                    $state.go("exit");
+                })
+            ;
+        };
+
+
+
+        this.deleteProp = function (key) {
+            delete vm.currentExpose[key];
+        };
+        this.setProp = function (key, value) {
+            vm.currentExpose[key] = value;
+        };
+
+
+        this.clearOtherVal = function(source,targetToClear){
+            if(angular.isArray(targetToClear)){
+                for(var i=0;i<targetToClear.length;i++){
+                    if(vm.currentExpose[source]!=""){
+                        vm.currentExpose[targetToClear[i]]="";
+                    }
+                }
+            }else{
+                if(vm.currentExpose[source]!=""){
+                    vm.currentExpose[targetToClear]="";
+                }
+            }
+
+        };
+
         var list_jahre = [];
         for (var i = 1900; i <= new Date().getFullYear(); i++) {
             list_jahre.push(i);
@@ -451,16 +710,18 @@ angular.module('zimmoApp')
         }
 
         var list_geschoss = [];
-        for (i= -1; i <= 10; i++) {
+        for (i= 1; i <= 10; i++) {
             list_geschoss.push(i);
         }
         var list_geschoss_zusatz = [];
         angular.copy(list_geschoss,list_geschoss_zusatz);
+        list_geschoss_zusatz.push("-1");
         list_geschoss_zusatz.push("Dachgeschoss");
+
         this.datalists = {
             land:["Deutschland","Schweiz","Österreich"],
             stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
-            wohnungstyp: ["Dachgeschoss","Maisonette","Penthaus"],
+            wohnungstyp: ["Dachgeschoss","Maisonette","Penthouse","Etagenwohnung"],
             haustyp: ["Einfamilienhaus","Bungalow","Doppelhaus","Reihenendhaus","Reihenmittelhaus","Villa","Stadthaus"],
             energieausweis: ["Bedarfsausweis","Verbrauchsausweis"],
             heizung: ["Fernwärme","Gaszentral","Gasetage","Ölzentral","Palletheizung","Erdwärme","Blockheizkraftwerk"],
@@ -492,52 +753,7 @@ angular.module('zimmoApp')
 
         };
 
-        this.setExposeModelData = function(model,item){
-            vm.currentExpose[model]= item;
-        }
-        this.addImage = function(kat){
 
-            var canvas =  vm.tempdata.cImage.cropper.getCroppedCanvas();
-
-            vm.addToImages({
-                arrayname:'object',
-                data: {
-                    title:angular.copy(vm.tempdata.cImage.title),
-                    imgString:canvas.toDataURL(),
-                    source:vm.tempdata.cImage.source,
-                    kat:{
-                        "type": "select",
-                        "name": "Service",
-                        "value": kat,
-                        "values": [ "Titelbild", "Objektbild"]
-                    }
-                }
-            });
-
-            // empty CroppArea
-            vm.tempdata.cImage.cropper.destroy();
-            vm.tempdata.cImage.source = null;
-            vm.tempdata.cImage.title = "";
-
-            var c=document.getElementById("canvas_crop");
-            var ctx=c.getContext("2d");
-            ctx.clearRect(0,0,c.width,c.height);
-
-        };
-
-        this.addToImages = function(obj){
-            /*
-            data = {
-            title,imgString,source,kat(additional dropdown data)
-            }
-*/
-            console.log("addToImages");
-            console.log(obj);
-            if(!vm.images[obj.arrayname]){
-                vm.images[obj.arrayname] = [];
-            }
-            vm.images[obj.arrayname].push(obj.data);
-        };
 
         this.uploader =  new FileUploader({
             url: 'upload.php'
@@ -547,89 +763,7 @@ angular.module('zimmoApp')
             console.info('onAfterAddingFile', fileItem);
         };
 
-        this.submit_form_expose = function(){
-            // vm.currentExpose
-            var obj = vm.checkExposeForm();
 
-            if(obj!=false){
-                var credentials = {
-                    action: "exposeInsert",
-                    formdata: obj
-                };
-                $http({
-                    url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                    method: 'POST',
-                    data: JSON.stringify(credentials),
-                    withCredentials: true
-
-                })
-                .then(
-                    function (response) {
-                        console.log(response);
-                        if (response.data.type === "success" || response.data.type === "err") {
-                            $state.go("tool.sucheOne", {exposeid: response.data.returnID});
-                            vm.showFeedback(response.data);
-                        }
-                    },
-                    function (data) {
-                        console.log("err" + data.toString());
-                    }
-                );
-
-            }else{
-                console.log("Check failed");
-            }
-
-        };
-        this.userEdit = function(){
-            var credentials = {
-                action: "userEdit",
-                formdata: vm.userObj
-            };
-            $http({
-                url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                method: 'POST',
-                data: JSON.stringify(credentials),
-                withCredentials: true
-
-            })
-                .then(
-                    function (response) {
-                        if (response.data.type === "success" || response.data.type === "err") {
-                            vm.showFeedback(response.data);
-
-                        }
-                    },
-                    function (data) {
-                        console.log("err" + data.toString());
-                    }
-                );
-        }
-        this.userChangePW = function(){
-            var credentials = {
-                action: "userChangePW",
-                formdata: vm.userObj.password
-            };
-            $http({
-                url: scriptbase + 'scripts/php/ajaxCtrl.php',
-                method: 'POST',
-                data: JSON.stringify(credentials),
-                withCredentials: true
-
-            })
-                .then(
-                    function (response) {
-                        if (response.data.type === "success" || response.data.type === "err") {
-                            vm.userObj.password = {}
-                            vm.showFeedback(response.data);
-
-                        }
-                    },
-                    function (data) {
-                        console.log("err" + data.toString());
-                    }
-                );
-        }
 
     }])
     .run(
@@ -849,6 +983,42 @@ angular.module('zimmoApp')
 
 
         });
-    }]);
+    }])
+    .directive('buttonSubmit', function() {
+        return{
+            restrict: 'EA',
+            scope: {
+                callClick: '&',
+                callHtml: "@",
+                callClass: "@",
+                callIcon: "@"
+            },
+            controller: function($scope,$element){
+                var iconSet = JSON.parse($scope.callIcon);
+                $scope.icon = iconSet.init;
+                $scope.callClickCallback = function(){
+                   var response = $scope.callClick();
+                    response.then(function(result){
+                        if(result === true){
+                            $scope.icon = iconSet.callback_success;
+                        }else{
+                            $scope.icon = iconSet.callback_error;
+                        }
+                    })
+
+               }
+            },
+            template: '<button type="button" class="{{callClass}}" ng-click="callClickCallback()">' +
+                        '<span class="{{icon}}"></span>' +
+                        '<span class="marginLeft10">{{callHtml}}</span>' +
+                        '</button>',
+
+            link: function(scope, element, attrs){
+
+            }
+        };
+    })
+
+;
 
 

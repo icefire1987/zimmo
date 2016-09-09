@@ -6,16 +6,16 @@
                     <uib-accordion-heading>
                         Eigene Daten
                         <i class="pull-right glyphicon"
-                           ng-class="{'glyphicon-chevron-down': c_tool.accExpo.statusAddress.open, 'glyphicon-chevron-right': ! c_tool.accExpo.statusAddress.open}"></i>
+                           ng-class="{'glyphicon-chevron-down': c_tool.accExpo.editUser.open, 'glyphicon-chevron-right': ! c_tool.accExpo.editUser.open}"></i>
                     </uib-accordion-heading>
                     <div class="row">
                         <form name="change_password" class="col-xs-12">
-                            <h4><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Passwort ändern</h4>
+                            <h4><span class="glyphicon glyphicon-lock" aria-hidden="true"></span><span class="marginLeft10">Passwort ändern</span></h4>
                             <div class="row">
                                 <label class="col-xs-12 col-sm-8">
                                     <span class="col-xs-4 text-right">Altes Passwort</span>
                                     <input class="col-xs-4" id="reg_pass_old" type="password" name="pass_old" placeholder="Passwort" required
-                                           ng-model="c_tool.userObj.password.old" ng-model-options="{ debounce: 500 }">
+                                           ng-model="c_tool.userObj.password.old" ng-model-options="{ debounce: 500 }" autocomplete="off">
 
                                     <div class="col-xs-4 errorArea" ng-messages="change_password.pass_old.$error">
                                         <div ng-messages-include="views/regForm_messages.html"></div>
@@ -44,37 +44,77 @@
                                     </div>
                                 </label>
                             </div>
-                                <button type="button" class="btn btn-success"ng-click="c_tool.userChangePW()">Änderung speichern</button>
+                            <button-submit
+                                    call-class="btn btn-success"
+                                    call-click="c_tool.userChangePW()"
+                                    call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
+                                    call-HTML="Änderung speichern">
+                            </button-submit>
                           </form>
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
-                            <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Profilinformationen ändern</h4>
+                            <h4><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="marginLeft10">Profilinformationen ändern</span></h4>
                             <div class="row">
                                 <label class="col-xs-12 col-sm-8">
                                     <span class="col-xs-4 text-right">Vorname</span>
-                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.prename">
+                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObjTemp.prename">
                                 </label>
                             </div>
                             <div class="row">
                                 <label class="col-xs-12 col-sm-8">
                                     <span class="col-xs-4 text-right">Nachname</span>
-                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.lastname">
+                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObjTemp.lastname">
                                 </label>
                             </div>
 
-                            <button type="button" class="btn btn-success" ng-click="c_tool.userEdit()">Änderung speichern</button>
+                            <button-submit
+                                    call-class="btn btn-success"
+                                    call-click="c_tool.userEdit()"
+                                    call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
+                                    call-HTML="Änderung speichern">
+                            </button-submit>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-12">
-                            <h4><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> Teamzugehörigkeit</h4>
+                            <h4><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span><span class="marginLeft10">Teamzugehörigkeit</span></h4>
                             <div class="row">
                                 <label class="col-xs-12 col-sm-8">
-                                    <span class="col-xs-4 text-right">Einladung annehmen</span>
-                                    <input class="col-xs-4" type="text" ng-model="c_tool.userObj.invitecode" placeholder="Einladungscode">
-                                    <div class="col-xs-4"><button type="button" class="btn btn-success" ng-click="c_tool.userEdit()">Einladungscode prüfen</button></div>
-                                    <span class="col-xs-12 ">{{c_tool.userObj.invitecode_feeedback}}</span>
+                                    <div class="row">
+                                        <span class="col-sm-2 col-xs-hidden"></span>
+                                        <span class="col-xs-12 col-sm-6" ng-if="c_tool.invitecode_feeedback">
+                                            <div class="well">
+                                                <h3 class="text-info">Einladung erhalten</h3>
+                                                <div class="row">
+                                                    <span class="col-xs-6">Gesendet: </span><span class="col-xs-6">{{c_tool.invitecode_feeedback.send}}</span>
+                                                </div>
+                                                <div class="row">
+                                                    <span class="col-xs-6">Teamname: </span><span class="col-xs-6">{{c_tool.invitecode_feeedback.team}}</span>
+                                                </div>
+                                                <div class="row row-paddingbottom">
+                                                    <span class="col-xs-6">Ansprechpartner: </span><span class="col-xs-6">{{c_tool.invitecode_feeedback.admin}}</span>
+                                                </div>
+                                                <div class="row row-paddingbottom">
+                                                    <div class="col-xs-12 text-center">
+                                                        <button-submit
+                                                                call-class="btn btn-success"
+                                                                call-click="c_tool.userJoinTeam()"
+                                                                call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
+                                                                call-HTML="Team beitreten">
+                                                        </button-submit>
+                                                    </div>
+                                                </div>
+                                                 <div class="row">
+                                                    <div class="col-xs-12 col-sm-offset-1">
+                                                        <small>
+                                                        Nach deinem Beitritt wirst du vom Administrator der Organisation freigeschalten
+                                                        </small>
+                                                   </div>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
                                 </label>
                             </div>
                             <div class="row">
@@ -86,7 +126,7 @@
                             <div class="row">
                                 <label class="col-xs-12 col-sm-8">
                                     <span class="col-xs-4 text-right">Deine Nutzerrolle</span>
-                                    <span>{{c_tool.userObj.role || 'Basis'}}</span>
+                                    <span>{{c_tool.userObj.role || 'Ohne'}}</span>
                                 </label>
                             </div>
 

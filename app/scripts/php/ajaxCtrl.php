@@ -66,6 +66,18 @@ class AjaxControl{
                 case "userChangePW":
                     $this->userChangePW();
                     break;
+                case "userCheckInvite":
+                    $this->userCheckInvite();
+                    break;
+                case "userJoinTeam":
+                    $this->userJoinTeam();
+                    break;
+                case "getCurrentUser":
+                    $this->getCurrentUser();
+                    break;
+                default:
+                    $this->wrongroute($this->input["action"]);
+                    break;
             }
 
         }else{
@@ -82,6 +94,13 @@ class AjaxControl{
         echo json_encode($loginObj);
     }
 
+    function getCurrentUser(){
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["userid"] = $_SESSION["userid"];
+        $loginObj = $loginModel->getCurrentUser($data);
+        echo json_encode($loginObj);
+    }
     function checkLogin(){
         $_SESSION["userid"]=2;
         return true;
@@ -134,8 +153,7 @@ class AjaxControl{
             echo json_encode(array("type" => "err", "feedbacktext" => "Daten konnten nciht gespeichert werden"));
         }
     }
-    function userChangePW()
-    {
+    function userChangePW(){
         $loginModel = new LoginModel($this->DB);
         $data = [];
         $data["old"] = $this->Security->validateInput('string', $this->input["formdata"], 'old');
@@ -157,8 +175,60 @@ class AjaxControl{
         }
     }
 
+    function userCheckInvite(){
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["userid"] = $_SESSION['userid'];
+        $userObj = $loginModel->checkInvite($data);
+        if (isset($userObj["code"]) && $userObj["code"] == 1) {
+            echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich abgefragt", "txt"=>$userObj["txt"] ));
+        } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
+            echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+        } else {
+            echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte"));
+        }
+    }
+
+    function userJoinTeam(){
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["userid"] = $_SESSION['userid'];
+        $data["teamID"] = $this->Security->validateInput('string', $this->input["formdata"], 'teamID');
+        $userObj = $loginModel->userJoinTeam($data);
+        if (isset($userObj["code"]) && $userObj["code"] == 1) {
+            echo json_encode(array("type" => "success", "feedbacktext" => "Team erfolgreich beigetreten"));
+        } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
+            echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+        } else {
+            echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte"));
+        }
+    }
+
+    function userCheckInviteCode(){
+        $loginModel = new LoginModel($this->DB);
+        $data = [];
+        $data["code"] = $this->Security->validateInput('string', $this->input["formdata"], 'code');
+        $data["userid"] = $_SESSION['userid'];
+        if(strlen($data["code"])==7){
+
+            $userObj = $loginModel->checkInvite($data);
+            if (isset($userObj["code"]) && $userObj["code"] == 1) {
+                echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert"));
+            } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
+                echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+            } else {
+                echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte"));
+            }
+        }else{
+            echo json_encode(array("type" => "err", "feedbacktext" => "Der Einladungscode hat das falsche Format"));
+        }
+    }
+
+    function wrongroute($route){
+        echo json_encode(array("type"=>"err","text"=>"Fehlerhafter Funktionsaufruf".$route,"code"=>10,"feedbacktext"=>"Serverfehler. Fehlerhafter Funktionsaufruf: AjaxCtrl->".$route));
+    }
     function noroute(){
-        echo json_encode(array("type"=>"err","text"=>"Route nicht übermittelt","code"=>10));
+        echo json_encode(array("type"=>"err","text"=>"Route nicht übermittelt","code"=>10,"feedbacktext"=>"Route nicht übermittelt"));
     }
 
     function exposeSearch($parse=false){
@@ -403,10 +473,15 @@ class AjaxControl{
     }
 }
 
-$ctrl = new AjaxControl();
-$ctrl->setHeaders();
-$ctrl->getInput();
-$ctrl->router();
+try{
+    $ctrl = new AjaxControl();
+    $ctrl->setHeaders();
+    $ctrl->getInput();
+    $ctrl->router();
+}catch(EXCEPTION $e){
+    echo json_encode(array("type" => "err", "feedbacktext" => "Serverfehler", "code" => 10));
+}
+
 
 
 
