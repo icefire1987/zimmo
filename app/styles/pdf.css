@@ -239,6 +239,12 @@ body {
 	padding:0;
 	box-sizing: border-box;
 }
+.maindata .tableWrapper_30{
+	width: 32%;
+	box-sizing: border-box;
+	display: inline-block;
+	padding-right:10px;
+}
 .maindata .tableWrapper{
 	width: 47%;
 	box-sizing: border-box;
@@ -252,7 +258,7 @@ body {
 	padding:0;
 }
 
-.maindata .tableWrapper2 td:nth-child(1),.maindata .tableWrapper2 td:nth-child(4){
+.maindata .tableWrapper2 td:nth-child(1),.maindata .tableWrapper2 td:nth-child(4),.maindata .tableWrapper2 td:nth-child(7){
 	width: 10px;
 
 }

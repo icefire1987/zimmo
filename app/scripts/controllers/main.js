@@ -9,7 +9,12 @@
  */
 
 angular.module('zimmoApp')
-  .controller('MainCtrl',['$http','$cookies','$state','$location','$rootScope','AuthService', function ($http,$cookies,$state,$location,$rootScope,AuthService) {
+  .controller('MainCtrl',['$http','$cookies','$state','$location','$rootScope','$localStorage','AuthService', function ($http,$cookies,$state,$location,$rootScope,$localStorage,AuthService) {
+      // on local:
+      var scriptbase = 'http://localhost/Zimmo/app/';
+      // on webserver:
+      //var scriptbase = '';
+
     var vm = this;
     this.dataLoading = false;
 
@@ -38,20 +43,19 @@ angular.module('zimmoApp')
       //$event.preventDefault();
         var credentials = {'action':'login','formdata':vm.loginObj.formdata};
         $http({
-            url: 'scripts/php/ajaxCtrl.php',
-            //url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+            url: scriptbase+'scripts/php/ajaxCtrl.php',
             method: 'POST',
             data: JSON.stringify(credentials),
             withCredentials: true
 
         })
         .then(function(response) {
-            console.log(response.data);
             try{
                 var resObj = response.data;
                 if(resObj.code===1) {
                     AuthService.UserIsAuthenticated;
-                    //$localStorage.user = JSON.parse(resObj.data);
+                    $localStorage.user = JSON.parse(resObj.data);
+                    $localStorage.session = JSON.parse(resObj.session);
                     // LOGIN erfolgreich
                     if ($rootScope.returnToState){
                         $state.go($rootScope.returnToState);
@@ -73,8 +77,7 @@ angular.module('zimmoApp')
           this.dataLoading = true;
           var credentials = {'action':'register','formdata':vm.regObj.formdata};
           $http({
-              //url: 'scripts/php/ajaxCtrl.php',
-              url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+              url: scriptbase+'scripts/php/ajaxCtrl.php',
               method: 'POST',
               data: JSON.stringify(credentials),
               withCredentials: true

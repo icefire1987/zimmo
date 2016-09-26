@@ -9,7 +9,7 @@
  */
 angular.module('zimmoApp')
     //NgTableParams
-    .controller('ToolCtrl', ['$http', '$state', 'AuthService','UserService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','$q','FileUploader', function ($http, $state, AuthService,UserService, NgTableParams, $timeout, leafletData, $scope,$localStorage,$q,FileUploader) {
+    .controller('ToolCtrl', ['$http', '$state','$rootScope', 'AuthService','UserService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','$q','FileUploader', function ($http, $state,$rootScope, AuthService,UserService, NgTableParams, $timeout, leafletData, $scope,$localStorage,$q,FileUploader) {
         // on local:
         var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
@@ -19,6 +19,54 @@ angular.module('zimmoApp')
         this.repLB = function(){
             return JSON.stringify(vm.currentExpose,null," ").replace(/,/g,', <br>');
         };
+
+        this.ajaxCall = function(data){
+            //Credentials:
+
+            // action , formdata
+
+            var defer = $q.defer();
+            $http({
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                method: 'POST',
+                data: JSON.stringify(data.credentials),
+                withCredentials: true
+
+            })
+                .then(
+                    function (response) {
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            vm.showFeedback(response.data);
+                            if(response.data.type=="success"){
+                                if(data.callback_success){
+                                    data.callback_success(response.data);
+                                }
+                                defer.resolve(true);
+                            }else if(response.data.type=="err"){
+                                if(data.callback_err){
+                                    data.callback_err(response.data);
+                                }
+                                defer.resolve(false);
+                            }else{
+                                if(data.callback_unknown){
+                                    data.callback_unknown(response.data);
+                                }
+                                defer.resolve(false);
+                            }
+                        }else{
+                            if(data.callback_unknown){
+                                data.callback_unknown(response);
+                            }
+                            defer.resolve(false);
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                    }
+                );
+            return defer.promise;
+        };
+
 
     // USER
         vm.userObj = {};
@@ -238,6 +286,7 @@ angular.module('zimmoApp')
 
         this.submit_form_expose = function(){
             // vm.currentExpose
+
             var obj = vm.checkExposeForm();
 
             if(obj!=false){
@@ -258,8 +307,18 @@ angular.module('zimmoApp')
                             console.log(response);
                             if (response.data.type === "success" || response.data.type === "err") {
                                 defer.resolve(true);
-                                $state.go("tool.sucheOne", {exposeid: response.data.returnID});
-                                vm.showFeedback(response.data);
+                                if(obj.showLageplan){
+                                    vm.saveMapFile(response.data.returnID).then(function(response2){
+                                        $state.go("tool.sucheOne", {exposeid: response.data.returnID});
+                                        vm.showFeedback(response.data);
+                                    });
+                                }else{
+
+                                    $state.go("tool.sucheOne", {exposeid: response.data.returnID});
+                                    vm.showFeedback(response.data);
+
+                                }
+
                             }
                         },
                         function (data) {
@@ -315,7 +374,12 @@ angular.module('zimmoApp')
 
                             vm.currentExpose.innenausstattung = JSON.parse(vm.currentExpose.innenausstattung);
                             vm.currentExpose.boden = JSON.parse(vm.currentExpose.boden);
-                            vm.currentExpose.kuechenausstattung = JSON.parse(vm.currentExpose.kuechenausstattung);
+                            if(vm.currentExpose.kuechenausstattung!=="") {
+                                vm.currentExpose.kuechenausstattung = JSON.parse(vm.currentExpose.kuechenausstattung);
+                            }
+                            if(vm.currentExpose.badezimmer!=="") {
+                                vm.currentExpose.badezimmer = JSON.parse(vm.currentExpose.badezimmer);
+                            }
                             // checkboxes:
                             vm.currentExpose.kueche = !!+vm.currentExpose.kueche;
                             vm.currentExpose.moebliert = !!+vm.currentExpose.moebliert;
@@ -323,7 +387,8 @@ angular.module('zimmoApp')
                             vm.currentExpose.saniert = !!+vm.currentExpose.saniert;
                             vm.currentExpose.renoviert = !!+vm.currentExpose.renoviert;
                             vm.currentExpose.denkmalschutz = !!+vm.currentExpose.denkmalschutz;
-                            vm.currentExpose.badezimmer = JSON.parse(vm.currentExpose.badezimmer);
+
+                            vm.currentExpose.showLageplan = !!+vm.currentExpose.showLageplan;
 
                             try {
                                 if(response.data.text.map){
@@ -408,8 +473,23 @@ angular.module('zimmoApp')
             vm.images[obj.arrayname].push(obj.data);
         };
 
+
+        this.addBadezimmer = function (badezimmer) {
+            if(!vm.currentExpose.badezimmer){
+                vm.currentExpose.badezimmer = [];
+            }
+            if(vm.currentExpose.badezimmer.length == 0){
+                vm.currentExpose.badezimmer = [];
+            }
+            vm.currentExpose.badezimmer.push({'type':badezimmer,'enSuite':false});
+        }
         this.checkExposeForm = function () {
+            console.log(vm.currentExpose);
+            if(vm.currentExpose.showLageplan){
+                vm.currentExpose.lageplan = "lage.png";
+            }
             var returnObj = vm.currentExpose;
+
             returnObj.images = vm.images;
             return returnObj;
         };
@@ -424,27 +504,39 @@ angular.module('zimmoApp')
 
             /* CrossOrigin-Problem auf localhost */
 
-            /*$http({
-             url: "http://nominatim.openstreetmap.org/search?street="
-             + vm.currentExpose.hausnummer
-             + " "
-             + vm.currentExpose.strasse
-             + "&city="
-             + vm.currentExpose.ort
-             + "&country=de"
-             + "&postalcode="
-             + vm.currentExpose.plz
-             + "&format=json&limit=1&addressdetails=0",
-             method: 'GET'
+            $http({
+                 url: "https://nominatim.openstreetmap.org/search?street="
+                 + vm.currentExpose.hausnummer
+                 + "+"
+                 + vm.currentExpose.strasse
+                 + "&city="
+                 + vm.currentExpose.ort
+                 + "&country=de"
+                 + "&postalcode="
+                 + vm.currentExpose.plz
+                 + "&format=json&limit=1&addressdetails=0",
+                 method: 'GET',
+                withCredentials: false
              })
              .then(
-             function (response) {
-             console.log(response);
-             var resdata = response;
-             }
-             );*/
+                 function (response) {
+                     console.log(response);
+                     var resdata = response.data;
+                     try {
+                         if (typeof resdata[0].lon != 'undefined') {
+                             var lon_parse = resdata[0].lon;
+                             var lat_parse = resdata[0].lat;
+                             vm.setMap({lat:lat_parse,lon:lon_parse,zoom: 14});
+                         } else {
+                             console.log("no");
+                         }
+                     } catch (e) {
+                         console.log("try: get map # " + e);
+                     }
+                 }
+             );
 
-            var resdata = [{
+           /* var resdata = [{
                 "place_id": "33098231",
                 "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http:\/\/www.openstreetmap.org\/copyright",
                 "osm_type": "node",
@@ -456,38 +548,8 @@ angular.module('zimmoApp')
                 "class": "place",
                 "type": "house",
                 "importance": 0.321
-            }];
-            try {
-                if (typeof resdata[0].lon != 'undefined') {
-                    var lon_parse = resdata[0].lon;
-                    var lat_parse = resdata[0].lat;
-                    console.log("try if");
-                    vm.mapdata.center = {
-                        lat: (lat_parse) * 1,
-                        lng: (lon_parse) * 1,
-                        zoom: parseInt(14)
-                    };
-                    vm.mapdata.markers = {
-                        objekt: {
-                            lat: (lat_parse) * 1,
-                            lng: (lon_parse) * 1,
-                            focus: true,
-                            draggable: true
-                        }
-                    };
-                    leafletData.getMap().then(function (map) {
-                        $timeout(function () {
-                            map.invalidateSize();
-                        }, 300);
-                    });
+            }];*/
 
-
-                } else {
-                    console.log("no");
-                }
-            } catch (e) {
-                console.log("try: get map # " + e);
-            }
         };
 
         this.setMap = function(mapdata){
@@ -510,8 +572,46 @@ angular.module('zimmoApp')
                     map.invalidateSize();
                 }, 300);
             });
+
+
         };
 
+        this.saveMapFile = function(objectID){
+            var defer = $q.defer();
+            leafletData.getMap().then(function (map) {
+                $timeout(function () {
+                    leafletImage(map, function(err, canvas) {
+                        // now you have canvas
+                        // example thing to do with that canvas:
+                        var obj = {dataurl : canvas.toDataURL(),objectID : objectID};
+                        var credentials = {
+                            action: 'saveFile',
+                            formdata: obj
+                        };
+                        $http({
+                            url: scriptbase + 'scripts/php/ajaxCtrl.php',
+                            method: 'POST',
+                            data: JSON.stringify(credentials),
+                            withCredentials: true
+
+                        })
+                            .then(
+                                function (response) {
+                                    console.log("done");
+                                    console.log(response);
+                                    defer.resolve(true);
+                                },
+                                function (data) {
+                                    console.log("err");
+                                    console.log(data);
+                                    defer.resolve(false);
+                                }
+                            )
+                    });
+                }, 300);
+            });
+            return defer.promise;
+        };
         this.pdf = function (obj) {
             var credentials = {
                 action: 'createPDF',
@@ -604,6 +704,11 @@ angular.module('zimmoApp')
 
         vm.accExpo.statusAddress.open = true;
 
+        vm.accConfig = {
+            statusLage: {open:true}
+        };
+
+
         this.doopen = function () {
             if (vm.accExpo.statusAddress.open) {
                 leafletData.getMap().then(function (map) {
@@ -621,6 +726,7 @@ angular.module('zimmoApp')
 
         this.showFeedback = function (responsedata) {
             this.timer=null;
+            vm.feedback = {};
             vm.feedback.type = responsedata.type;
             vm.feedback.text = responsedata.feedbacktext;
             if (responsedata.addData) {
@@ -638,26 +744,22 @@ angular.module('zimmoApp')
 
         };
 
+        // Config
+
+        vm.configObj = { presets : {}};
 
 
+        this.getConfig = function(){
+            vm.configObj.presets.lage = vm.presets_lage();
+        };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        this.logout = function () {
+        this.presets_lage = function () {
             var credentials = {
-                action: 'logout'
+                action: "getPresets",
+                formdata: {"presetType":"lage"}
             };
+            // we only check via php-session
+            var defer = $q.defer();
             $http({
                 url: scriptbase + 'scripts/php/ajaxCtrl.php',
                 method: 'POST',
@@ -665,12 +767,92 @@ angular.module('zimmoApp')
                 withCredentials: true
 
             })
-                .then(function (response) {
-                    UserService.clear();
-                    $localStorage.$reset();
-                    $state.go("exit");
-                })
-            ;
+                .then(
+                    function (response) {
+                        console.info(response)
+                        if (response.data.type === "success" || response.data.type === "err") {
+                            if(response.data.code == 4){
+                                //SHOW LOGIN
+
+                            }
+                            vm.showFeedback(response.data);
+
+                            defer.resolve(true);
+                            try{
+                                vm.configObj.lage_db = JSON.parse(response.data.txt);
+                            }catch(e){
+                                console.error(e);
+                            }
+
+                        }
+                    },
+                    function (data) {
+                        console.log("err" + data.toString());
+                        defer.resolve(false);
+                    }
+                );
+            return defer.promise;
+        };
+        this.lage_select = function (){
+            vm.configObj.lage_titel = vm.configObj.lage_dropdown.title;
+            vm.configObj.lage_text = vm.configObj.lage_dropdown.text;
+        }
+        this.presets_submitLage = function(obj){
+            if(obj.form.$invalid){
+                return false;
+            }
+            var promise = vm.ajaxCall(
+                {
+                    credentials: {
+                        action: "setPresets",
+                        formdata: {
+                            "presetType": "lage",
+                            "action": obj.action,
+                            "title":vm.configObj.lage_titel,
+                            "text":vm.configObj.lage_text
+
+                        }
+                    },
+                    callback_success: function (responseObj) {
+                        console.info(responseObj);
+                        vm.configObj = {};
+                        return true;
+                    },
+                    callback_err: function (responseObj) {
+                        console.error(responseObj);
+                        return false;
+                    },
+                    callback_unknown: function (responseObj) {
+                        console.error(responseObj);
+                        return false;
+                    }
+                }
+            );
+            return promise;
+        };
+
+
+
+
+        this.logout = function () {
+            var promise = vm.ajaxCall(
+                {
+                    credentials : {
+                        action: "logout"
+                    },
+                    callback_success : function(responseObj){
+                        UserService.clear();
+                        $localStorage.$reset();
+                        $state.go("exit");
+                    },
+                    callback_err : function(responseObj){
+                        console.log(responseObj);
+                    },
+                    callback_unknown : function(responseObj){
+                        console.log(responseObj);
+                    }
+                }
+            );
         };
 
 
@@ -718,6 +900,30 @@ angular.module('zimmoApp')
         list_geschoss_zusatz.push("-1");
         list_geschoss_zusatz.push("Dachgeschoss");
 
+        this.presets = function(){
+            vm.ajaxCall(
+                {
+                    credentials : {
+                        action: "getPresets",
+                        formdata: {"presetType":"lage"}
+                    },
+                    callback_success: function (responseObj) {
+                        console.info(responseObj);
+                        vm.configObj = {};
+                        return true;
+                    },
+                    callback_err: function (responseObj) {
+                        console.error(responseObj);
+                        return false;
+                    },
+                    callback_unknown: function (responseObj) {
+                        console.error(responseObj);
+                        return false;
+                    }
+                }
+            );
+        };
+
         this.datalists = {
             land:["Deutschland","Schweiz","Österreich"],
             stellplatztyp: ["Tiefgaragenstellplatz","Außenstellplatz","Carport","E-Parkplatz","Garage","Parkhaus"],
@@ -740,9 +946,7 @@ angular.module('zimmoApp')
             zimmer: list_zimmer,
             geschoss: list_geschoss,
             geschoss_zusatz: list_geschoss_zusatz,
-            lagebeschreibung : [
-                {"bezirk":"Lichtenberg","beschreibung":"Der heutige Ortsteil geht zurück auf das im 13. Jahrhundert im Barnim gegründete Dorf Lichtenberg. Dieses Dorf blieb über viele Jahrhunderte eine kleine, landwirtschaftlich geprägte Siedlung mit wenigen hundert Einwohnern im Osten der Stadt Berlin. Erst Ende des 19. Jahrhunderts stieg durch die Industrialisierung die Einwohnerzahl Lichtenbergs um ein Vielfaches, sodass der Ortschaft 1907 das Stadtrecht verliehen wurde. Durch die Gründung von Groß-Berlin im Jahr 1920 wurde die Stadt Lichtenberg jedoch nach Berlin eingemeindet und bildet seitdem den namensgebenden Ortsteil für den Berliner Bezirk Lichtenberg."}
-            ],
+            lagebeschreibung : vm.presets.lage,
             badezimmer: [
                 "Vollbad","Duschbad","Gäste-WC"
             ]
@@ -763,6 +967,35 @@ angular.module('zimmoApp')
             console.info('onAfterAddingFile', fileItem);
         };
 
+        this.checkLogin = function(){
+
+            if(vm.ajaxCall(
+                {
+                    credentials : {
+                        action: "checkLogin"
+                    },
+                    callback_success : function(responseObj){
+                        console.info("S");
+                        console.log(responseObj);
+                        return true;
+                    },
+                    callback_err : function(responseObj){
+                        console.error("E");
+                        console.log(responseObj);
+                        return false;
+                    },
+                    callback_unknown : function(responseObj){
+                        console.error("U");
+                        console.log(responseObj);
+                        return false;
+                    }
+                }
+            )){
+                $rootScope.returnToState = $state.current.name;
+            }
+            // Input speichern und anschließend an Zielfunktion weiterleiten
+            //$state.go("getstarted");
+        };
 
 
     }])
@@ -998,13 +1231,20 @@ angular.module('zimmoApp')
                 $scope.icon = iconSet.init;
                 $scope.callClickCallback = function(){
                    var response = $scope.callClick();
-                    response.then(function(result){
-                        if(result === true){
-                            $scope.icon = iconSet.callback_success;
-                        }else{
-                            $scope.icon = iconSet.callback_error;
-                        }
-                    })
+                    console.log(response);
+                    if(response){
+                        response.then(function(result){
+
+                            if(result === true){
+                                $scope.icon = iconSet.callback_success;
+                            }else{
+                                $scope.icon = iconSet.callback_error;
+                            }
+                        })
+                    }else{
+                        $scope.icon = iconSet.callback_error;
+                    }
+
 
                }
             },

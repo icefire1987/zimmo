@@ -65,7 +65,7 @@ class ExposeModel{
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
                   CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
-                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart',
+                  CASE objekttyp WHEN 1 THEN 'Haus' WHEN 2 THEN 'Wohnung' WHEN 3 THEN 'Grundstück' END as 'objektart',
                   zimmer,wohnflaeche
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
@@ -84,7 +84,7 @@ class ExposeModel{
                 SELECT 
                   objects.id,go,strasse,hausnummer,plz,ort,
                   CASE geschaeftsart WHEN 1 THEN 'Kauf' WHEN 2 THEN 'Miete' END as 'geschaeftsart',
-                  CASE objekttyp WHEN 1 THEN 'Grundstück' WHEN 2 THEN 'Haus' WHEN 3 THEN 'Wohnung' END as 'objektart',
+                  CASE objekttyp WHEN 1 THEN 'Haus' WHEN 2 THEN 'Wohnung' WHEN 3 THEN 'Grundstück' END as 'objektart',
                   zimmer,wohnflaeche
                 FROM objects
                 LEFT JOIN members ON objects.userID = members.id
@@ -171,10 +171,12 @@ class ExposeModel{
 
         $prep_stmt = "
             SELECT 
-              objects.*
+              objects.*,
+              tab_geschaeftsart.name as ga
             FROM objects
             LEFT JOIN members ON objects.userID = members.id
-            LEFT JOIN members as me ON me.id = ?            
+            LEFT JOIN members as me ON me.id = ?  
+            LEFT JOIN tab_geschaeftsart ON tab_geschaeftsart.id = objects.geschaeftsart
             WHERE members.teamID = me.teamID AND (members.roleID < me.roleID OR members.id = me.id)
             AND objects.id = ?
            ";
@@ -221,8 +223,12 @@ class ExposeModel{
                 if($result->num_rows>0 && $row["imageTyp"]!=null){
                     switch($row["imageTyp"]){
                         case 1:
+                            $imageTyp = "object";
+                            $kat = "Titelbild";
+                            break;
                         case 2:
                             $imageTyp = "object";
+                            $kat = "Objektbild";
                             break;
                         case 3:
                             $imageTyp = "grundriss";
@@ -232,11 +238,21 @@ class ExposeModel{
                             break;
                     }
                     $base64Data = $row["imagePath"];
-                    $dbData[$imageTyp][] = array(
+                    $tempArr = array(
                         "title"=>$row["title"],
                         "imgString"=>$base64Data,
                         "imageTag"=>$row["imageTag"]
                     );
+                    if(isset($kat)){
+                        //DROPDOWN
+                        $tempArr["kat"] = array(
+                            "type"=>"select",
+                            "name"=>"Service",
+                            "value"=>$kat,
+                            "values"=>array("Titelbild", "Objektbild")
+                        );
+                    }
+                    $dbData[$imageTyp][] = $tempArr;
                 }
 
             }
@@ -265,7 +281,7 @@ class ExposeModel{
            "aussenflaeche_balkon","aussenflaeche_terrasse","decke","wcgast","badezimmer","badtyp",
            "badbesonderheit","heizung","boden","kueche","kuechenausstattung","innenausstattung",
            "energiewert","energieausweisTyp","denkmalschutz","zustand","lage","lagebeschreibung",
-           "objektbeschreibung","sonstiges","updatedatum","userID","map","kuechenmarke","nutzflaeche",
+           "objektbeschreibung","sonstiges","updatedatum","userID","map","kuechenmarke","nutzflaeche","lageplan","showLageplan"
             ];
        foreach($neededKeys as $k=>$v){
            if(!array_key_exists($v,$data)){
@@ -407,5 +423,113 @@ class ExposeModel{
         }
         return $files_removed;
 
+    }
+
+    function getPresets($data){
+        if(!isset($_SESSION["userid"])){
+            return array("code"=>4,"txt"=>"no login");
+        }
+        $user = $_SESSION["userid"];
+        $type = $data["type"];
+
+        $prep_stmt = "
+            SELECT 
+              tab_presets.*             
+            FROM tab_presets
+            LEFT JOIN members ON tab_presets.teamID = members.teamID                     
+            WHERE members.id = ? AND type = ?
+           ";
+
+        $stmt =  $this->db->mysqli->prepare($prep_stmt);
+        if ($stmt) {
+            $stmt->bind_param('is', $user,$type);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                // get variables from result.
+                $stmt->bind_result($id,$teamID,$type,$title,$text);
+                WHILE ($stmt->fetch()) {
+                    $dbData[] = array(
+                        "id" => $id,
+                        "teamID" => $teamID,
+                        "type" => $type,
+                        "title" => $title,
+                        "text" => $text
+                    );
+                }
+                $stmt->close();
+                return array("code"=>1,"txt"=>json_encode($dbData));
+            }else if ($stmt->num_rows == 0) {
+                $stmt->close();
+                return array("code"=>1,"txt"=>null);
+            }else{
+                $stmt->close();
+                return array("code"=>28,"txt"=>"NoRes Expose::getAll");
+            }
+            return array("code"=>1,"txt"=>json_encode($dbData));
+        } else {
+            print_r($this->db->mysqli->error);
+            return array("code"=>29,"txt"=>"DB-Error Expose::getAll");
+        }
+    }
+
+    function insertPresets($data){
+        if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO tab_presets(teamID,type,title,text) VALUES (?,?,?,?)"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        $insertData  = array(
+            "teamID"=>$data["user"]["team"]["id"],
+            "type"=>$data["presetType"],
+            "title"=>$data["title"],
+            "text"=>$data["text"]
+        );
+
+        if (!$stmt->bind_param('isss',$insertData["teamID"],$insertData["type"],$insertData["title"],$insertData["text"])) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+        return array("returnID"=>$this->db->mysqli->insert_id);
+    }
+    function updatePresets($data){
+        if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO tab_presets(id,title,text) VALUES (?,?,?)"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        $insertData  = array(
+            "id"=>$data["id"],
+            "title"=>$data["title"],
+            "text"=>$data["text"]
+        );
+
+        if (!$stmt->bind_param('iss',$insertData["id"],$insertData["title"],$insertData["text"])) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+        return array("returnID"=>$this->db->mysqli->insert_id);
+    }
+    function deletePresets($data){
+        if (!($stmt = $this->db->mysqli->prepare("DELETE FROM tab_presets WHERE id=?"))){
+            echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
+        }
+
+        $insertData  = array(
+            "id"=>$data["id"]
+        );
+
+        if (!$stmt->bind_param('i',$insertData["id"])) {
+            echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+
+        if (!$stmt->execute()) {
+            echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+        }
+        return array("returnID"=>$this->db->mysqli->insert_id);
     }
 }

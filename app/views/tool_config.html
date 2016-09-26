@@ -1,0 +1,65 @@
+<div class="container">
+    <div class="row">
+
+        <uib-accordion close-others="true" class="col-xs-12">
+            <uib-accordion-group  is-open="c_tool.accConfig.statusLage.open">
+                <uib-accordion-heading>
+                    Lagebeschreibungen
+                    <i class="pull-right glyphicon"
+                       ng-class="{'glyphicon-chevron-down': c_tool.accConfig.statusLage.open, 'glyphicon-chevron-right': ! c_tool.accConfig.statusLage.open}"></i>
+                </uib-accordion-heading>
+                <div class="row">
+                    <form name="addPresetLage" class="col-xs-12 col-md-6">
+                        <h4><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><span class="marginLeft10">neuen Text anlegen</span></h4>
+                        <div class="row ">
+
+                            <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
+                                <span>neuen Text anlegen oder bestehenden Text ändern</span>
+                                <select class="form-control" name="lage_dropdown" class="" ng-model="c_tool.configObj.lage_dropdown"
+                                        ng-model-options="{ debounce: 500 }" ng-options="item as item.title for item in c_tool.configObj.lage_db" ng-change="c_tool.lage_select()">
+                                    <option value="">neuen Text anlegen</option>
+                                </select>
+                            </label>
+
+                            <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
+                                <span>Titel</span>
+                                <input class="form-control" type="text" name="lage_title" placeholder="DropDown-Text" required
+                                       ng-model="c_tool.configObj.lage_titel" ng-model-options="{ debounce: 500 }" autocomplete="off">
+                            </label>
+
+                            <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
+                                <div class="row">
+                                    <span class="col-xs-6">Text im Expose</span>
+                                    <span class="col-xs-6 text-right"> {{addPresetLage.input_lage_text.$viewValue.length ||0}} / 900</span>
+                                </div>
+
+                                <div class="errorArea" ng-messages="form_reg.pass.$error">
+                                    <div ng-show="addPresetLage.input_lage_text.$error.minlength">Mindestlänge: 300 Zeichen</div>
+                                </div>
+                                <textarea class="form-control" rows="5"
+                                          name="input_lage_text"
+                                          ng-minlength="300"
+                                          ng-minlength="900"
+                                          ng-model="c_tool.configObj.lage_text"
+                                ></textarea>
+                            </label>
+                            <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
+                                <button-submit
+                                        call-class="btn btn-success"
+                                        call-click="c_tool.presets_submitLage({form:addPresetLage,action:'insert'})"
+                                        call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
+                                        call-HTML="Eintrag erstellen"
+                                        ng-disable="!c_tool.configObj.lage_dropdown"
+                                >
+                                </button-submit>
+
+
+                            </label>
+
+                        </div>
+                    </form>
+                </div>
+            </uib-accordion-group>
+        </uib-accordion>
+    </div>
+</div>

@@ -145,12 +145,17 @@
                                                                                    ng-click="c_tool.getMap()"> Lageplan
 										erstellen</span>
                             </label>
-                            <label class="col-xs-4 col-md-2" style="display: none;" id="parent_saveMap">
+
+                            <label class="control-label col-xs-4 col-sm-3">
+                                <input type="checkbox" name="showLageplan" ng-model="c_tool.currentExpose.showLageplan">
+                                <span class="tag">Lageplan anzeigen</span>
+                            </label>
+<!--
+                             <label class="col-xs-4 col-md-2" style="display: none;" id="parent_saveMap">
                                 <span class="btn btn-default" style="white-space: normal;"
                                       id="saveMap"> Karte speichern</span>
                                 <span class="text-success" style="display: none" id="saveMap_return">gespeichert &#10004;</span>
                             </label>
-<!--
                             <div class="checkbox_custom col-xs-6 col-md-3">
                                 <label class="">
                                     <input type="checkbox" ng-checked="c_tool.currentExpose.showMap">
@@ -164,6 +169,7 @@
                                 <leaflet center="c_tool.mapdata.center" markers="c_tool.mapdata.markers"
                                          layers="c_tool.mapdata.layers"></leaflet>
                             </div>
+                            <div id="helper-map-image" class="hidden"></div>
                         </div>
                     </uib-accordion-group>
                     <uib-accordion-group is-open="c_tool.accExpo.statusKosten.open">
@@ -196,7 +202,7 @@
                                     </div>
                                 </div>
                                 <input type="number" name="wohngeld" placeholder="in €" class="form-control" step="1"
-                                       ng-model="c_tool.currentExpose.wohngeld" ng-model-options="{ debounce: 500 }">
+                                       ng-model="c_tool.currentExpose.nebenkosten" ng-model-options="{ debounce: 500 }">
                             </label>
                         </div>
                         <div class="row row-paddingbottom" ng-if="c_tool.currentExpose.geschaeftsart==2">
@@ -268,7 +274,7 @@
                                 </div>
                                 <select name="provisionEinheit" class="form-control" ng-model="c_tool.currentExpose.provisionEinheit"
                                         ng-model-options="{ debounce: 500 }">
-                                    <option value="Euro">Euro</option>
+                                    <option value="Eur">Euro</option>
                                     <option value="%">%</option>
                                 </select>
                             </label>
@@ -298,7 +304,7 @@
                                 </div>
                                 <select name="kautionEinheit" class="form-control" ng-model="c_tool.currentExpose.kautionEinheit"
                                         ng-model-options="{ debounce: 500 }">
-                                    <option value="Euro">Euro</option>
+                                    <option value="Eur">Euro</option>
                                     <option value="NKM">NKM</option>
                                 </select>
                             </label>
@@ -545,10 +551,20 @@
                                 <label class="control-label col-xs-4 col-sm-3">
                                     <input type="checkbox" name="renoviert" ng-model="c_tool.currentExpose.renoviert">
                                     <span class="tag">renoviert</span>
+
+                                    <label class="control-label col-xs-12">
+                                        <input type="text" name="renovierung" placeholder="Jahr" class="form-control"
+                                           ng-model="c_tool.currentExpose.renovierung" ng-model-options="{ debounce: 500 }" ng-if="c_tool.currentExpose.renoviert">
+                                     </label>
+
                                 </label>
                                 <label class="control-label col-xs-4 col-sm-3">
                                     <input type="checkbox" name="saniert" ng-model="c_tool.currentExpose.saniert">
                                     <span class="tag">saniert</span>
+                                    <label class="control-label col-xs-12">
+                                        <input type="text" name="sanierung" placeholder="Jahr" class="form-control"
+                                               ng-model="c_tool.currentExpose.sanierung" ng-model-options="{ debounce: 500 }" ng-if="c_tool.currentExpose.saniert">
+                                    </label>
                                 </label>
                                 <label class="control-label col-xs-4 col-sm-3">
                                     <input type="checkbox" name="moebliert" ng-model="c_tool.currentExpose.moebliert">
@@ -570,25 +586,35 @@
                                        ng-model="c_tool.currentExpose.decke" ng-model-options="{ debounce: 500 }">
                             </label>
 
-                            <label class="control-label col-xs-4 col-sm-3"  ng-if="c_tool.currentExpose.objekttyp!=3">
-                                <div>
-                                    <div class="text-inline">
-                                        <span>Stockwerkanzahl Haus</span>
-                                    </div>
-                                </div>
-                                <input type="text" name="stockwerke" placeholder="" class="form-control" list="datalist_geschoss" required
-                                       ng-model="c_tool.currentExpose.stockwerke" ng-model-options="{ debounce: 500 }">
-                            </label>
-
                             <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp==2">
                                 <div>
                                     <div class="text-inline">
-                                        <span>Stockwerk der Wohnung</span>
+                                        <span>Stockwerk</span>
                                     </div>
                                 </div>
-                                <input type="text" name="stockwerk" placeholder="" class="form-control" list="datalist_geschoss" required
-                                       ng-model="c_tool.currentExpose.stockwerk" ng-model-options="{ debounce: 500 }">
+                                <div class="row">
+                                    <div class="col-xs-5">
+                                        <input type="text" name="stockwerk" placeholder="" class="form-control" list="datalist_geschoss"
+                                        ng-model="c_tool.currentExpose.stockwerk" ng-model-options="{ debounce: 500 }">
+                                    </div>
+                                    <span class="col-xs-1 padding-none text-center ">von</span>
+                                    <div class="col-xs-5">
+                                        <input type="text" name="stockwerke" placeholder="" class="form-control" list="datalist_geschoss"
+                                        ng-model="c_tool.currentExpose.stockwerke" ng-model-options="{ debounce: 500 }">
+                                    </div>
+                                </div>
                             </label>
+
+                            <label class="control-label col-xs-4 col-sm-3" ng-if="c_tool.currentExpose.objekttyp==1">
+                                <div>
+                                    <div class="text-inline">
+                                        <span>Stockwerke</span>
+                                    </div>
+                                </div>
+                                <input type="text" name="stockwerke" placeholder="" class="form-control" list="datalist_geschoss"
+                                       ng-model="c_tool.currentExpose.stockwerke" ng-model-options="{ debounce: 500 }">
+                            </label>
+
                                 <label class="control-label col-xs-4 col-sm-3">
                                     <div>
                                         <div class="text-inline">
@@ -757,7 +783,7 @@
                                         </select>
                                     </div>
                                     <div class="col-xs-6 col-sm-3">
-                                        <button type="button" class="btn btn-large btn-default" title="Badezimmertyp aus Dropdown-Menü wählen" ng-disabled="!badezimmer" ng-click="c_tool.currentExpose.badezimmer.push({'type':badezimmer,'enSuite':false})">Badezimmer hinzufügen</button>
+                                        <button type="button" class="btn btn-large btn-default" title="Badezimmertyp aus Dropdown-Menü wählen" ng-disabled="!badezimmer" ng-click="c_tool.addBadezimmer(badezimmer)">Badezimmer hinzufügen</button>
                                     </div>
                                 </div>
                                 <div class="row row-paddingbottom" ng-repeat="(key, value) in c_tool.currentExpose.badezimmer track by key">
@@ -842,6 +868,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row" ng-show="c_tool.images.object.length>0">
                             <div class="col-xs-12">
                                 <ol class="sortable nested_with_switch vertical" id="imageList">

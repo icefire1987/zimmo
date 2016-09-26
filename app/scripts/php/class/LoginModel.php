@@ -60,8 +60,9 @@ class LoginModel{
                             $user_email);
                         $_SESSION['login_string'] = hash('sha512',
                             $db_password . $user_browser);
+                        $_SESSION["id"] = session_id();
                         // Login successful.
-                        return array("code"=>1,"txt"=>"Login erfolgreich","data"=>json_encode(array("prename"=>$prename,"lastname"=>$lastname,"role"=>$role)));
+                        return array("code"=>1,"txt"=>"Login erfolgreich","data"=>json_encode(array("prename"=>$prename,"lastname"=>$lastname,"role"=>$role)),"session"=>json_encode($_SESSION));
                     } else {
                         // Password is not correct
                         // We record this attempt in the database
@@ -82,7 +83,7 @@ class LoginModel{
     }
     function getCurrentUser($data){
         if (!($stmt = $this->db->mysqli->prepare("
-            SELECT prename, lastname, teams.name as team,role.name
+            SELECT prename, lastname, teams.name as team,role.name,teams.id as teamID
             
             FROM members 
             LEFT JOIN teams ON teams.id = members.teamID
@@ -104,10 +105,10 @@ class LoginModel{
 
             if ($stmt->num_rows == 1) {
                 // get variables from result.
-                $stmt->bind_result($prename, $lastname, $team,$role);
+                $stmt->bind_result($prename, $lastname, $team,$role,$teamID);
                 $stmt->fetch();
 
-                return array("code" => 1, "txt" => json_encode(array("prename" => $prename, "lastname" => $lastname,"team"=>array("name"=>$team),"role"=>$role)));
+                return array("code" => 1, "txt" => json_encode(array("prename" => $prename, "lastname" => $lastname,"team"=>array("name"=>$team,"id"=>$teamID),"role"=>$role)));
             }
         }
     }
@@ -286,7 +287,9 @@ class LoginModel{
             $stmt->execute();    // Execute the prepared query.
             $stmt->store_result();
 
-
+            if ($stmt->num_rows == 0) {
+                return array("code"=>2,"txt"=>"Keine Einladung");
+            }
             if ($stmt->num_rows == 1) {
                 // get variables from result.
                 $stmt->bind_result($teamid,$name, $admin, $send);

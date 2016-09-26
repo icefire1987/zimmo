@@ -28,11 +28,17 @@ class AjaxControl{
 
     function router(){
         if(isset($this->input) && isset($this->input["action"])){
+            if($this->input["action"] != "login" && $this->input["action"] != "checkLogin" && $this->input["action"] != "logout"){
+                if($this->checkLogin()==false){
+                    echo json_encode(array("type"=>"err","feedbacktext"=>"Nicht eingeloggt","text"=>"Nicht eingeloggt","code"=>4));
+                    return false;
+                }
+            }
             switch ($this->input["action"]){
                 case "login":
                     $this->login();
                     break;
-                case "check":
+                case "checkLogin":
                     $this->checkLogin();
                     break;
                 case "register":
@@ -75,6 +81,18 @@ class AjaxControl{
                 case "getCurrentUser":
                     $this->getCurrentUser();
                     break;
+                case "saveFile":
+                    $this->saveFile();
+                    break;
+
+                case "getPresets":
+                    $this->getPresets();
+                    break;
+                case "setPresets":
+                    $this->setPresets();
+                    break;
+
+
                 default:
                     $this->wrongroute($this->input["action"]);
                     break;
@@ -102,10 +120,7 @@ class AjaxControl{
         echo json_encode($loginObj);
     }
     function checkLogin(){
-        $_SESSION["userid"]=2;
-        return true;
         if($this->Security->userLoggedIn()===false){
-            echo json_encode(array("type"=>"err","text"=>"Nicht eingeloggt","code"=>4));
             return false;
         }else{
             return true;
@@ -183,7 +198,7 @@ class AjaxControl{
         if (isset($userObj["code"]) && $userObj["code"] == 1) {
             echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich abgefragt", "txt"=>$userObj["txt"] ));
         } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
-            echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+            echo json_encode(array("type" => "err", "txt" => $userObj["txt"]));
         } else {
             echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte"));
         }
@@ -228,7 +243,7 @@ class AjaxControl{
         echo json_encode(array("type"=>"err","text"=>"Fehlerhafter Funktionsaufruf".$route,"code"=>10,"feedbacktext"=>"Serverfehler. Fehlerhafter Funktionsaufruf: AjaxCtrl->".$route));
     }
     function noroute(){
-        echo json_encode(array("type"=>"err","text"=>"Route nicht übermittelt","code"=>10,"feedbacktext"=>"Route nicht übermittelt"));
+        echo json_encode(array("type"=>"err","text"=>"Route nicht übermittelt","code"=>10,"feedbacktext"=>"Route nicht übermittelt."));
     }
 
     function exposeSearch($parse=false){
@@ -329,24 +344,30 @@ class AjaxControl{
                 $err = false;
                 foreach($images as $imgType=>$imgArray){
                     // imgType : object, grundriss, energieausweis
-                    switch($imgType){
-                        case "object":
-                            $imageTyp=2;
-                            break;
-                        case "grundriss":
-                            $imageTyp=3;
-                            break;
 
-                        case "energieausweis":
-                            $imageTyp=4;
-                            break;
-                        default:
-                            $imageTyp=2;
-                            break;
-                    }
                     foreach($imgArray as $imgKey=>$imgObj){
                         $dataobj  =false;
                         // new upoloaded image
+                        switch($imgType) {
+                            case "object":
+                                $imageTyp = 2;
+                                if (isset($imgObj["kat"]) && isset($imgObj["kat"]["value"])) {
+                                    if ($imgObj["kat"]["value"] == "Titelbild") {
+                                        $imageTyp = 1;
+                                    }
+                                }
+                                break;
+                            case "grundriss":
+                                $imageTyp=3;
+                                break;
+                            case "energieausweis":
+                                $imageTyp=4;
+                                break;
+                            default:
+                                $imageTyp=2;
+                                break;
+                        }
+
                         if(strpos($imgObj["imgString"],"base64")) {
 
                             if ( ! is_dir($this->uploadpath)) {
@@ -369,6 +390,7 @@ class AjaxControl{
                                 $filename = $imgType . "_" . $imgKey . "." . $filetype;
                                 $filepath = "uploads/".$obj["returnID"] ."/". $filename ;
                                 $filepath_global = $this->uploadpath . $filename;
+
                                 if (file_put_contents($filepath_global, $decodedImgData)) {
                                     $dataobj = array(
                                         "exposeID" => $obj["returnID"],
@@ -440,7 +462,18 @@ class AjaxControl{
             $data = [];
             $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'id');
             $raw = $this->getExposeRecord($data["id"]);
+            $raw["images"] = $this->getExposeImages($data["id"]);
 
+            foreach( $raw["images"] as $type => $obj ){
+                if($type == "object"){
+                    foreach($obj as $key=>$imageArr){
+                        if($imageArr["kat"]["value"] == "Titelbild"){
+                            $raw["images"]["front"][]= $imageArr;
+                            array_splice($raw["images"]["object"], $key, 1);
+                        }
+                    }
+                }
+            }
             $pdfmodel = new PDFModel($this->DB);
 
             $obj = $pdfmodel->createPDF($raw);
@@ -471,6 +504,70 @@ class AjaxControl{
         $exposeModel = new ExposeModel($this->DB);
         return $exposeModel->getExposeImages(array("id"=>$id));
     }
+
+    function saveFile(){
+        $dataurl = $this->Security->validateInput('string', $this->input["formdata"], 'dataurl');
+        $objectID = $this->Security->validateInput('int', $this->input["formdata"], 'objectID');
+        list($type, $dataurl) = explode(';', $dataurl);
+        list(, $dataurl)      = explode(',', $dataurl);
+        $dataurl = str_replace(' ','+',$dataurl);
+        $dataurl = base64_decode($dataurl);
+
+        file_put_contents($this->uploadpath.$objectID."/lage.png",$dataurl);
+    }
+
+    function getPresets(){
+        $model = new ExposeModel($this->DB);
+        $presetType = $this->Security->validateInput('string', $this->input["formdata"], 'presetType');
+
+        $data = [];
+        $data["type"] = $presetType;
+
+
+        $userObj = $model->getPresets($data);
+        if (isset($userObj["code"]) && $userObj["code"] == 1) {
+            echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich abgefragt","txt"=> $userObj["txt"]));
+        } else if (isset($userObj["code"]) && $userObj["code"] != 1) {
+            echo json_encode(array("type" => "err", "feedbacktext" => $userObj["txt"]));
+        } else {
+            echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte", "txt"=> $userObj));
+        }
+
+    }
+
+    function setPresets(){
+        $modelUser = new LoginModel($this->DB);
+        $parse = array("userid"=>$_SESSION["userid"]);
+        $userCall = $modelUser->getCurrentUser($parse);
+        $user = json_decode($userCall["txt"],true);
+        $model = new ExposeModel($this->DB);
+        $data = [];
+
+        $data["presetType"] = $this->Security->validateInput('string', $this->input["formdata"], 'presetType');
+        $data["id"] = $this->Security->validateInput('integer', $this->input["formdata"], 'presetID');
+        $data["action"] = $this->Security->validateInput('string', $this->input["formdata"], 'action');
+        $data["title"] = $this->Security->validateInput('string', $this->input["formdata"], 'title');
+        $data["text"] = $this->Security->validateInput('string', $this->input["formdata"], 'text');
+
+        $data["user"] = $user;
+        if(isset($data["id"]) && $data["id"]>0){
+            if($data["action"] == "delete"){
+                $model->deletePresets($data);
+            }
+            if($data["action"] == "update"){
+                $model->updatePresets($data);
+            }
+        }else{
+            if($data["action"] == "insert"){
+                if($model->insertPresets($data)){
+                    echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert","txt"=> $data));
+                }else{
+                    echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte", "txt"=> $data));
+                }
+            }
+        }
+    }
+
 }
 
 try{

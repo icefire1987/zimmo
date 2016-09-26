@@ -11,7 +11,7 @@ class PDFModel{
         require_once("dompdf/dompdf_config.inc.php");
         $this->pdf = new DOMPDF();
     }
-    function preparePDF($content){
+    function preparePDF1($content){
         $content["badausstattung"] = array();
         $badArr = json_decode($content["badtyp"]);
         $badAusArray = json_decode($content["badbesonderheit"]);
@@ -116,8 +116,9 @@ class PDFModel{
                 unset($end);
             }
         }
+
         // K�che-Syntax
-        $kuecheArr = explode(",", $content["kuecheausstattung"]);
+        $kuecheArr = explode(",", $content["kuechenausstattung"]);
         $freitext="";
         foreach($kuecheArr as $ind=>$word){
             switch($word){
@@ -128,13 +129,13 @@ class PDFModel{
                     if(!isset($add)){$add=array();}
                     $add[]=$word."e";
                     break;
-                case "Markenger�ten":
-                case "allen technischen Ger�ten ausgestattet":
+                case "Markengeräten":
+                case "allen technischen Geräten ausgestattet":
                     if(!isset($mit)){$mit=array();}
                     $mit[]=$word;
                     break;
-                case "Wohnk�che":
-                case "offene K�che":
+                case "Wohnküche":
+                case "offene Küche":
                     if(!isset($kuecheTyp)){$kuecheTyp=array();}
                     $kuecheTyp[]=$word;
                     break;
@@ -155,12 +156,12 @@ class PDFModel{
         }
         if(isset($kuecheTyp)){
             if(count($kuecheTyp)>1){
-                $kuecheString .= " offene Wohnk�che";
+                $kuecheString .= " offene Wohnküche";
             }else{
                 $kuecheString .= " ".$kuecheTyp[0];
             }
         }else{
-            $kuecheString .= " K�che";
+            $kuecheString .= " Küche";
         }
         if(isset($mit)){
             $i=0;
@@ -177,6 +178,54 @@ class PDFModel{
         }
         $content["kuecheausstattung"] = $kuecheString;
         $content["kueche_freitext"] = $freitext;
+        return $content;
+    }
+    function preparePDF($content){
+        //var_dump($content);
+        $content["ausstattungArr"] = array();
+
+        if(isset($content["saniert"]) && $content["saniert"]>0){
+            $content["ausstattungArr"][] = "Objekt saniert ".(isset($content["sanierung"]) && $content["sanierung"]>0?"(".$content["sanierung"].")":"");
+        }
+        if(isset($content["renoviert"]) && $content["renoviert"]>0){
+            $content["ausstattungArr"][] = "Objekt renoviert ".(isset($content["renovierung"]) && $content["renovierung"]>0?"(".$content["renovierung"].")":"");
+        }
+        if(isset($content["moebliert"]) && $content["moebliert"]>0){
+            $content["ausstattungArr"][] = "Objekt möbliert";
+        }
+        $bad =  json_decode($content["badezimmer"],true);
+        foreach($bad as $key => $val){
+            $content["ausstattungArr"][] = $val["type"].($val["enSuite"]===true?", en Suite":"");
+        }
+        $boden =  json_decode($content["boden"],true);
+        foreach($boden as $key => $val){
+            if($val == true){
+                $content["ausstattungArr"][] = $key;
+            }
+        }
+        $innen =  json_decode($content["innenausstattung"],true);
+        foreach($innen as $key => $val){
+            if($val == true){
+                $content["ausstattungArr"][] = $key;
+            }
+        }
+
+        $content["kuechenArr"] = array();
+        if($content["kueche"]>0) {
+            $content["kuechenArr"][] = "Einbauküche vorhanden";
+            if(trim($content["kuechenmarke"])!=""){
+                $content["kuechenArr"][] = array("name"=>"Küchenmarke","val"=>$content["kuechenmarke"]);
+            }
+            $kueche = json_decode($content["kuechenausstattung"], true);
+            $merkmale = "";
+            foreach ($kueche as $key => $val) {
+                if ($val == true) {
+                    $merkmale .= $key.", ";
+                }
+            }
+            $merkmale = rtrim($merkmale,', ');
+            $content["kuechenArr"][] =  array("name"=>"Küchenmerkmale","val"=>$merkmale);
+        }
         return $content;
     }
     function createPDF($objRaw){

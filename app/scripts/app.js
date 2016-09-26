@@ -12,6 +12,7 @@ angular
     .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angularFileUpload','ngStorage'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider,$locationProvider) {
+
         $httpProvider.defaults.withCredentials = true;
         $httpProvider.defaults.useXDomain = true;
         $logProvider.debugEnabled(false);
@@ -103,6 +104,16 @@ angular
                 authenticate: true,
                 roles: []
             })
+            .state('tool.config', {
+                url: '/config',
+                templateUrl: 'views/tool_config.html',
+                authenticate: true,
+                roles: [],
+                controller: function($scope,$stateParams){
+                    $scope.c_tool.getConfig();
+                }
+            })
+
             .state('tool.accessdenied', {
                 url: '/denied',
                 templateUrl: 'views/tool_denied.html',
@@ -152,7 +163,12 @@ angular
         }
 
     }])
-    .service('UserService',['$rootScope','$http','$localStorage','$q', function($rootScope,$http,$localStorage,$q){
+    .service('UserService',['$rootScope','$http','$localStorage','$cookies', function($rootScope,$http,$localStorage,$cookies){
+        // on local:
+        var scriptbase = 'http://localhost/Zimmo/app/';
+        // on webserver:
+        //var scriptbase = '';
+
         var self = this;
             self.userObj = {};
 
@@ -163,8 +179,7 @@ angular
             var credentials = {'action':'getCurrentUser','formdata':{}};
 
             $http({
-                //url: 'scripts/php/ajaxCtrl.php',
-                url: 'http://localhost/Zimmo/app/scripts/php/ajaxCtrl.php',
+                url: scriptbase + 'scripts/php/ajaxCtrl.php',
                 method: 'POST',
                 data: JSON.stringify(credentials),
                 withCredentials: true
@@ -192,6 +207,9 @@ angular
 
         this.clear = function(){
             self.userObj = {};
+            console.log($cookies.get("zuumeoImmoApp_Session"))
+            $cookies.remove("zuumeoImmoApp_Session");
+            console.log("Clear");
         };
 
         this.getUser = function () {

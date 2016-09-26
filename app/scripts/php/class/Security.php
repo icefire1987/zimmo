@@ -42,10 +42,10 @@ class Security{
         }
     }
     function  userLoggedIn(){
-        return (isset($_SESSION) && isset($_SESSION["login_string"]));
+        return (isset($_SESSION) && isset($_SESSION["userid"]));
     }
     function sec_session_start($name, $limit = 16000, $path = '/', $domain = null, $secure = null){
-        $lifetime=3600;
+        $lifetime=7200;
         // Set the cookie name
         session_name($name . '_Session');
 
