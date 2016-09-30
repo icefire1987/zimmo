@@ -216,7 +216,7 @@ angular.module('zimmoApp')
         }
     // EXPOSE
         vm.currentExpose = {};
-
+        vm.presets = {};
         vm.myMap = {};
         vm.mapdata = {
             center: {},
@@ -900,16 +900,16 @@ angular.module('zimmoApp')
         list_geschoss_zusatz.push("-1");
         list_geschoss_zusatz.push("Dachgeschoss");
 
-        this.presets = function(){
+        this.getPresets = function(){
             vm.ajaxCall(
                 {
                     credentials : {
-                        action: "getPresets",
-                        formdata: {"presetType":"lage"}
+                        action: "getPresets"
                     },
                     callback_success: function (responseObj) {
-                        console.info(responseObj);
-                        vm.configObj = {};
+                       for(var type in responseObj){
+                           vm.presets[type] = responseObj[type];
+                       }
                         return true;
                     },
                     callback_err: function (responseObj) {

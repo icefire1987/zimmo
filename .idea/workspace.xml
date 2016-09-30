@@ -9,23 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80c40469-6520-4581-a71e-bee97f73df85" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/tool_config.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/index.html" afterPath="$PROJECT_DIR$/app/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/app.js" afterPath="$PROJECT_DIR$/app/scripts/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/controllers/main.js" afterPath="$PROJECT_DIR$/app/scripts/controllers/main.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/controllers/tool.js" afterPath="$PROJECT_DIR$/app/scripts/controllers/tool.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/ajaxCtrl.php" afterPath="$PROJECT_DIR$/app/scripts/php/ajaxCtrl.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/class/ExposeModel.php" afterPath="$PROJECT_DIR$/app/scripts/php/class/ExposeModel.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/class/LoginModel.php" afterPath="$PROJECT_DIR$/app/scripts/php/class/LoginModel.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/class/PDFModel.php" afterPath="$PROJECT_DIR$/app/scripts/php/class/PDFModel.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/class/Security.php" afterPath="$PROJECT_DIR$/app/scripts/php/class/Security.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/scripts/php/templates_pdf/pdfLayoutKauf.php" afterPath="$PROJECT_DIR$/app/scripts/php/templates_pdf/pdfLayoutKauf.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/styles/pdf.css" afterPath="$PROJECT_DIR$/app/styles/pdf.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/tool.html" afterPath="$PROJECT_DIR$/app/views/tool.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/tool_expose.html" afterPath="$PROJECT_DIR$/app/views/tool_expose.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/tool_user.html" afterPath="$PROJECT_DIR$/app/views/tool_user.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
     </list>
     <ignored path="Zimmo.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -79,11 +64,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="tool.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="tool.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/scripts/controllers/tool.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="697">
-              <caret line="920" column="22" selection-start-line="920" selection-start-column="22" selection-end-line="920" selection-end-column="22" />
+            <state relative-caret-position="442">
+              <caret line="218" column="24" selection-start-line="218" selection-start-column="24" selection-end-line="218" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -119,11 +104,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/scripts/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="71" column="53" selection-start-line="71" selection-start-column="53" selection-end-line="71" selection-end-column="53" />
+            <state relative-caret-position="731">
+              <caret line="82" column="67" selection-start-line="82" selection-start-column="67" selection-end-line="82" selection-end-column="67" />
               <folding>
                 <marker date="1474632340931" expanded="true" signature="7600:7611" ph="{...}" />
               </folding>
@@ -280,10 +265,10 @@
     </include_path>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1912" />
+    <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1936" />
-    <option name="height" value="1216" />
+    <option name="height" value="1176" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -585,7 +570,7 @@
       <workItem from="1472652909128" duration="66114000" />
       <workItem from="1473414504636" duration="15455000" />
       <workItem from="1473750024086" duration="66270000" />
-      <workItem from="1474884115327" duration="18072000" />
+      <workItem from="1474884115327" duration="22731000" />
     </task>
     <task id="LOCAL-00001" summary="cd">
       <created>1467219105470</created>
@@ -720,14 +705,21 @@
       <option name="project" value="LOCAL" />
       <updated>1473438271017</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="cd">
+      <created>1474909126462</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1474909126462</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="665495000" />
+    <option name="totallyTimeSpent" value="670154000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1912" y="-8" width="1936" height="1216" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18020834" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -1101,6 +1093,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
           <caret line="87" column="47" selection-start-line="87" selection-start-column="47" selection-end-line="87" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1108,6 +1101,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="774">
           <caret line="267" column="19" selection-start-line="267" selection-start-column="19" selection-end-line="267" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1123,6 +1117,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
           <caret line="204" column="41" selection-start-line="204" selection-start-column="41" selection-end-line="204" selection-end-column="41" />
+          <folding>
+            <marker date="1474474719332" expanded="true" signature="14932:14938" ph="•" />
+            <marker date="1474474719332" expanded="true" signature="14954:14969" ph="..." />
+            <marker date="1474474719332" expanded="true" signature="15005:15020" ph="..." />
+            <marker date="1474474719332" expanded="true" signature="15085:15091" ph="•" />
+            <marker date="1474474719332" expanded="true" signature="15107:15122" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1214,16 +1215,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/scripts/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="71" column="53" selection-start-line="71" selection-start-column="53" selection-end-line="71" selection-end-column="53" />
-          <folding>
-            <marker date="1474632340931" expanded="true" signature="7600:7611" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/views/tool_expose.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
@@ -1242,9 +1233,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/scripts/controllers/tool.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="920" column="22" selection-start-line="920" selection-start-column="22" selection-end-line="920" selection-end-column="22" />
+        <state relative-caret-position="442">
+          <caret line="218" column="24" selection-start-line="218" selection-start-column="24" selection-end-line="218" selection-end-column="24" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/scripts/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="731">
+          <caret line="82" column="67" selection-start-line="82" selection-start-column="67" selection-end-line="82" selection-end-column="67" />
+          <folding>
+            <marker date="1474632340931" expanded="true" signature="7600:7611" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
