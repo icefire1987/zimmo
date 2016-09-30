@@ -27,6 +27,7 @@ angular.module('zimmoApp')
       }
     };
 
+
     this.regObj = {
         formdata : {
             prename : '',
