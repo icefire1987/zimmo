@@ -6,14 +6,28 @@
  * Date: 28.06.2016
  * Time: 09:42
  */
+
+/**
+ * printf( str_replace('?', '%s', $prep_stmt), $var1, $var2);
+ */
 class ExposeModel{
     /**
      * @param mysqli $dbCLassObj
+     */
+
+    /**
+     * ExposeModel constructor.
+     * @param $dbCLassObj
      */
     function __construct($dbCLassObj){
         $this->db = $dbCLassObj;
         $this->basepath = "../../";
     }
+
+    /**
+     * @param bool $search
+     * @return array|null
+     */
     function getExpose($search=false){
         $user = $_SESSION["userid"];
 
@@ -430,7 +444,7 @@ class ExposeModel{
             return array("code"=>4,"txt"=>"no login");
         }
         $user = $_SESSION["userid"];
-        $type = $data["type"];
+        $presetType = $data["type"];
 
         $prep_stmt = "
             SELECT 
@@ -442,19 +456,20 @@ class ExposeModel{
 
         $stmt =  $this->db->mysqli->prepare($prep_stmt);
         if ($stmt) {
-            $stmt->bind_param('is', $user,$type);
+            $stmt->bind_param('is', $user,$presetType);
+
             $stmt->execute();
             $stmt->store_result();
             if ($stmt->num_rows > 0) {
                 // get variables from result.
                 $stmt->bind_result($id,$teamID,$type,$title,$text);
                 WHILE ($stmt->fetch()) {
-                    $dbData[] = array(
+                    $dbData[$presetType][] = array(
                         "id" => $id,
                         "teamID" => $teamID,
                         "type" => $type,
-                        "title" => $title,
-                        "text" => $text
+                        "title" => html_entity_decode($title),
+                        "text" => html_entity_decode($text)
                     );
                 }
                 $stmt->close();
@@ -495,23 +510,26 @@ class ExposeModel{
         return array("returnID"=>$this->db->mysqli->insert_id);
     }
     function updatePresets($data){
-        if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO tab_presets(id,title,text) VALUES (?,?,?)"))){
+        if (!($stmt = $this->db->mysqli->prepare("REPLACE INTO tab_presets(id,teamID,title,text,type) VALUES (?,?,?,?,?)"))){
             echo "Prepare failed: (" . $this->db->mysqli->errno . ") " . $this->db->mysqli->error;
         }
 
         $insertData  = array(
             "id"=>$data["id"],
             "title"=>$data["title"],
-            "text"=>$data["text"]
+            "text"=>$data["text"],
+            "type"=>$data["presetType"],
+            "teamID"=>$data["user"]["team"]["id"],
         );
 
-        if (!$stmt->bind_param('iss',$insertData["id"],$insertData["title"],$insertData["text"])) {
+        if (!$stmt->bind_param('iisss',$insertData["id"],$insertData["teamID"],$insertData["title"],$insertData["text"],$insertData["type"])) {
             echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
         }
 
         if (!$stmt->execute()) {
             echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
         }
+
         return array("returnID"=>$this->db->mysqli->insert_id);
     }
     function deletePresets($data){

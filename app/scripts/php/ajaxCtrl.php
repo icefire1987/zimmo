@@ -544,7 +544,7 @@ class AjaxControl{
         $data = [];
 
         $data["presetType"] = $this->Security->validateInput('string', $this->input["formdata"], 'presetType');
-        $data["id"] = $this->Security->validateInput('integer', $this->input["formdata"], 'presetID');
+        $data["id"] = $this->Security->validateInput('int', $this->input["formdata"], 'presetID');
         $data["action"] = $this->Security->validateInput('string', $this->input["formdata"], 'action');
         $data["title"] = $this->Security->validateInput('string', $this->input["formdata"], 'title');
         $data["text"] = $this->Security->validateInput('string', $this->input["formdata"], 'text');
@@ -552,10 +552,18 @@ class AjaxControl{
         $data["user"] = $user;
         if(isset($data["id"]) && $data["id"]>0){
             if($data["action"] == "delete"){
-                $model->deletePresets($data);
+                if($model->deletePresets($data)){
+                    echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert","txt"=> $data));
+                }else{
+                    echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte", "txt"=> $data));
+                }
             }
             if($data["action"] == "update"){
-                $model->updatePresets($data);
+                if($model->updatePresets($data)){
+                    echo json_encode(array("type" => "success", "feedbacktext" => "Daten erfolgreich gespeichert","txt"=> $data));
+                }else{
+                    echo json_encode(array("type" => "err", "feedbacktext" => "Fehlerhafte Rückgabewerte", "txt"=> $data));
+                }
             }
         }else{
             if($data["action"] == "insert"){
@@ -567,6 +575,7 @@ class AjaxControl{
             }
         }
     }
+
 
 }
 

@@ -65,14 +65,24 @@ class image{
 		}
 		return false;
 	}
-	function showImage($iw){
+	function showImage($iw,$options=false){
+
 		if($this->ratio>$iw->ratio){
+
 			$z=$iw->height - ( ($iw->width/$this->width)*$this->height );
-			$style="width:".$iw->width."px;margin-top:".($z/2)."px;";
+			$style="width:".($iw->width-2)."px;margin-top:".($z/2)."px;";
+            $return = '<img style="'.$style.'" src="'.$this->path.'">';
 		}else{
-			$style="height:".$iw->height."px";
+            if(isset($options) && isset($options["border"]) && $options["border"] == 0){
+                $style="height:".$iw->height."px;border:none;";
+                $return = '<div style="border:1px solid black;"><img style="'.$style.'" src="'.$this->path.'"></div>';
+            }else{
+                $style="height:".$iw->height."px ";
+                $return = '<img style="'.$style.'" src="'.$this->path.'">';
+            }
+
 		}
-		return '<img style="'.$style.'" src="'.$this->path.'">';
+		return $return;
 	}
 	function showTitle(){
 		return '<span class="block imgTitle" style="margin:0 auto;width:'.$this->realwidth.'px">'.$this->title.'</span>';

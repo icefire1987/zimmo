@@ -2,60 +2,66 @@
     <div class="row">
 
         <uib-accordion close-others="true" class="col-xs-12">
-            <uib-accordion-group  is-open="c_tool.accConfig.statusLage.open">
+            <uib-accordion-group  is-open="c_tool.accConfig[$index].open" ng-repeat="(presettype,preset) in c_tool.configObj.presets">
                 <uib-accordion-heading>
-                    Lagebeschreibungen
+                    {{preset.static.heading}}
                     <i class="pull-right glyphicon"
-                       ng-class="{'glyphicon-chevron-down': c_tool.accConfig.statusLage.open, 'glyphicon-chevron-right': ! c_tool.accConfig.statusLage.open}"></i>
+                       ng-class="{'glyphicon-chevron-down': c_tool.accConfig[$index].open, 'glyphicon-chevron-right': ! c_tool.accConfig[$index].open}"></i>
                 </uib-accordion-heading>
                 <div class="row">
-                    <form name="addPresetLage" class="col-xs-12 col-md-6">
+                    <form name="addPreset" class="col-xs-12 col-md-6">
                         <h4><span class="glyphicon glyphicon-edit" aria-hidden="true"></span><span class="marginLeft10">neuen Text anlegen</span></h4>
                         <div class="row ">
-
                             <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
                                 <span>neuen Text anlegen oder bestehenden Text ändern</span>
-                                <select class="form-control" name="lage_dropdown" class="" ng-model="c_tool.configObj.lage_dropdown"
-                                        ng-model-options="{ debounce: 500 }" ng-options="item as item.title for item in c_tool.configObj.lage_db" ng-change="c_tool.lage_select()">
+                                <select class="form-control" name="addPreset_dropdown" class="" ng-model="c_tool.configObj[presettype].dropdown"
+                                        ng-model-options="{ debounce: 500 }" ng-options="item as item.title for item in c_tool.configObj[presettype]" ng-change="c_tool.preset_select(presettype)">
                                     <option value="">neuen Text anlegen</option>
                                 </select>
                             </label>
-
+                        </div>
+                        <div class="row ">
                             <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
                                 <span>Titel</span>
-                                <input class="form-control" type="text" name="lage_title" placeholder="DropDown-Text" required
-                                       ng-model="c_tool.configObj.lage_titel" ng-model-options="{ debounce: 500 }" autocomplete="off">
+                                <input class="form-control" type="text" name="addPreset_title" placeholder="DropDown-Text" required
+                                       ng-model="c_tool.configObj[presettype].title" ng-model-options="{ debounce: 500 }" autocomplete="off">
                             </label>
 
                             <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
                                 <div class="row">
                                     <span class="col-xs-6">Text im Expose</span>
-                                    <span class="col-xs-6 text-right"> {{addPresetLage.input_lage_text.$viewValue.length ||0}} / 900</span>
+                                    <span class="col-xs-6 text-right"> {{addPreset.input_text.$viewValue.length ||0}} / 900</span>
                                 </div>
-
                                 <div class="errorArea" ng-messages="form_reg.pass.$error">
-                                    <div ng-show="addPresetLage.input_lage_text.$error.minlength">Mindestlänge: 300 Zeichen</div>
+                                    <div ng-show="addPreset.input_text.$error.minlength">Mindestlänge: 300 Zeichen</div>
                                 </div>
                                 <textarea class="form-control" rows="5"
-                                          name="input_lage_text"
+                                          name="input_text"
                                           ng-minlength="300"
                                           ng-minlength="900"
-                                          ng-model="c_tool.configObj.lage_text"
-                                ></textarea>
+                                          ng-model="c_tool.configObj[presettype].text">
+                                </textarea>
                             </label>
-                            <label class="form-group col-xs-12 col-md-10 col-md-offset-2">
+                            <label class="form-group col-xs-6 col-md-4 col-md-offset-2">
                                 <button-submit
                                         call-class="btn btn-success"
-                                        call-click="c_tool.presets_submitLage({form:addPresetLage,action:'insert'})"
+                                        call-click="c_tool.presets_submit({form:addPreset,action:(c_tool.configObj[presettype].presetID>0)?('update'):('insert'),presetType:presettype})"
                                         call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
-                                        call-HTML="Eintrag erstellen"
-                                        ng-disable="!c_tool.configObj.lage_dropdown"
+                                        call-HTML="{{(c_tool.configObj[presettype].presetID>0)?('Eintrag aktualisieren'):('Eintrag erstellen')}}"
+                                        ng-disable="!c_tool.configObj[presettype].dropdown"
                                 >
                                 </button-submit>
-
-
                             </label>
-
+                            <label class="form-group col-xs-6 col-md-4 col-md-offset-2">
+                                <button-submit
+                                        call-class="btn btn-danger"
+                                        call-click="c_tool.presets_submit({form:addPreset,action:'delete',presetType:presettype})"
+                                        call-icon='{"init":"glyphicon glyphicon-floppy-disk","callback_success":"glyphicon glyphicon-floppy-saved","callback_error":"glyphicon glyphicon-floppy-remove"}'
+                                        call-HTML="Eintrag entfernen"
+                                        ng-show="c_tool.configObj[presettype].dropdown"
+                                >
+                                </button-submit>
+                            </label>
                         </div>
                     </form>
                 </div>

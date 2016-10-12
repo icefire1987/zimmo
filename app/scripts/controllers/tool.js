@@ -11,6 +11,7 @@ angular.module('zimmoApp')
     //NgTableParams
     .controller('ToolCtrl', ['$http', '$state','$rootScope', 'AuthService','UserService', 'NgTableParams', '$timeout', 'leafletData', '$scope','$localStorage','$q','FileUploader', function ($http, $state,$rootScope, AuthService,UserService, NgTableParams, $timeout, leafletData, $scope,$localStorage,$q,FileUploader) {
         // on local:
+        console.log("ToolCtrl");
         var scriptbase = 'http://localhost/Zimmo/app/';
         // on webserver:
         //var scriptbase = '';
@@ -369,6 +370,7 @@ angular.module('zimmoApp')
                             vm.currentExpose.kaltmiete = parseFloat(vm.currentExpose.kaltmiete);
                             vm.currentExpose.nebenkosten = parseFloat(vm.currentExpose.nebenkosten);
                             vm.currentExpose.kaution = parseFloat(vm.currentExpose.kaution);
+                            vm.currentExpose.provision = parseFloat(vm.currentExpose.provision);
                             vm.currentExpose.stellplatz = parseFloat(vm.currentExpose.stellplatz);
                             vm.currentExpose.stellplatzkosten = parseFloat(vm.currentExpose.stellplatzkosten);
 
@@ -465,8 +467,7 @@ angular.module('zimmoApp')
              title,imgString,source,kat(additional dropdown data)
              }
              */
-            console.log("addToImages");
-            console.log(obj);
+
             if(!vm.images[obj.arrayname]){
                 vm.images[obj.arrayname] = [];
             }
@@ -705,7 +706,7 @@ angular.module('zimmoApp')
         vm.accExpo.statusAddress.open = true;
 
         vm.accConfig = {
-            statusLage: {open:true}
+
         };
 
 
@@ -750,13 +751,17 @@ angular.module('zimmoApp')
 
 
         this.getConfig = function(){
-            vm.configObj.presets.lage = vm.presets_lage();
+            vm.configObj.presets.lage = vm.presets('lage');
+            vm.configObj.presets.objekt = vm.presets('objekt');
+
+            vm.configObj.presets.lage.static = {heading:"Lagebeschreibung"};
+            vm.configObj.presets.objekt.static = {heading:"Objektbeschreibung"};
         };
 
-        this.presets_lage = function () {
+        this.presets = function (obj) {
             var credentials = {
                 action: "getPresets",
-                formdata: {"presetType":"lage"}
+                formdata: {"presetType":obj}
             };
             // we only check via php-session
             var defer = $q.defer();
@@ -779,7 +784,7 @@ angular.module('zimmoApp')
 
                             defer.resolve(true);
                             try{
-                                vm.configObj.lage_db = JSON.parse(response.data.txt);
+                                vm.configObj[obj] = (JSON.parse(response.data.txt))[obj];
                             }catch(e){
                                 console.error(e);
                             }
@@ -793,11 +798,21 @@ angular.module('zimmoApp')
                 );
             return defer.promise;
         };
-        this.lage_select = function (){
-            vm.configObj.lage_titel = vm.configObj.lage_dropdown.title;
-            vm.configObj.lage_text = vm.configObj.lage_dropdown.text;
-        }
-        this.presets_submitLage = function(obj){
+        this.preset_select = function (obj){
+            if(vm.configObj[obj].dropdown == null){
+                vm.configObj[obj].presetID = null;
+                vm.configObj[obj].title = "";
+                vm.configObj[obj].text = "";
+            }else{
+                vm.configObj[obj].title = vm.configObj[obj].dropdown.title;
+                vm.configObj[obj].text = vm.configObj[obj].dropdown.text;
+                vm.configObj[obj].presetID = vm.configObj[obj].dropdown.id;
+            }
+
+
+        };
+
+        this.presets_submit = function(obj){
             if(obj.form.$invalid){
                 return false;
             }
@@ -806,16 +821,19 @@ angular.module('zimmoApp')
                     credentials: {
                         action: "setPresets",
                         formdata: {
-                            "presetType": "lage",
+                            "presetType": obj.presetType,
                             "action": obj.action,
-                            "title":vm.configObj.lage_titel,
-                            "text":vm.configObj.lage_text
-
+                            "title":vm.configObj[obj.presetType].title,
+                            "text":vm.configObj[obj.presetType].text,
+                            "presetID": vm.configObj[obj.presetType].presetID
                         }
                     },
                     callback_success: function (responseObj) {
                         console.info(responseObj);
-                        vm.configObj = {};
+                        vm.configObj[obj.presetType].dropdown = 0;
+                        vm.configObj[obj.presetType].title = "";
+                        vm.configObj[obj.presetType].text = "";
+                        vm.getConfig();
                         return true;
                     },
                     callback_err: function (responseObj) {
@@ -830,10 +848,6 @@ angular.module('zimmoApp')
             );
             return promise;
         };
-
-
-
-
         this.logout = function () {
             var promise = vm.ajaxCall(
                 {
@@ -900,17 +914,18 @@ angular.module('zimmoApp')
         list_geschoss_zusatz.push("-1");
         list_geschoss_zusatz.push("Dachgeschoss");
 
-        this.getPresets = function(){
+        this.getPresets = function(type){
+            var temp = [];
             vm.ajaxCall(
                 {
                     credentials : {
+                        formdata: {presetType:type},
                         action: "getPresets"
                     },
-                    callback_success: function (responseObj) {
-                       for(var type in responseObj){
-                           vm.presets[type] = responseObj[type];
-                       }
-                        return true;
+                    callback_success: function (response) {
+                        var responseObj = JSON.parse(response.txt);
+                        vm.presets[type] = responseObj[type];
+                        console.log(responseObj)
                     },
                     callback_err: function (responseObj) {
                         console.error(responseObj);
@@ -946,7 +961,6 @@ angular.module('zimmoApp')
             zimmer: list_zimmer,
             geschoss: list_geschoss,
             geschoss_zusatz: list_geschoss_zusatz,
-            lagebeschreibung : vm.presets.lage,
             badezimmer: [
                 "Vollbad","Duschbad","Gäste-WC"
             ]
@@ -1258,6 +1272,20 @@ angular.module('zimmoApp')
             }
         };
     })
+
+    .directive('htmlText', function(){
+        return {
+            'restrict': 'A',
+            'require': 'ngModel',
+            'link': function(scope,element,attrs,model) {
+                scope.$watch(attrs['ngModel'], function (v) {
+                    attrs['ngModel'] = "FFFF"
+                });
+            }
+        };
+    });
+
+
 
 ;
 

@@ -633,54 +633,17 @@
                         </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        <!--
-                        <div class="row row-paddingbottom">
-                            <label class="control-label col-xs-4 col-sm-3">
-                                <div>
-                                    <div class="text-inline">
-                                        <span>Balkon</span>
-                                    </div>
-                                    <div class="text-inline form-error" ng-messages="form_object.balkon.$error">
-                                        <div ng-messages-include="views/regForm_messages.html"></div>
-                                    </div>
-                                </div>
-                                <input type="text" name="balkon" placeholder="Anzahl oder m²" class="form-control"
-                                       ng-model="c_tool.currentExpose.balkon" ng-model-options="{ debounce: 500 }">
-                            </label>
-                            <label class="control-label col-xs-4 col-sm-3">
-                                <div>
-                                    <div class="text-inline">
-                                        <span>Terrasse</span>
-                                    </div>
-                                    <div class="text-inline form-error" ng-messages="form_object.terrasse.$error">
-                                        <div ng-messages-include="views/regForm_messages.html"></div>
-                                    </div>
-                                </div>
-                                <input type="text" name="terrasse" placeholder="Anzahl oder m²" class="form-control"
-                                       ng-model="c_tool.currentExpose.terrasse" ng-model-options="{ debounce: 500 }">
-                            </label>
-                        </div>
-                        -->
-
                         <div class="row row-paddingbottom">
                             <label class="control-label col-xs-6">
                                 <div>
                                     <div class="text-inline">
                                         <span>Objektbeschreibung</span>
-                                        <br>
+                                        <select class="col-xs-6 col-sm-4" ng-model="item"
+                                                ng-model-options="{ debounce: 500 }" ng-options="item as item.title for item in c_tool.presets.objekt | orderBy:'toString()'"
+                                                ng-change="c_tool.currentExpose.objektbeschreibung = item.text">
+                                            <option value="">Vorlage wählen</option>
+
+                                        </select>
                                     </div>
                                     <div class="text-inline form-error" ng-messages="form_object.objektbeschreibung.$error">
                                         <div ng-messages-include="views/exposeForm_messages.html"></div>
@@ -694,8 +657,8 @@
                                     <div class="row">
                                         <span class="col-xs-6 col-sm-4">Lagebeschreibung</span>
                                         <select name="land" class="col-xs-6 col-sm-4" ng-model="item"
-                                                ng-model-options="{ debounce: 500 }" ng-options="item as item.bezirk for item in c_tool.datalists.lagebeschreibung | orderBy:'toString()'"
-                                                ng-change="c_tool.currentExpose.lagebeschreibung = item.beschreibung">
+                                                ng-model-options="{ debounce: 500 }" ng-options="item as item.title for item in c_tool.presets.lage | orderBy:'toString()'"
+                                                ng-change="c_tool.currentExpose.lagebeschreibung = item.text">
                                             <option value="">Vorlage wählen</option>
 
                                         </select>
@@ -1003,6 +966,8 @@
 <datalist id="datalist_geschoss_zusatz">
     <option  data-ng-repeat="dl_opt in c_tool.datalists.geschoss_zusatz | orderBy: dl_opt" value="{{dl_opt}}">
 </datalist>
+
+{{c_tool.presets.lage}}
 
 <!--
 

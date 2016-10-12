@@ -9,7 +9,7 @@
  * Main module of the application.
  */
 angular
-    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angularFileUpload','ngStorage'])
+    .module('zimmoApp', ['ui.router','ngMessages','ngTable','ui.bootstrap','leaflet-directive','ngCookies','angularFileUpload','ngStorage','ngSanitize'])
 
     .config(['$stateProvider', '$urlRouterProvider', '$httpProvider','$logProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $httpProvider,$logProvider,$locationProvider) {
 
@@ -72,6 +72,9 @@ angular
                     $scope.c_tool.currentExpose = {};
                     $scope.c_tool.images = {object:[],grundriss:[],energieausweis:[]};
                     $scope.c_tool.feedbackVisible = false;
+                    $scope.c_tool.getPresets('lage');
+                    $scope.c_tool.getPresets('objekt');
+
                 }
             })
             .state('tool.exposeOne', {
@@ -81,6 +84,9 @@ angular
                 roles: [],
                 controller: function($scope,$stateParams){
                     $scope.c_tool.setRecord($stateParams.exposeid);
+                    $scope.c_tool.getPresets('lage');
+                    $scope.c_tool.getPresets('objekt');
+
                 }
             })
             .state('tool.suche', {

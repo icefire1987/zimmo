@@ -9,8 +9,8 @@
 try{
 	// .../it/
 	$basepath = filter_input(INPUT_SERVER, 'DOCUMENT_ROOT');
-	$appfolder = $basepath."immo_preview/";
-	//$appfolder = "../../";
+	//$appfolder = $basepath."immo_preview/";
+	$appfolder = "../../";
 
 	$imagefolder = $appfolder."images/";
 	$uploadfolder = $appfolder."uploads/".$content["id"]."/";
@@ -51,7 +51,6 @@ try{
 				<td>
 					<span class="address block">Engel & Völkers Berlin</span>
 					<span class="address block">BerlinCharlottenburg@engelvoelkers.com</span>
-					<div style="height:5px;"></div>
 					<span class="address block">Bleibtreustr. 34/35  10707 Berlin</span>
 					<span class="address block">EuV Residential Berlin GmbH  Tel. +49-(0)30-88 00 11 88</span>
 					<span class="address block">Lizenzpartner der Engel & Völkers Residential GmbH</span>
@@ -128,7 +127,7 @@ try{
 			<? echo $header; ?>
 		</div>
 		<div class="content">
-			<div class="imageWrapper" style="height:460px;">
+			<div class="imageWrapper" style="height:480px;">
 				<div>
 			<?php
 			$k=0;
@@ -179,36 +178,28 @@ try{
 							<tr>
 								<td>&bull;</td><td>Kaufpreis</td><td class="nowrap"> <?php echo number_format($content["kaufpreis"],0, ',', '.'); ?> EUR</td>
 							</tr>
+						<?php if($content["stellplatz"]>0){?>
+							<tr>
+								<td>&bull;</td><td>Stellplätze</td><td><?php echo $content["stellplatz"]; ?></td>
+							</tr>
+							<tr>
+								<td>&bull;</td><td>Stellplatzkosten</td><td><?php if($content["stellplatzkosten"]==0){echo "inkl.";}else{ echo number_format($content["stellplatzkosten"],0, ',', '.')." EUR"; } ?></td>
+							</tr>
+						<?php }?>
 
 
-							<?php if($content["provision"]>0){?>
-								<tr>
-									<td>&bull;</td><td>Courtage</td><td><?php echo $content["provision"]." ".strtoupper($content["provisionEinheit"]); ?></td>
-								</tr>
-							<?php }?>
 
 						</table>
 					</div>
 					<div class="tableWrapper_30">
 						<table>
 						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==1 || $content["objekttyp"]==2)){?>
-						<?php if(isset($content["zimmer"]) && $content["zimmer"]>0){ ?>
+							<?php if(isset($content["zimmer"]) && $content["zimmer"]>0){ ?>
 							<tr>
 								<td>&bull;</td><td>Zimmer</td><td><?php echo $content["zimmer"]; ?></td>
 							</tr>
-						<?	}	?>
-						<?php if(isset($content["denkmalschutz"]) && $content["denkmalschutz"]==1){?>
-							<tr>
-								<td>&bull;</td><td>Energieausweis</td><td>Denkmalschutz</td>
-							</tr>
-						<?php }else{?>
-						<?php if($content["energiewert"]>0){?>
-							<tr>
-								<td>&bull;</td><td><?php echo ( (isset($content["energieausweisTyp"]) && $content["energieausweisTyp"]=="Bedarfsausweis")?("Endenergiebedarf"):("Energieverbrauchskennwert"))?></td>
-								<td><?php echo $content["energiewert"]; ?>kWh/m²</td>
-							</tr>
-						<?php }?>
-						<?	}	?>
+							<?	}	?>
+
 						<?	}	?>
 
 						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==1 || $content["objekttyp"]==2)){?>
@@ -220,6 +211,13 @@ try{
 							</tr>
 							<?php  } ?>
 						<?php }	?>
+						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==2)){?>
+							<?php if($content["besonderheit"]!=""){?>
+								<tr>
+									<td>&bull;</td><td>Wohnungstyp</td><td><?php echo $content["besonderheit"]; ?></td>
+								</tr>
+							<?php  } ?>
+						<?php  } ?>
 						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==2)){?>
 
 							<?php if($content["stockwerk"]>0){?>
@@ -245,21 +243,23 @@ try{
 								<td>&bull;</td><td>Baujahr</td><td><?php echo ($content["baujahr"]==0)?("o.A."):($content["baujahr"]); ?></td>
 							</tr>
 						<?php }	?>
-						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==2)){?>
-							<?php if($content["besonderheit"]!=""){?>
+
+						<?php if(isset($content["objekttyp"]) && ($content["objekttyp"]==1 || $content["objekttyp"]==2)){?>
+							<?php if(isset($content["denkmalschutz"]) && $content["denkmalschutz"]==1){?>
 								<tr>
-									<td>&bull;</td><td>Wohnungstyp</td><td><?php echo $content["besonderheit"]; ?></td>
+									<td>&bull;</td><td>Energieausweis</td><td>Denkmalschutz</td>
 								</tr>
-							<?php  } ?>
-						<?php  } ?>
-						<?php if($content["stellplatz"]>0){?>
-							<tr>
-								<td>&bull;</td><td>Stellplätze</td><td><?php echo $content["stellplatz"]; ?></td>
-							</tr>
-							<tr>
-								<td>&bull;</td><td>Stellplatzkosten</td><td><?php if($content["stellplatzkosten"]==0){echo "inkl.";}else{ echo number_format($content["stellplatzkosten"],0, ',', '.')." EUR"; } ?></td>
-							</tr>
-						<?php }?>
+							<?php }else{?>
+								<?php if($content["energiewert"]>0){?>
+									<tr>
+										<td>&bull;</td><td><?php echo ( (isset($content["energieausweisTyp"]) && $content["energieausweisTyp"]=="Bedarfsausweis")?("Endenergiebedarf"):("Energieverbrauchskennwert"))?></td>
+										<td><?php echo $content["energiewert"]; ?>kWh/m²</td>
+									</tr>
+								<?php }?>
+							<?	}	?>
+						<?php }	?>
+
+
 							<tr>
 								<td>&bull;</td><td>Lieferung</td><td><?php if($content["lieferung"]==0){echo "ab sofort";}else{echo date("d.m.Y",strtotime($content["lieferung"]));}; ?></td>
 							</tr>
@@ -272,7 +272,7 @@ try{
 				<div class="halfBox">
 					<span class="subTitle">Courtagepassus</span>
 					<p style="margin-right:5px;font-size:10px;word-break: normal;text-align:justify;">
-						Die Courtage in Höhe von <?php echo $content["provision"].strtoupper($content["provisionEinheit"]); ?> inkl. der gesetzlichen Mehrwertsteuer auf den Kaufpreis ist mit dem Zustandekommen des Kaufvertrages
+						Die Courtage in Höhe von <?php echo number_format($content["provision"]*1.19,2, ',', '.').strtoupper($content["provisionEinheit"]); ?> inkl. der gesetzlichen Mehrwertsteuer auf den Kaufpreis ist mit dem Zustandekommen des Kaufvertrages
 						(notarieller Vertragsab-schluss) verdient und fällig. Die Vermittelnden und/oder Nachweisenden, EuV Residential Berlin GmbH
 						(Lizenznehmer der Engel & Völkers Residential GmbH) und ggf. deren Beauftragter, erhalten einen unmittelbaren Zahlungsanspruch gegenüber
 						dem Käufer (Vertrag zugunsten Dritter, § 328 BGB). Alle Angaben sind ohne Gewähr und basieren ausschließlich auf Informationen,
@@ -306,9 +306,10 @@ try{
 		<div class="header">
 			<? echo $header; ?>
 		</div>
+
 		<div class="content">
-			<div class="maindata">
-				<table class="tableCenter">
+            <div class="imageWrapper" style="height:450px;">
+				<table class="tableCenter" style="border-collapse:collapse;">
 			<?php
 				$image1=false;
 				$image2=false;
@@ -327,14 +328,12 @@ try{
 						$tdWidth=$gall["cols"][$x];
 						echo '<td style="width:'.$tdWidth.'%;">';
 						?>
-							<div class="imageWrapperLarge" style="height:430px">
-								<div>
+
 								<?php
 									echo $imgObj->showImage($ic->__get("imageWrapper"));
 									echo $imgObj->showTitle($ic->__get("imageWrapper"));
 								?>
-								</div>
-							</div>
+
 						</td>
 						<?php
 						$k++;
@@ -345,100 +344,59 @@ try{
 				?>
 
 				</table>
-				<br>
-				<div class="container">
-					<span class="subTitle">Ausstattung</span>
-					<div class="maindata">
-						<p>
-							<?php
-								if(isset($content["manualTextAusstattung"])){
-									echo $content["manualTextAusstattung"];
-								}
-							?>
-						</p>
-						<div class="tableWrapper2">
-							<table>
-								<tr>
-								<?php
-								/*
-									if($content["decke"]!=null && $content["decke"]>0){
-										$arrAusstattung[] =  array("name"=>"Deckenhöhe","val"=>$content["decke"]." m");
-									}
-									if($content["schlafzimmer"]!=null && $content["schlafzimmer"]>0){
-										$arrAusstattung[] =  array("name"=>"Schlafzimmer","val"=>$content["schlafzimmer"]);
-									}
-									$innenausstattung = explode(",", $content["innenausstattung"]);
+            </div>
+            <div class="container">
+                <span class="subTitle">Ausstattung</span>
+                <div class="maindata">
+                    <p>
+                        <?php
+                            if(isset($content["manualTextAusstattung"])){
+                                echo $content["manualTextAusstattung"];
+                            }
+                        ?>
+                    </p>
+                    <div class="tableWrapper2">
+                        <table>
+                            <tr>
+                            <?php
+                                $i=1;
+                                foreach($content["ausstattungArr"] as $point){
+                                    if($point==""){continue;}
+                                    if(is_array($point)){
+                                        echo "<td>&bull;</td><td style='text-align:left'>".$point["name"]."</td><td style='text-align:left'>".$point["val"]."</td>";
+                                    }else{
+                                        echo "<td>&bull;</td><td style='text-align:left'>".$point."</td><td></td>";
+                                    }
 
-									$ausstattung = array_merge($arrAusstattung,$innenausstattung);
-									$boden = explode(",", $content["boden"]);
-									$counter=0;
-									$lastElement=end($boden);
-									foreach ($boden as $keyB=>$valB){
-										$newArray[$counter]=$valB;
-										if($valB!=$lastElement){
-											$counter=$counter+2;
-										}
-									}
-									$counter=0;
-									foreach ($ausstattung as $keyA=>$valA){
-										WHILE(isset($newArray[$counter])){
-											$counter++;
-										}
-										$newArray[$counter]=$valA;
-										$counter++;
+                                    if($i%3==0){
+                                        echo "</tr><tr>";
+                                    }
 
-									}
-									ksort($newArray);
-									$ausstattungboden = $newArray;
-									foreach($ausstattungboden as $a => $b) {
-										if($b == 'Keller' || $b == 'Hauswirtschaftsraum') {
-											$item = $ausstattungboden[$a];
-											unset($ausstattungboden[$a]);
-											array_push($ausstattungboden, $item);
-										}
-									}
-								*/
-									$i=1;
-									foreach($content["ausstattungArr"] as $point){
-										if($point==""){continue;}
-										if(is_array($point)){
-											echo "<td>&bull;</td><td style='text-align:left'>".$point["name"]."</td><td style='text-align:left'>".$point["val"]."</td>";
-										}else{
-											echo "<td>&bull;</td><td style='text-align:left'>".$point."</td><td></td>";
-										}
-
-										if($i%3==0){
-											echo "</tr><tr>";
-										}
-
-										$i++;
-									}
-								?>
-								</tr>
+                                    $i++;
+                                }
+                            ?>
+                            </tr>
 
 
-							</table>
-						</div>
-						<? if(isset($content["kuechenArr"]) && count($content["kuechenArr"])>0){ ?>
-							<p>
-								<?php
-								foreach($content["kuechenArr"] as $point){
-									if($point==""){continue;}
-									if(is_array($point)){
-										echo $point["name"].": ".$point["val"]."<br>";
-									}else{
-										echo $point."<br>";
-									}
-								}
-								?>
-							</p>
-						<?	}	?>
-					</div>
-				</div>
-
-
-			</div>
-
+                        </table>
+                    </div>
+                    <br><br>
+                    <? if(isset($content["kuechenArr"]) && count($content["kuechenArr"])>0){ ?>
+                        <p>
+                            <?php
+                            foreach($content["kuechenArr"] as $point){
+                                if($point==""){continue;}
+                                if(is_array($point)){
+                                    echo $point["name"].": ".$point["val"]."<br>";
+                                }else{
+                                    echo $point."<br>";
+                                }
+                            }
+                            ?>
+                        </p>
+                    <?	}	?>
+                </div>
+            </div>
 		</div>
 
 		<div class="footer">
@@ -469,7 +427,7 @@ try{
 				<?php
 				$image1=false;
 				$image2=false;
-				$ic->setImageWrapper(350);
+				$ic->setImageWrapper(420);
 				if(isset($object[$a])){
 					$image1=new Image($appfolder.$object[$a]["imgString"], $object[$a]["title"]);
 				}
@@ -484,7 +442,7 @@ try{
 						$tdWidth=$gall["cols"][$x];
 						echo '<td style="width:'.$tdWidth.'%;">';
 						?>
-							<div class="imageWrapper">
+                            <div class="imageWrapperLarge" style="height:430px">
 								<div>
 								<?php
 									echo $imgObj->showImage($ic->__get("imageWrapper"));
@@ -675,8 +633,8 @@ try{
 				?>
 				<span class="subTitleSmall">Grundriss <?php  echo (!empty($content["images"]["grundriss"][$k]["title"])?"(".$content["images"]["grundriss"][$k]["title"].")":""); ?></span>
 				
-				<div class="imageWrapperXLarge">					
-					<?php echo $image->showImage($ic->__get("imageWrapper"));	?>					
+				<div class="imageWrapperXLarge">
+					<?php echo $image->showImage($ic->__get("imageWrapper"),array("border"=>"0"));	?>
 					<span class="imgTitleSmall">
 						Der Grundriss ist nicht maßstabsgerecht. Diese Unterlagen wurden uns vom Auftraggeber übergeben.<br>
 						Für die Richtigkeit der Angaben können wir daher keine Gewähr übernehmen.
